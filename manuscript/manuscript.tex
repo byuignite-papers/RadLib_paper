@@ -67,7 +67,7 @@
 %% \address{Address\fnref{label3}}
 %% \fntext[label3]{}
 
-\title{Untitled RadLib Paper}
+\title{RadLib: a radiative heat transfer model library for CFD}
 
 %% use optional labels to link authors explicitly to addresses:
 %% \author[label1,label2]{}
@@ -86,18 +86,11 @@
 \begin{abstract}
 %% Text of abstract 
 Ca. 100 words
-
 \end{abstract}
 
 \begin{keyword}
 %% keywords here, in the form: keyword \sep keyword
-radiative heat transfer \sep reacting flows 
-
-%% PACS codes here, in the form: \PACS code \sep code
-
-%% MSC codes here, in the form: \MSC code \sep code
-%% or \MSC[2008] code \sep code (2000 is the default)
-
+radiative heat transfer \sep reacting flows  \sep CFD
 \end{keyword}
 
 \end{frontmatter}
@@ -119,9 +112,9 @@ C1 & Current code version & TODO 2.1 \\
 \hline
 C2 & Permanent link to code/repository used for this code version & $github.com/BYUignite/RadLib$ \\
 \hline
-C3 & Code Ocean compute capsule & \\
+C3 & Code Ocean compute capsule & N/A \\
 \hline
-C4 & Legal Code License   & TODO MIT license (MIT) \\
+C4 & Legal Code License   & MIT license (MIT) \\
 \hline
 C5 & Code versioning system used & Git \\
 \hline
@@ -141,70 +134,109 @@ C9 & Support email for questions & davidlignell@byu.edu \\
 
 \linenumbers
 
-%% main text
-
-The permanent link to code/repository or the zip archive should include the following requirements: 
-\begin{itemize}
-	\item TO DO: README.txt and LICENSE.txt.
-	\item TO DO: Source code in a src/ directory, not the root of the repository.
-	\item TO DO: Tag corresponding with the version of the software that is reviewed.
-	\item TO DO: Documentation in the repository in a docs/ directory, and/or READMEs, as appropriate.
-\end{itemize}
-
+% TO DO
+% - update README
+% - tag software version
+% - decide on and generate documentation
 
 \section{Motivation and significance}
-\label{}
+\label{s:motivation}
 
-Introduce the scientific background and the motivation for developing the software. \cite{Lignell_2018}
+% Brain dump for first draft
+Why did we make this? Radiation is hard to deal with in CFD. It's complicated. You can't really get analytic solutions to practical problems. In lots of cases, that's fine because radiation can be safely neglected; it's not usually the dominant mode of heat transfer. However, we do combustion CFD. Radiation isn't always important to combustion problems, but when it is, simulations can get grossly inaccurate. So we need a nice way to account for radiation in our CFD simulations. 
 
-Explain why the software is important, and describe the exact (scientific) problem(s) it solves.
+When is radiation important to combustion simulations? In high-temperature systems, radiation can often be neglected in the beginning and middle of the simulation (assuming, say, a jet flame or a counterflow flame or something like that). At those times (which I'm going to call "early flame"), convective heat transfer dominates pretty heavily. However, radiation becomes more important for late-stage flame phenomena, either after some time has gone by (radiation time scales?), or physically high up in a flame where convection doesn't dominate as much as below, or just in areas that are relatively far away from the flame sheet itself where the reactions are happening. There's also soot, which involves radiation heavily, but soot particles are so big and slow that their time and length scales (and their radiative time scales) mean that radiation doesn't become important until late in the flame evolution. 
 
-Indicate in what way the software has contributed (or how it will contribute in the future) to the process of scientific discovery; if available, this is to be supported by citing a research paper using the software.
+So what's the problem? Why hasn't this been done already? Radiation is complicated. So is combustion. Combustion in particular can be so complex that direct simulations are too computationally expensive for us to simulate configurations that are practical for engineering systems. Direct simulations are usually used as a research tool. Other modeling approaches exist (LES, ODT, etc.) that lower the computational cost and allow us to simulate practical things. So far so good. 
 
-Provide a description of the experimental setting (how does the user use the software?).
+Radiation is a little like combustion in that its core mechanisms are complex, physically and mathematically. In addition, it's directional AND depends on the wavelength of the energy involved (other heat transfer doesn't have the wavelength dependence); its governing equations integrate over direction and wavelength, which makes things extra complicated. RADIATION GOVERNING EQUATIONS HERE.  Convective heat transfer follows easy rules, but radiation doesn't. There are simple systems in which we can boil things down to analytic solutions, but most of the time, the simple equations don't apply, and that's often true in combustion systems where there are so many different length and time scales involved. The fundamental equations of radiative heat transfer are big and mathematically complex; they don't have analytic solutions except in the simplest geometries. So what do we do? One of two things. One, we do ray tracing (sometimes referred to as Monte Carlo simulations. These can be extremely accurate, but super computationally expensive. Essentially the equivalent of a direct numerical solution. Two, we simplify the the equations. We make assumptions. And so on. This is potentially less accurate, but more practical. By simplifying the fundamental governing equations, we create models that apply to various situations, systems, and geometries (i.e. black body assumptions, directional assumptions, etc.). There are models developed for CFD and specific combustion systems. These are the models that we've put into practice here in such a way that they're easy to apply to various systems. Modular organization for this purpose.
 
-Introduce related work in literature (cite or list algorithms used, other software etc.).
+So far there isn't an easy way to access and use radiation models. There are simple ones in Cantera (check this, there might not be any), but they make too many assumptions or don't work well for combustion or what have you. RadLib is a radiation library of models that you can apply to any simulation type, and we'd like to add it to Cantera, too. Basically, there isn't a reliable way to do radiation calculations in CFD simulations without coding the models yourself, which is extra hard because they're complicated and hard. So we've done it for you and put them in a library that easy for anyone to use. \cite{Lignell_2018}
 
+Models we're using:
+\begin{itemize}
+	\item planck mean (optically thin?)
+	\item two flux model (not sure if we even have this)
+	\item weighted sum of grey gases (CITE Bordbar and others)
+	\item SLW model (CITE Solovjov and others)
+\end{itemize}
+Discuss pros and cons of each model for combustion simulations? You still have to pick the right one for your simulation and situation. That discussion might fit better in software description section. See example section for comparisons of models. 
+
+%Author guidelines for this section:
+%\begin{itemize}
+%	\item Introduce the scientific background and the motivation for developing the software. \cite{Lignell_2018}
+%	\item Explain why the software is important, and describe the exact (scientific) problem(s) it solves.
+%	\item Indicate in what way the software has contributed (or how it will contribute in the future) to the process of scientific discovery; if available, this is to be supported by citing a research paper using the software.
+%	\item Provide a description of the experimental setting (how does the user use the software?).
+%	\item Introduce related work in literature (cite or list algorithms used, other software etc.).
+%\end{itemize}
 
 \section{Software description}
-\label{}
+\label{s:description}
 
-Describe the software in as much as is necessary to establish a vocabulary needed to explain its impact. 
+%Author guidelines for this section
+%\begin{itemize}
+%	\item Describe the software in as much as is necessary to establish a vocabulary needed to explain its impact.
+%	\item  Give a short overview of the overall software architecture; provide a pictorial component overview or similar (if possible). If necessary provide implementation details.
+%	\item Present the major functionalities of the software.
+%\end{itemize}
+
+\subsection{Model descriptions}
+\label{s:models}
+
+You need two separate (but very related) models for any given case: one to get radiation absorption coefficients and one for the solution to the governing equations. The first can happen independently of anything else, but the second requires the first. You can sort of mix and match models, but usually we don't, so it's not presented that way in the software. 
+
+\subsubsection{Planck Mean}
+\label{s:planckmean}
+
+\subsubsection{WSGG}
+\label{s:wsgg}
+
+\subsubsection{RCSLW}
+\label{s:RCSLW}
 
 \subsection{Software Architecture}
-\label{}
+\label{s:architechture}
 
-Give a short overview of the overall software architecture; provide a pictorial component overview or similar (if possible). If necessary provide implementation details.
+Object-oriented C++ class library. Examples folder contains sample driver scripts for using the library. 
 
-\subsection{Software Functionalities}
-\label{}
-
-Present the major functionalities of the software.
-
-\subsection{Sample code snippets analysis (optional)}
-\label{}
+Python version somewhere? Corresponding examples?
 
 \section{Illustrative Examples}
-\label{}
+\label{s:Examples}
 
-Provide at least one illustrative example to demonstrate the major functions.
+Simple comparisons of each of these models as implemented to some ray-tracing results (equivalent to a direct numerical solution) to establish validity. Illustrates when to use various models and why you might choose one over another. Plots and discussion go here. 
 
-Optional: you may include one explanatory video that will appear next to your article, in the right hand side panel. (Please upload any video as a single supplementary file with your article. Only one MP4 formatted, with 50MB maximum size, video is possible per article. Recommended video dimensions are 640 x 480 at a maximum of 30 frames/second. Prior to submission please test and validate your .mp4 file at $ http://elsevier-apps.sciverse.com/GadgetVideoPodcastPlayerWeb/verification$. This tool will display your video exactly in the same way as it will appear on ScienceDirect.).
+%Author guidelines for this section
+%\begin{itemize}
+%	\item Provide at least one illustrative example to demonstrate the major functions.
+%	\item Optional: you may include one explanatory video 
+%\end{itemize}
 
 \section{Impact}
-\label{}
+\label{s:impact}
 
-\textbf{This is the main section of the article and the reviewers weight the description here appropriately}
+As far as I'm aware, there isn't an easy way to incorporate radiative heat transfer into a CFD simulation. Most cases use optically thin assumption (which works in some cases, but not in others) or neglect radiation entirely (also applicable sometimes, but not always). Unfortunately, this means that when you simulation some configuration in which radiation might be important to the overall heat transfer, you won't get accurate simulation results. Furthermore, if your study is about something else entirely, your radiation model (or lack thereof) becomes a source of error that may be very difficult to separate from other sources of error in your simulation study (i.e. soot modeling studies). As of right now, if you want any detailed radiation treatment, you have to code it yourself, which is difficult and requires external validation. 
 
-Indicate in what way new research questions can be pursued as a result of the software (if any).
+RadLib can make researchers' lives easier by providing a library of prevalidated radiation models that can be switched out with no difficulty. Additional models can be added easily using the provided modular framework. Researchers can even use Radlib as a tool for comparing models. No need to code multiple different complex radiation models yourself just to decide which one works best for your simulation. And no need to puzzle through the literature to figure our which model(s) might be best for your simulation, either; instead, you can test them yourself. It saves tons of time and effort that researchers can now put toward results rather than code or model development. 
 
-Indicate in what way, and to what extent, the pursuit of existing research questions is improved (if so).
+By putting all these models side by side in a modular framework, RadLib also provides a structure on which new or altered radiation models can be tested against existing ones. Maybe more comparative studies can be done, especially for more complex simulation cases. We plan to add radiation models as appropriate to RadLib, too. 
 
-Indicate in what way the software has changed the daily practice of its users (if so).
+RadLib opens up new horizons for CFD simulations, especially in combustion cases. It is designed such that it can be easily incorporated into existing research codes. Our group plans to use it with ODT [CITE OTHER SOFTWAREX PAPER HERE?] alongside soot model library (in development) to study late-flame phenomena such as soot oxidation, flame extinction, and soot-flame breakthrough. These topics in particular are difficult because they require accurate simulation data over a relatively long computational time in addition to good models for both soot chemistry (which is an active research area) and radiation heat transfer (which is the difficult part that RadLib can solve). Using RadLib for such studies allows us to separate and quantify sources of error that may occur due to various models, which is super difficult if you only have one model to work with or it hasn't been validated well. 
 
-Indicate how widespread the use of the software is within and outside the intended user group.
+RadLib can also be used outside of combustion CFD research for anything involving radiative heat transfer. Potential research areas that could benefit include atmospheric and climate sciences, interstellar phenomena, improving efficiency of energy-producing processes, safety in chemical plant design, etc. We aren't experts in these areas, but radiative heat transfer is a universal phenomena that applies to any system or process that involves heat transfer. 
 
-Indicate in what way the software is used in commercial settings and/or how it led to the creation of spin-off companies (if so).
+This software has not been used outside of the current research group, and it is not used in any commercial settings at this time. 
+
+%Author guidelines for this section
+%\begin{itemize}
+%	\item \textbf{This is the main section of the article and the reviewers weight the description here appropriately}
+%	\item Indicate in what way new research questions can be pursued as a result of the software (if any).
+%	\item Indicate in what way, and to what extent, the pursuit of existing research questions is improved (if so).
+%	\item Indicate in what way the software has changed the daily practice of its users (if so).
+%	\item Indicate how widespread the use of the software is within and outside the intended user group.
+%	\item Indicate in what way the software is used in commercial settings and/or how it led to the creation of spin-off companies (if so).
+%\end{itemize}
 
 \section{Conclusions}
 \label{}
@@ -224,7 +256,7 @@ We wish to confirm that there are no known conflicts of interest associated with
 \section*{Acknowledgements}
 \label{}
 
-This work was supported by the funding from the National Science Foundation under Grant Number CBET-1403403. 
+This work was supported in part by the funding from the National Science Foundation under Grant Number CBET-1403403 and [INSERT SALLY FUNDING SOURCE HERE?].
 
 Special thanks to Vladimir P. Solovjov of Brigham Young University for his insights and assistance with model development.
 
@@ -255,7 +287,7 @@ S1 & Current software version & TODO 2.1 \\
 \hline
 S2 & Permanent link to executables of this version  & TODO For example: $https://github.com/combogenomics/$ $DuctApe/releases/tag/DuctApe-0.16.4$ \\
 \hline
-S3 & Legal Software License & TODO MIT license (MIT) \\
+S3 & Legal Software License & MIT license (MIT) \\
 \hline
 S4 & Computing platforms/Operating Systems & Linux, OS X, Microsoft Windows\\
 \hline
