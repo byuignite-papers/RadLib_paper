@@ -151,20 +151,28 @@ So what's the problem? Why hasn't this been done already? Radiation is complicat
 
 Radiation is a little like combustion in that its core mechanisms are complex, physically and mathematically. In addition, it's directional AND depends on the wavelength of the energy involved (other heat transfer doesn't have the wavelength dependence); its governing equations integrate over direction and wavelength, which makes things extra complicated. RADIATION GOVERNING EQUATIONS HERE.  Convective heat transfer follows easy rules, but radiation doesn't. There are simple systems in which we can boil things down to analytic solutions, but most of the time, the simple equations don't apply, and that's often true in combustion systems where there are so many different length and time scales involved. The fundamental equations of radiative heat transfer are big and mathematically complex; they don't have analytic solutions except in the simplest geometries. So what do we do? One of two things. One, we do ray tracing (sometimes referred to as Monte Carlo simulations. These can be extremely accurate, but super computationally expensive. Essentially the equivalent of a direct numerical solution. Two, we simplify the the equations. We make assumptions. And so on. This is potentially less accurate, but more practical. By simplifying the fundamental governing equations, we create models that apply to various situations, systems, and geometries (i.e. black body assumptions, directional assumptions, etc.). There are models developed for CFD and specific combustion systems. These are the models that we've put into practice here in such a way that they're easy to apply to various systems. Modular organization for this purpose.
 
-So far there isn't an easy way to access and use radiation models. There are simple ones in Cantera (check this, there might not be any), but they make too many assumptions or don't work well for combustion or what have you. RadLib is a radiation library of models that you can apply to any simulation type, and we'd like to add it to Cantera, too. Basically, there isn't a reliable way to do radiation calculations in CFD simulations without coding the models yourself, which is extra hard because they're complicated and hard. So we've done it for you and put them in a library that easy for anyone to use. \cite{Lignell_2018}
+So far there isn't an easy way to access and use radiation models. There are simple ones in Cantera (check this, there might not be any), but they make too many assumptions or don't work well for combustion or what have you. RadLib is a radiation library of models that you can apply to any simulation type, and we'd like to add it to Cantera, too. Basically, there isn't a reliable way to do radiation calculations in CFD simulations without coding the models yourself, which is extra hard because they're complicated and hard. So we've done it for you and put them in a library that easy for anyone to use.
 
 Models we're using:
 \begin{itemize}
-	\item planck mean (optically thin?)
-	\item two flux model (not sure if we even have this)
-	\item weighted sum of grey gases (CITE Bordbar and others)
-	\item SLW model (CITE Solovjov and others)
+	\item planck mean (optically thin?) with coefficients from TNF website \cite{Smith_2003}
+	\begin{itemize}
+		\item other references from TNF website: \cite{Grosshandler_1993,Frank_2000,Zhu_2002,Barlow_2001}
+	\end{itemize}
+	\item weighted sum of grey gases \cite{Bordbar_2014,Bordbar_2020}
+	\item RCSLW model \cite{Solovjov_2017}
+	\begin{itemize}
+		\item SLW model \cite{Solovjov_2001}
+		\item LCSLW \cite{Solovjov_2020}
+		\item "It is shown that the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases." \cite{Badger_2019}
+
+	\end{itemize}		
 \end{itemize}
 Discuss pros and cons of each model for combustion simulations? You still have to pick the right one for your simulation and situation. That discussion might fit better in software description section. See example section for comparisons of models. 
 
 %Author guidelines for this section:
 %\begin{itemize}
-%	\item Introduce the scientific background and the motivation for developing the software. \cite{Lignell_2018}
+%	\item Introduce the scientific background and the motivation for developing the software. 
 %	\item Explain why the software is important, and describe the exact (scientific) problem(s) it solves.
 %	\item Indicate in what way the software has contributed (or how it will contribute in the future) to the process of scientific discovery; if available, this is to be supported by citing a research paper using the software.
 %	\item Provide a description of the experimental setting (how does the user use the software?).
@@ -184,15 +192,16 @@ Discuss pros and cons of each model for combustion simulations? You still have t
 \subsection{Model descriptions}
 \label{s:models}
 
-You need two separate (but very related) models for any given case: one to get radiation absorption coefficients and one for the solution to the governing equations. The first can happen independently of anything else, but the second requires the first. You can sort of mix and match models, but usually we don't, so it's not presented that way in the software. 
+RadLib includes three radiation models of varying complexity. Each model consists of two parts: calculation of radiation absorption coefficients and solution of the radiative transfer equation. Radiation absorption coefficients are typically described by correlations relating species absorption coefficients to temperature [CHECK THIS]. The radiative transfer equation (RTE) includes one or more gas species over which the radiative intensity or heat flux is calculated. In RadLib, four radiating gas species are used: H$_2$O, CO, CO$_2$, and CH$_4$. [also soot?] 
 
-\subsubsection{Planck Mean}
+\subsubsection{Planck mean absorption coefficients}
 \label{s:planckmean}
 
-\subsubsection{WSGG}
+
+\subsubsection{Weighted sum of gray gases (WSGG)}
 \label{s:wsgg}
 
-\subsubsection{RCSLW}
+\subsubsection{Rank Correlated SLW (RCSLW) model}
 \label{s:RCSLW}
 
 \subsection{Software Architecture}
@@ -205,18 +214,12 @@ Python version somewhere? Corresponding examples?
 \section{Illustrative Examples}
 \label{s:Examples}
 
-Simple comparisons of each of these models as implemented to some ray-tracing results (equivalent to a direct numerical solution) to establish validity. Illustrates when to use various models and why you might choose one over another. Plots and discussion go here. 
-
-%Author guidelines for this section
-%\begin{itemize}
-%	\item Provide at least one illustrative example to demonstrate the major functions.
-%	\item Optional: you may include one explanatory video 
-%\end{itemize}
+Simple comparisons of each of these models as implemented to some ray-tracing results (equivalent to a direct numerical solution) to establish validity. Illustrates when to use various models and why you might choose one over another. Plots and discussion go here. Five example cases demonstrated with this code in both C++ and Python.
 
 \section{Impact}
 \label{s:impact}
 
-As far as I'm aware, there isn't an easy way to incorporate radiative heat transfer into a CFD simulation. Most cases use optically thin assumption (which works in some cases, but not in others) or neglect radiation entirely (also applicable sometimes, but not always). Unfortunately, this means that when you simulation some configuration in which radiation might be important to the overall heat transfer, you won't get accurate simulation results. Furthermore, if your study is about something else entirely, your radiation model (or lack thereof) becomes a source of error that may be very difficult to separate from other sources of error in your simulation study (i.e. soot modeling studies). As of right now, if you want any detailed radiation treatment, you have to code it yourself, which is difficult and requires external validation. 
+As far as I'm aware, there isn't an easy way to incorporate radiative heat transfer into a CFD simulation. Most cases use optically thin assumption (which works in some cases, but not in others) or neglect radiation entirely (also applicable sometimes, but not always). [Refer to TNF website radiation page here.] Unfortunately, this means that when you simulation some configuration in which radiation might be important to the overall heat transfer, you won't get accurate simulation results. Furthermore, if your study is about something else entirely, your radiation model (or lack thereof) becomes a source of error that may be very difficult to separate from other sources of error in your simulation study (i.e. soot modeling studies). As of right now, if you want any detailed radiation treatment, you have to code it yourself, which is difficult and requires external validation. 
 
 RadLib can make researchers' lives easier by providing a library of prevalidated radiation models that can be switched out with no difficulty. Additional models can be added easily using the provided modular framework. Researchers can even use Radlib as a tool for comparing models. No need to code multiple different complex radiation models yourself just to decide which one works best for your simulation. And no need to puzzle through the literature to figure our which model(s) might be best for your simulation, either; instead, you can test them yourself. It saves tons of time and effort that researchers can now put toward results rather than code or model development. 
 
@@ -256,9 +259,7 @@ We wish to confirm that there are no known conflicts of interest associated with
 \section*{Acknowledgements}
 \label{}
 
-This work was supported in part by the funding from the National Science Foundation under Grant Number CBET-1403403 and [INSERT SALLY FUNDING SOURCE HERE?].
-
-Special thanks to Vladimir P. Solovjov of Brigham Young University for his insights and assistance with model development.
+The authors extend special thanks to Hadi Bordbar for assistance with the WSGG model and to Vladimir Solovjov and Brent Webb of Brigham Young University for their insights and assistance with the RCSLW model. 
 
 %% The Appendices part is started with the command \appendix;
 %% appendix sections are then done as normal sections
