@@ -192,14 +192,39 @@ Discuss pros and cons of each model for combustion simulations? You still have t
 \subsection{Model descriptions}
 \label{s:models}
 
-RadLib includes three radiation models of varying complexity. Each model consists of two parts: calculation of radiation absorption coefficients and solution of the radiative transfer equation. Radiation absorption coefficients are typically described by correlations relating species absorption coefficients to temperature [CHECK THIS]. The radiative transfer equation (RTE) includes one or more gas species over which the radiative intensity or heat flux is calculated. In RadLib, four radiating gas species are used: H$_2$O, CO, CO$_2$, and CH$_4$. [also soot?] 
+RadLib includes three models of varying complexity and accuracy to calculate the radiation absorption coefficients and their weighting factors for each gas considered by the model. Radiation absorption coefficients are typically calculated using correlations relating them local properties such as temperature, total pressure, or species partial pressure, depending on the model. Correlations come from curve fits to high-resolution radiation property databases. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$) and, optionally, soot volume fraction in its calculation of absorption coefficients and weighting factors. 
 
-\subsubsection{Planck mean absorption coefficients}
+Once the radiative absorption coefficients are calculated, they are then used to solve the radiative transfer equation (RTE), which depends on the simulation configuration and assumptions. Solving the RTE is not the focus of this software, but RadLib's example cases do employ a simple implicit trapezoid method solver to calculate the radiative heat flux and volumetric heat source profiles between two parallel planes. [MORE DESCRIPTION OF SOLVER GOES HERE?]
+
+[OTHER THINGS THAT APPLY TO ALL MODELS GO HERE]
+
+[MAYBE INCLUDE SOME BASIC INFO ON LBL?]
+
+\subsubsection{Planck Mean absorption coefficients}
 \label{s:planckmean}
 
+When we refer to the Plank Mean model, what we're using is actually the Planck Mean absorption coefficients, calculated from the correlations given on the TNF workshop site \citep{Smith_2003}. Their correlations (temperature dependent) are based on the RADCAL model in \citep{Grosshandler_1993}. The TNF radiation model is also documented in \citep{Barlow_2001}.
+
+This model is commonly used because it's relatively simple, easy to implement, low in computational expense, and provides reasonably accurate results in many cases. 
+
+Quote from TNF site page: "The characteristics of some flames selected for the workshop are such that a model based upon the assumption of optically thin radiative heat loss should yield reasonable accuracy. This has been demonstrated for the simple hydrogen jet flames \cite{Barlow_1999}. However, there is some evidence that the optically thin model significantly over predicts radiative losses from the CH4 flames in the TNF library, due to strong absorption by the 4.3-micron band of CO2 \cite{Frank_2000,Zhu_2002,Coelho_2002}." Basically, it works well for flames that are actually optically thin, but not so well for flames that aren't. This is especially true of sooting flames. 
 
 \subsubsection{Weighted sum of gray gases (WSGG)}
 \label{s:wsgg}
+The basic assumption of weighted sum of gray gases (WSGG) models in general is that the non-gray behavior of gas mixtures, in this case H$_2$O and CO$_2$, can be modeled by a weighted sum of several gray gases and one transparent gas (which represents the spectral windows between absorption bands). 
+RadLib uses the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. RadLib, in accordance with the Bordbar et al. WSGG method cited above, uses a mixture of four gray gases and one transparent gas. Absorption coefficients are calculated by 
+\begin{equation}
+	K_i=\sum_{k=0}^{4}d_{i,k}M_r^k,
+\end{equation}
+where $K_i$ is the absorption coefficient for species $i$, $d_{i,k}$ is a species-specific correlated model coefficient, and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$. The weight factors are calculated by 
+\begin{equation}
+	a_i=\sum_{j=0}^{4}b_{i,j}T_r^j,
+\end{equation}
+where $a_i$ is the weighting factor for species $i$ and $T_r$ is a normalized temperature equal to $T/T_{ref}$ with $T_{ref}=1200$K. The value of $b_{i,j}$ is calculated by 
+\begin{equation}
+	b_{i,j}=\sum_{k=0}^{4}C_{i,j}M_r^k,
+\end{equation}
+where $C_{i,j}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. 
 
 \subsubsection{Rank Correlated SLW (RCSLW) model}
 \label{s:RCSLW}
@@ -207,14 +232,16 @@ RadLib includes three radiation models of varying complexity. Each model consist
 \subsection{Software Architecture}
 \label{s:architechture}
 
-Object-oriented C++ class library. Examples folder contains sample driver scripts for using the library. 
+RadLib is an object-oriented C++ class library. 
+
+Examples folder contains sample driver scripts for using the library. 
 
 Python version somewhere? Corresponding examples?
 
 \section{Illustrative Examples}
 \label{s:Examples}
 
-Simple comparisons of each of these models as implemented to some ray-tracing results (equivalent to a direct numerical solution) to establish validity. Illustrates when to use various models and why you might choose one over another. Plots and discussion go here. Five example cases demonstrated with this code in both C++ and Python.
+Simple comparisons of each of these models to some ray-tracing results (equivalent to a direct numerical solution) to establish validity. Illustrates when to use various models and why you might choose one over another. Plots and discussion go here. Five example cases demonstrated with this code in both C++ and Python. Compared to line-by-line calculations (essentially the radiation version of Monte Carlo). 
 
 \section{Impact}
 \label{s:impact}
