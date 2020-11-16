@@ -153,22 +153,6 @@ Radiation is a little like combustion in that its core mechanisms are complex, p
 
 So far there isn't an easy way to access and use radiation models. There are simple ones in Cantera (check this, there might not be any), but they make too many assumptions or don't work well for combustion or what have you. RadLib is a radiation library of models that you can apply to any simulation type, and we'd like to add it to Cantera, too. Basically, there isn't a reliable way to do radiation calculations in CFD simulations without coding the models yourself, which is extra hard because they're complicated and hard. So we've done it for you and put them in a library that easy for anyone to use.
 
-Models we're using:
-\begin{itemize}
-	\item planck mean (optically thin?) with coefficients from TNF website \cite{Smith_2003}
-	\begin{itemize}
-		\item other references from TNF website: \cite{Grosshandler_1993,Frank_2000,Zhu_2002,Barlow_2001}
-	\end{itemize}
-	\item weighted sum of grey gases \cite{Bordbar_2014,Bordbar_2020}
-	\item RCSLW model \cite{Solovjov_2017}
-	\begin{itemize}
-		\item SLW model \cite{Solovjov_2001}
-		\item LCSLW \cite{Solovjov_2020}
-		\item "It is shown that the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases." \cite{Badger_2019}
-
-	\end{itemize}		
-\end{itemize}
-Discuss pros and cons of each model for combustion simulations? You still have to pick the right one for your simulation and situation. That discussion might fit better in software description section. See example section for comparisons of models. 
 
 %Author guidelines for this section:
 %\begin{itemize}
@@ -179,9 +163,6 @@ Discuss pros and cons of each model for combustion simulations? You still have t
 %	\item Introduce related work in literature (cite or list algorithms used, other software etc.).
 %\end{itemize}
 
-\section{Software description}
-\label{s:description}
-
 %Author guidelines for this section
 %\begin{itemize}
 %	\item Describe the software in as much as is necessary to establish a vocabulary needed to explain its impact.
@@ -189,7 +170,7 @@ Discuss pros and cons of each model for combustion simulations? You still have t
 %	\item Present the major functionalities of the software.
 %\end{itemize}
 
-\subsection{Model descriptions}
+\section{Model descriptions}
 \label{s:models}
 
 RadLib includes three models of varying complexity and accuracy to calculate the radiation absorption coefficients and their weighting factors for each gas considered by the model. Radiation absorption coefficients are typically calculated using correlations relating them local properties such as temperature, total pressure, or species partial pressure, depending on the model. Correlations come from curve fits to high-resolution radiation property databases. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$) and, optionally, soot volume fraction in its calculation of absorption coefficients and weighting factors. 
@@ -200,7 +181,7 @@ Once the radiative absorption coefficients are calculated, they are then used to
 
 [MAYBE INCLUDE SOME BASIC INFO ON LBL?]
 
-\subsubsection{Planck Mean absorption coefficients}
+\subsection{Planck Mean absorption coefficients}
 \label{s:planckmean}
 
 When we refer to the Plank Mean model, what we're using is actually the Planck Mean absorption coefficients, calculated from the correlations given on the TNF workshop site \citep{Smith_2003}. Their correlations (temperature dependent) are based on the RADCAL model in \citep{Grosshandler_1993}. The TNF radiation model is also documented in \citep{Barlow_2001}.
@@ -209,7 +190,7 @@ This model is commonly used because it's relatively simple, easy to implement, l
 
 Quote from TNF site page: "The characteristics of some flames selected for the workshop are such that a model based upon the assumption of optically thin radiative heat loss should yield reasonable accuracy. This has been demonstrated for the simple hydrogen jet flames \cite{Barlow_1999}. However, there is some evidence that the optically thin model significantly over predicts radiative losses from the CH4 flames in the TNF library, due to strong absorption by the 4.3-micron band of CO2 \cite{Frank_2000,Zhu_2002,Coelho_2002}." Basically, it works well for flames that are actually optically thin, but not so well for flames that aren't. This is especially true of sooting flames. 
 
-\subsubsection{Weighted sum of gray gases (WSGG)}
+\subsection{Weighted sum of gray gases (WSGG)}
 \label{s:wsgg}
 The basic assumption of weighted sum of gray gases (WSGG) models in general is that the non-gray behavior of gas mixtures, in this case H$_2$O and CO$_2$, can be modeled by a weighted sum of several gray gases and one transparent gas (which represents the spectral windows between absorption bands). 
 RadLib uses the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. RadLib, in accordance with the Bordbar et al. WSGG method cited above, uses a mixture of four gray gases and one transparent gas. Absorption coefficients are calculated by 
@@ -224,19 +205,48 @@ where $a_i$ is the weighting factor for species $i$ and $T_r$ is a normalized te
 \begin{equation}
 	b_{i,j}=\sum_{k=0}^{4}C_{i,j}M_r^k,
 \end{equation}
-where $C_{i,j}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. 
+where $C_{i,j}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. The model coefficients $d_{i,k}$ and $C_{i,j}$ can be found in the literature \citep{Bordbar_2014,Bordbar_2020}. RadLib uses the updated model coefficients from \citep{Bordbar_2020}, which extends the model presented in \citep{Bordbar_2014} to include all possible values of the H$_2$O-CO$_2$ molar ratio. 
 
-\subsubsection{Rank Correlated SLW (RCSLW) model}
+\subsection{Rank Correlated SLW (RCSLW)}
 \label{s:RCSLW}
 
-\subsection{Software Architecture}
+The Spectral Line Weighted-sum-of-gray gases (SLW) model represents a family of global approaches to radiative heat transfer in high-temperature gases that also includes Absorption Distribution Function (ADF) and Full Spectrum $k$-distribution (FSK) models, all of which are based on the same fundamental principle in modeling the gas absorption spectrum \cite{Solovjov_2016}. In order to extend their spectral models from uniform conditions (isothermal, homogeneous gases) to nonuniform conditions (non-isothermal, non-homogeneous gases), these models take a reference approach in which local gas states are corrected relative to a reference state. Reference approaches, however, generally lack consistent reference states and can yield significant errors in cases with large spatial temperature gradients \cite{Solovjov_2017}. The Rank Correlated SLW (RCSLW) model is a unique extension of the generalized SLW model that does not require a specified gas reference state and preserves the emission term of the spectrally integrated RTE. Recent comparison of advanced SLW modeling approaches revealed that "the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases" \citep{Badger_2019}. A brief overview of the general SLW and RCSLW models will be given here; detailed discussion can be found in the literature \cite{Solovjov_2000, Solovjov_2001, Solovjov_2008, Solovjov_2011, Solovjov_2014, Solovjov_2016, Solovjov_2017, Webb_2018}. 
+
+The radiative transfer equation (RTE) for an absorbing, emitting, and non-scattering medium along a given path length $s$ in a direction $\hat{\Omega}$ is given by 
+\begin{equation}
+	\frac{dI_{\eta}}{ds} = -\kappa_{\eta}I_{\eta} + \kappa_{\eta}I_{b \eta},
+\end{equation}
+where $I_{\eta}$ is the radiative spectral intensity, $I_{b\eta}$ is the Planck spectral distribution of blackbody intensity, and $\kappa_{\eta}$ is the spectral absorption coefficient of the medium. Integrating with respect to wavenumber and subdividing the absorption cross-section into gray gases gives the SLW form of the RTE:
+\begin{equation}
+\label{e:RTE_SLW}
+	\frac{dI_j}{ds} = -\kappa_jI_j + a_j\kappa_jI_b, \hspace{20pt} j=0,1,...,n.
+\end{equation}
+Here, $n$ is the number of gray gases in the model and $I_j$ is the intensity of gray gas $j$. $\kappa_j$ is the gray gas absorption coefficient, which can be calculated as $\kappa_j=N \sqrt{C_{j-1}C_j}$,
+where $C_{j-1}$ and $C_j$ are supplemental absorption cross-sections used to discretize the absorption spectrum \cite{Solovjov_2001}. The gray gas weights corresponding to each absorption coefficient are given by $a_j=F(C_j)-F(C_{j-1})$, where $F(C_j)$ is the absorption line blackbody distribution function (ALBDF) for species $j$, calculated from the detailed absorption spectrum of that species. The absorption cross-sections are chosen with respect to a thermodynamic reference state, which makes generalized SLW methods reference approaches. Once Equation ~\ref{e:RTE_SLW} is solved for each gray gas species, to total radiative intensity $I$ can be calculated by summing the gray gas intensities:
+\begin{equation}
+	I=\int_{\eta=0}^{\infty}I_{\eta}d\eta=\sum_{j=1}^n I_j.
+\end{equation}
+
+The Rank-Correlated SLW (RCSLW) model avoids specifying a reference state by relating thermodynamic states to one another instead. If two arbitrary absorption cross-sections define identical wavenumber intervals, the two cross-sections (neither of which is designated a reference cross-section) can be said to be rank-correlated. The inverse ALBDF, defined such that $C[F(C,\phi_g,T_b),\phi_g,T_b]=C$ and $F[C(F,\phi_g,T_b),\phi_g,T_b]=F$ for a given gas thermodynamic state $\phi_g$ and blackbody temperature $T_b$, is proven to have this property and can also be called the rank-correlated reordered absorption cross-sections \cite{Solovjov_2017}. As a result, the inverse ALBDF can be used to construct cross-section intervals for the RCSLW model that do not rely on a defined reference state or spectrum. RadLib's RCSLW model uses Method 1.2.2 as defined and recommended in \cite{Solovjov_2017}
+
+\section{Software Description}
 \label{s:architechture}
 
-RadLib is an object-oriented C++ class library. 
+RadLib is an object-oriented C++ class library, including both C++ and Python interfaces. The RadLib package contains five subdirectories (upon initial download): \texttt{source} contains the RadLib source code; \texttt{build} contains installation files; \texttt{examples} contains instructive example cases, including a simple interface and solver for a parallel planes geometry; \texttt{data} contains ALBDF data tables required for the RCSLW model; and \texttt{docs} contains files used to generate code documentation with Doxygen (optional). 
 
-Examples folder contains sample driver scripts for using the library. 
+The \texttt{source} and \texttt{examples} directories are further divided into \texttt{C++} and \texttt{Python} subdirectories to differentiate between interfaces. There are three interface options for using this code: C++, Python, and Cython-wrapped Python. C++ interfaces are located within the \texttt{examples/c++} folder, while Python interfaces are located within the \texttt{examples/python} folder. When running examples with Python, the Cython-wrapped version is the default; to run the regular Python version without the Cython wrapper, edit the comments near the top of the example files (i.e \texttt{ex\textunderscore S1.py}). The C++ interface produces the fastest-running code, followed by the Cython-wrapped Python interface and then the regular Python interface. [INSERT RUNTIME COMPARISONS HERE]
 
-Python version somewhere? Corresponding examples?
+RadLib installation is automated with CMake. First, navigate to the \texttt{radlib/build} directory. If the user requires an installation location other than the default \texttt{radlib/installed} directory, edit the \texttt{user\textunderscore config} file before running CMake. To compile the package, run the command \texttt{cmake -C user\textunderscore config ../source}. Upon successful completion, run \texttt{make} and then \texttt{make install} to complete the process. The generated C++ library file is located at \texttt{radlib/installled/lib/libradlib.a}. 
+
+Figure \ref{fig:flowchart} illustrates the basic structure use of the RadLib package within a generic example using the provided interfaces. The RadLib library generates absorption coefficients and their weighting factors for use within the appropriate RTE, but does not specify any particular geometry, making it a versatile tool for any simulation that requires radiative heat transfer, regardless of configuration. The interfaces, solver, and examples included with the library serve to illustrate its use and validate the implementation and results. 
+
+\begin{figure}
+	\begin{center}
+		\includegraphics[width=\textwidth]{../figures/radlib_structure.pdf}
+	\end{center}
+	\caption{Example workflow diagram. Highlighted areas are part of the RadLib library; other areas represent example infrastructure for using the package.}
+\label{fig:flowchart}
+\end{figure}
 
 \section{Illustrative Examples}
 \label{s:Examples}
