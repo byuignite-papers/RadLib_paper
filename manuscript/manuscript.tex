@@ -153,21 +153,20 @@ Radiation is a little like combustion in that its core mechanisms are complex, p
 
 So far there isn't an easy way to access and use radiation models. There are simple ones in Cantera (check this, there might not be any), but they make too many assumptions or don't work well for combustion or what have you. RadLib is a radiation library of models that you can apply to any simulation type, and we'd like to add it to Cantera, too. Basically, there isn't a reliable way to do radiation calculations in CFD simulations without coding the models yourself, which is extra hard because they're complicated and hard. So we've done it for you and put them in a library that easy for anyone to use.
 
-
 %Author guidelines for this section:
 %\begin{itemize}
-%	\item Introduce the scientific background and the motivation for developing the software. 
-%	\item Explain why the software is important, and describe the exact (scientific) problem(s) it solves.
-%	\item Indicate in what way the software has contributed (or how it will contribute in the future) to the process of scientific discovery; if available, this is to be supported by citing a research paper using the software.
-%	\item Provide a description of the experimental setting (how does the user use the software?).
-%	\item Introduce related work in literature (cite or list algorithms used, other software etc.).
+% \item Introduce the scientific background and the motivation for developing the software. 
+% \item Explain why the software is important, and describe the exact (scientific) problem(s) it solves.
+% \item Indicate in what way the software has contributed (or how it will contribute in the future) to the process of scientific discovery; if available, this is to be supported by citing a research paper using the software.
+% \item Provide a description of the experimental setting (how does the user use the software?).
+% \item Introduce related work in literature (cite or list algorithms used, other software etc.).
 %\end{itemize}
 
 %Author guidelines for this section
 %\begin{itemize}
-%	\item Describe the software in as much as is necessary to establish a vocabulary needed to explain its impact.
-%	\item  Give a short overview of the overall software architecture; provide a pictorial component overview or similar (if possible). If necessary provide implementation details.
-%	\item Present the major functionalities of the software.
+% \item Describe the software in as much as is necessary to establish a vocabulary needed to explain its impact.
+% \item  Give a short overview of the overall software architecture; provide a pictorial component overview or similar (if possible). If necessary provide implementation details.
+% \item Present the major functionalities of the software.
 %\end{itemize}
 
 \section{Model descriptions}
@@ -184,7 +183,7 @@ Once the radiative absorption coefficients are calculated, they are then used to
 \subsection{Planck Mean absorption coefficients}
 \label{s:planckmean}
 
-When we refer to the Plank Mean model, what we're using is actually the Planck Mean absorption coefficients, calculated from the correlations given on the TNF workshop site \citep{Smith_2003}. Their correlations (temperature dependent) are based on the RADCAL model in \citep{Grosshandler_1993}. The TNF radiation model is also documented in \citep{Barlow_2001}.
+When we refer to the Plank Mean model, what we're using is actually the Planck Mean (PM) absorption coefficients, calculated from the correlations given on the TNF workshop site \citep{Smith_2003}. Their correlations (temperature dependent) are based on the RADCAL model in \citep{Grosshandler_1993}. The TNF radiation model is also documented in \citep{Barlow_2001}.
 
 This model is commonly used because it's relatively simple, easy to implement, low in computational expense, and provides reasonably accurate results in many cases. 
 
@@ -195,15 +194,15 @@ Quote from TNF site page: "The characteristics of some flames selected for the w
 The basic assumption of weighted sum of gray gases (WSGG) models in general is that the non-gray behavior of gas mixtures, in this case H$_2$O and CO$_2$, can be modeled by a weighted sum of several gray gases and one transparent gas (which represents the spectral windows between absorption bands). 
 RadLib uses the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. RadLib, in accordance with the Bordbar et al. WSGG method cited above, uses a mixture of four gray gases and one transparent gas. Absorption coefficients are calculated by 
 \begin{equation}
-	K_i=\sum_{k=0}^{4}d_{i,k}M_r^k,
+ K_i=\sum_{k=0}^{4}d_{i,k}M_r^k,
 \end{equation}
 where $K_i$ is the absorption coefficient for species $i$, $d_{i,k}$ is a species-specific correlated model coefficient, and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$. The weight factors are calculated by 
 \begin{equation}
-	a_i=\sum_{j=0}^{4}b_{i,j}T_r^j,
+ a_i=\sum_{j=0}^{4}b_{i,j}T_r^j,
 \end{equation}
 where $a_i$ is the weighting factor for species $i$ and $T_r$ is a normalized temperature equal to $T/T_{ref}$ with $T_{ref}=1200$K. The value of $b_{i,j}$ is calculated by 
 \begin{equation}
-	b_{i,j}=\sum_{k=0}^{4}C_{i,j}M_r^k,
+ b_{i,j}=\sum_{k=0}^{4}C_{i,j}M_r^k,
 \end{equation}
 where $C_{i,j}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. The model coefficients $d_{i,k}$ and $C_{i,j}$ can be found in the literature \citep{Bordbar_2014,Bordbar_2020}. RadLib uses the updated model coefficients from \citep{Bordbar_2020}, which extends the model presented in \citep{Bordbar_2014} to include all possible values of the H$_2$O-CO$_2$ molar ratio. 
 
@@ -248,10 +247,68 @@ Figure \ref{fig:flowchart} illustrates the basic structure use of the RadLib pac
 \label{fig:flowchart}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Illustrative Examples}
 \label{s:Examples}
 
-Simple comparisons of each of these models to some ray-tracing results (equivalent to a direct numerical solution) to establish validity. Illustrates when to use various models and why you might choose one over another. Plots and discussion go here. Five example cases demonstrated with this code in both C++ and Python. Compared to line-by-line calculations (essentially the radiation version of Monte Carlo). 
+Several examples are presented to illustrate the behavior of the models. The examples show heat flux $q$ or volumetric heat source $Q$ one one-dimensional configurations with varying gas compositions and temperatures. We compare the PM, WSGG, and RCSLW models for each example. The examples are taken from those presented by Solvojov et al., (2017) \cite{Solovjov_2017}, and Bordbar et al., 2020 \cite{Bordbar_2020}; the number corresponds to the example in the respective referece. A ray-tracing code is used to solve the radiative transport equation between two parallel plates. 
+Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a cold slab where the cold thickness varies; Example S2 is similar but isothermal with a \emph{thick} slab of high CO$_2$ next to a \emph{thin} slab of low CO$_2$ of varying thickness; Example S3 has parabolic temperature and H$_2$O profiles; Example S4 has a triangular temperature profile between equally-spaced isothermal regions; Example S5 is a half-sinusoid decreasing in temperature from 1500 to 500 K; and Example B3 has symmetric temperature and H$_2$O profiles with central peaks of 1800 K and 1, respectively (with $y_{CO2}=1-y_{H2O}$). In each case, comparison is made to the line-by-line (LBL) data presented in the references. 
+%
+\begin{table}
+    \caption{Summary of example cases presented. S1-S5 are from \cite{Solovjov_2017}; B3 is from \cite{Bordbar_2017}. All cases have $P=1$ atm, black walls.}
+    \label{t:examples}
+    \centering
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{c l l c c c}
+        \hline
+        Example & T(K)                           & $y_{H2O}$  $y_{CO2}$ (mole frac.)                     & L (m)   & $T_{walls}$ (K)\\
+        \hline
+        S1 & $T(x<0.5)=2000$; $T(x>0.5)=300$     & $y_{CO2}=0.1$, $y_{H2O}=0.2$                          & 0.5-2.5 & cold, cold     \\
+        S2 & T=1000                              & $y_{CO2}(x<0.5)=0.4$, $y_{CO2}(x>0.5)=0.1$            & 0.5-2.5 & cold, cold     \\
+           &                                     & $y_{H2O}=0.0$                                         &         &                \\
+        S3 & $T(x) = 4000x(L-x)/L^2 + 800$       & $y_{H2O}(x) = 0.8x(L-x)/L^2 + 0.12$                   & 1       & 800, 800       \\
+           &                                     & $y_{CO2}=0$                                           &         &                \\
+        S4 & middle third triangular to 2500     & $y_{H2O}=0.1$, $y_{CO2}=0$                            & 0.3     & 500, 500       \\
+        S5 & $T(x) = 1000 + 500\cos(\pi x/L)$    & $y_{H2O}=0.1$, $y_{CO2}=0$                            & 2       & 1500, 500      \\
+        B3 & $T(x) = 400 + 1400\sin(\pi x/L)^2$  & $y_{H2O}(x) = 0.0001 + 0.9999\sin(\pi x/L)^2$         & 1       & 400, 400       \\
+           &                                     & $y_{CO2}=1-y_{H2O}$                                   &         &                \\
+        \hline
+    \end{tabular}
+    }
+\end{table}
+%
+
+The examples are provided with the radlib code and implemented in both C++ and Python. A Juptyer notebook is provided with the Python examples that runs the examples, displays the plots, and saves the plots to PDF files. Python and Cython versions of the one-dimensional solver \texttt{parallel\_planes} are provided for convenience.
+
+These examples are not meant to be exhaustive, and details about the motivation of these examples and the behavior of the specific models is to be found in the respective references. The cases presented are intended to illustrate the use of the radiative library. While not shown  for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in \cite{Solovjov_2017,Bordbar_2020}, so that these examples also serve as a validation of the implementation of the models.
+
+Figure~\ref{f:examples} shows comparative results for the different radiation models for these cases. 
+%
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{c c}
+        Example S1 & Example S2 \\
+        \includegraphics[width=3 in]{ex_1.pdf} &
+        \includegraphics[width=3 in]{ex_2b.pdf} \\
+        Example S3 & Example S4 \\
+        \includegraphics[width=3 in]{ex_3a.pdf} &
+        \includegraphics[width=3 in]{ex_4a.pdf} \\
+        Example S5 & Example B3 \\
+        \includegraphics[width=3 in]{ex_5b.pdf} &
+        \includegraphics[width=3 in]{ex_6.pdf}
+    \end{tabular}
+    \caption{Results for examples summarized in Table~\ref{t:examples}.}
+    \label{f:examples}
+    \end{center}
+\end{figure}
+%
+In general, the PM model performs poorly compared to the WSSGG and RCSLW models. A notable exception is Example S4. In Example S2, the PM $q(L)/\sigma T^4$ is off scale at an essentially constant at a value of unity. The PM absorption coefficient is 27.4 atm$^{-1}$m$^{-1}$, giving optical thicknesses of 0.09 and 0.36 m in the thick and thin layers, respectively, which are relatively small compared to the isothermal domain size greater than 0.5 m. Example S5 omits the PM model to more clealy show the behavior of the WSGG and RCSLW models. For that example, the PM values follow the shape of the other curves but $Q$ varies from around -80 at $x=0$ to a peak of 200 at x=$1.5$ m, and dropping to 100 kW/m$^3$ at $x=2$ m. In all examples, four gray ($n=4$) and one clear gas are computed for the RCSLW models to give a consistent comparison to the WSGG model. Example S5 shows the sensitivity of the RCSLW model to the number of gases used. When $n$ is increased to eight the RCSLW model improves to show nearly perfect agreement with the LBL data in Example S2.
+In all Examples, the RCSLW model is initialized using the mean temperature and composition on the domain. In Example S5, the RCSLW model converges to the LBL solution when the model is initialized using the maximum temperature instead of the average temperature.
+
+% TODO: do the cost comparison  <13-11-20, dol> %
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Impact}
 \label{s:impact}
@@ -270,12 +327,12 @@ This software has not been used outside of the current research group, and it is
 
 %Author guidelines for this section
 %\begin{itemize}
-%	\item \textbf{This is the main section of the article and the reviewers weight the description here appropriately}
-%	\item Indicate in what way new research questions can be pursued as a result of the software (if any).
-%	\item Indicate in what way, and to what extent, the pursuit of existing research questions is improved (if so).
-%	\item Indicate in what way the software has changed the daily practice of its users (if so).
-%	\item Indicate how widespread the use of the software is within and outside the intended user group.
-%	\item Indicate in what way the software is used in commercial settings and/or how it led to the creation of spin-off companies (if so).
+% \item \textbf{This is the main section of the article and the reviewers weight the description here appropriately}
+% \item Indicate in what way new research questions can be pursued as a result of the software (if any).
+% \item Indicate in what way, and to what extent, the pursuit of existing research questions is improved (if so).
+% \item Indicate in what way the software has changed the daily practice of its users (if so).
+% \item Indicate how widespread the use of the software is within and outside the intended user group.
+% \item Indicate in what way the software is used in commercial settings and/or how it led to the creation of spin-off companies (if so).
 %\end{itemize}
 
 \section{Conclusions}
