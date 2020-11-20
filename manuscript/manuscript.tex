@@ -120,7 +120,7 @@ C5 & Code versioning system used & Git \\
 \hline
 C6 & Software code languages, tools, and services used & C++, Python 3 \\
 \hline
-C7 & Compilation requirements, operating environments \& dependencies & TODO \\
+C7 & Compilation requirements, operating environments \& dependencies & Python 3, Cython \\
 \hline
 C8 & If available Link to developer documentation/manual & TODO \\
 \hline
@@ -233,11 +233,11 @@ Figure \ref{fig:flowchart} illustrates the basic structure use of the RadLib pac
 \section{Illustrative Examples}
 \label{s:Examples}
 
-Several examples are presented to illustrate the behavior of the models. The examples show heat flux $q$ or volumetric heat source $Q$ one one-dimensional configurations with varying gas compositions and temperatures. We compare the PM, WSGG, and RCSLW models for each example. The examples are taken from those presented by Solvojov et al., (2017) \cite{Solovjov_2017}, and Bordbar et al., 2020 \cite{Bordbar_2020}; the number corresponds to the example in the respective referece. A ray-tracing code is used to solve the radiative transport equation between two parallel plates. 
-Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a cold slab where the cold thickness varies; Example S2 is similar but isothermal with a \emph{thick} slab of high CO$_2$ next to a \emph{thin} slab of low CO$_2$ of varying thickness; Example S3 has parabolic temperature and H$_2$O profiles; Example S4 has a triangular temperature profile between equally-spaced isothermal regions; Example S5 is a half-sinusoid decreasing in temperature from 1500 to 500 K; and Example B3 has symmetric temperature and H$_2$O profiles with central peaks of 1800 K and 1, respectively (with $y_{CO2}=1-y_{H2O}$). In each case, comparison is made to the line-by-line (LBL) data presented in the references. 
+Several examples are presented to illustrate the behavior of the models. The examples show heat flux $q$ or volumetric heat source $Q$ in one one-dimensional configurations with varying gas compositions and temperatures. We compare the PM, WSGG, and RCSLW models for each example. The examples correspond to those presented by Solvojov et al. (S) \cite{Solovjov_2017} and Bordbar et al. (B) \cite{Bordbar_2020}, and the number of each example corresponds to the example number in the respective reference. A ray-tracing code is used to solve the radiative transport equation between two parallel plates. 
+Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a cold slab where the cold slab's thickness varies; Example S2 is isothermal with a thick slab of high CO$_2$ next to a thin slab of low CO$_2$ with variable thickness; Example S3 uses parabolic temperature and H$_2$O mole fraction profiles; Example S4 has a triangular temperature profile between equally-spaced isothermal regions; Example S5 uses a half-sinusoid temperature profile that decreases from 1500 to 500 K; and Example B3 has symmetric temperature and H$_2$O mole fraction profiles with central peaks of 1800 K and 1, respectively (with $y_{CO2}=1-y_{H2O}$). Each case is presented alongside the line-by-line (LBL) data presented in the references. 
 %
 \begin{table}
-    \caption{Summary of example cases presented. S1-S5 are from \cite{Solovjov_2017}; B3 is from \cite{Bordbar_2020}. All cases have $P=1$ atm, black walls.}
+    \caption{Summary of example cases presented. S1-S5 are from \cite{Solovjov_2017}; B3 is from \cite{Bordbar_2020}. All cases use $P=1$ atm and black walls.}
     \label{t:examples}
     \centering
     \resizebox{\textwidth}{!}{
@@ -260,9 +260,9 @@ Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a 
 \end{table}
 %
 
-The examples are provided with the radlib code and implemented in both C++ and Python. A Juptyer notebook is provided with the Python examples that runs the examples, displays the plots, and saves the plots to PDF files. Python and Cython versions of the one-dimensional solver \texttt{parallel\_planes} are provided for convenience.
+The examples are provided with the RadLib code and implemented in both C++ and Python. A Juptyer notebook is provided with the Python examples that runs the examples, displays the plots, and saves the plots to PDF files. Python and Cython versions of the one-dimensional solver \texttt{parallel\textunderscore planes.py} are provided for convenience. 
 
-These examples are not meant to be exhaustive, and details about the motivation of these examples and the behavior of the specific models is to be found in the respective references. The cases presented are intended to illustrate the use of the radiative library. While not shown  for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in \cite{Solovjov_2017,Bordbar_2020}, so that these examples also serve as a validation of the implementation of the models.
+These cases are intended to illustrate the use of the RadLib library and are not exhaustive. Details about these examples and their motivations can be found in their respective references. While ommitted here for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in \cite{Solovjov_2017,Bordbar_2020} such that these examples also serve as a validation of the implementation of the models.
 
 Figure~\ref{f:examples} shows comparative results for the different radiation models for these cases. 
 %
@@ -284,7 +284,7 @@ Figure~\ref{f:examples} shows comparative results for the different radiation mo
     \end{center}
 \end{figure}
 %
-In general, the PM model performs poorly compared to the WSSGG and RCSLW models. A notable exception is Example S4. In Example S2, the PM $q(L)/\sigma T^4$ is off scale at an essentially constant at a value of unity. The PM absorption coefficient is 27.4 atm$^{-1}$m$^{-1}$, giving optical thicknesses of 0.09 and 0.36 m in the thick and thin layers, respectively, which are relatively small compared to the isothermal domain size greater than 0.5 m. Example S5 omits the PM model to more clealy show the behavior of the WSGG and RCSLW models. For that example, the PM values follow the shape of the other curves but $Q$ varies from around -80 at $x=0$ to a peak of 200 at x=$1.5$ m, and dropping to 100 kW/m$^3$ at $x=2$ m. In all examples, four gray ($n=4$) and one clear gas are computed for the RCSLW models to give a consistent comparison to the WSGG model. Example S5 shows the sensitivity of the RCSLW model to the number of gases used. When $n$ is increased to eight the RCSLW model improves to show nearly perfect agreement with the LBL data in Example S2.
+In general, the PM model performs poorly compared to the WSSGG and RCSLW models. A notable exception is Example S4. In Example S2, the PM $q(L)/\sigma T^4$ is off scale at an essentially constant at a value of unity. The PM absorption coefficient is 27.4 atm$^{-1}$m$^{-1}$, giving optical thicknesses of 0.09 and 0.36 m in the thick and thin layers, respectively, which are relatively small compared to the isothermal domain size greater than 0.5 m. Example S5 omits the PM model to more clearly show the behavior of the WSGG and RCSLW models. For that example, the PM values follow the shape of the other curves but $Q$ varies from around -80 at $x=0$ to a peak of 200 at x=$1.5$ m, and dropping to 100 kW/m$^3$ at $x=2$ m. In all examples, four gray ($n=4$) and one clear gas are computed for the RCSLW models to give a consistent comparison to the WSGG model. Example S5 shows the sensitivity of the RCSLW model to the number of gases used. When $n$ is increased to eight the RCSLW model improves to show nearly perfect agreement with the LBL data in Example S2.
 In all Examples, the RCSLW model is initialized using the mean temperature and composition on the domain. In Example S5, the RCSLW model converges to the LBL solution when the model is initialized using the maximum temperature instead of the average temperature.
 
 % TODO: do the cost comparison  <13-11-20, dol> %
@@ -367,7 +367,7 @@ S3 & Legal Software License & MIT license (MIT) \\
 \hline
 S4 & Computing platforms/Operating Systems & Linux, OS X, Microsoft Windows\\
 \hline
-S5 & Installation requirements \& dependencies & TODO \\
+S5 & Installation requirements \& dependencies & Python 3, Cython \\
 \hline
 S6 & If available, link to user manual - if formally published include a reference to the publication in the reference
     list & TODO For example: $http://mozart.github.io/documentation/$ \\
