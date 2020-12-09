@@ -41,6 +41,8 @@
 \usepackage{float}
 \restylefloat{table}
 
+\usepackage{hyperref}
+
 \journal{SoftwareX}
 
 \begin{document}
@@ -77,6 +79,7 @@
 %\renewcommand{\thefootnote}{\fnsymbol{footnote}}
 \author{Victoria B. Stephens}
 \author{Sally Jensen}
+\author{Isaac Wheeler}
 \author{David O. Lignell\corref{cor1}}
 
 \cortext[cor1]{Corresponding author. \ead{davidlignell@byu.edu}}
@@ -95,24 +98,16 @@ radiative heat transfer \sep reacting flows  \sep CFD
 
 \end{frontmatter}
 
-\section*{Required Metadata}
-\label{}
-
-\section*{Current code version}
-\label{}
-
-Ancillary data table required for subversion of the codebase. Kindly replace examples in right column with the correct information about your current code, and leave the left column as it is.
-
 \begin{table}[H]
 \begin{tabular}{|l|p{6.5cm}|p{6.5cm}|}
 \hline
-\textbf{Nr.} & \textbf{Code metadata description} & \textbf{Please fill in this column} \\
+\textbf{Nr.} & \textbf{Code metadata description} & \textbf{Metadata} \\
 \hline
 C1 & Current code version & TODO 2.1 \\
 \hline
-C2 & Permanent link to code/repository used for this code version & $github.com/BYUignite/RadLib$ \\
+C2 & Permanent link to code/repository used for this code version & $github.com/BYUignite/radlib$ \\
 \hline
-C3 & Code Ocean compute capsule & N/A \\
+C3 & Code Ocean compute capsule & (in review) \\
 \hline
 C4 & Legal Code License   & MIT license (MIT) \\
 \hline
@@ -120,14 +115,14 @@ C5 & Code versioning system used & Git \\
 \hline
 C6 & Software code languages, tools, and services used & C++, Python 3 \\
 \hline
-C7 & Compilation requirements, operating environments \& dependencies & Python 3, Cython \\
+C7 & Compilation requirements, operating environments \& dependencies & CMake, C++, Python 3, Cython \\
 \hline
 C8 & If available Link to developer documentation/manual & TODO \\
 \hline
 C9 & Support email for questions & davidlignell@byu.edu \\
 \hline
 \end{tabular}
-\caption{Code metadata (mandatory)}
+\caption{Code metadata.}
 \label{} 
 \end{table}
 
@@ -139,6 +134,8 @@ C9 & Support email for questions & davidlignell@byu.edu \\
 % - tag software version
 % - decide on and generate documentation
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Motivation and significance}
 \label{s:motivation}
 
@@ -149,6 +146,8 @@ In some cases, other modes of heat transfer dominate the system, and radiation c
 Like combustion, the core mechanisms of radiation are physically and mathematically complex. Unlike other modes of heat transfer, it is governed by a set of integro-differential equations that depend on both direction and wavelength. Only the simplest systems have analytic solutions, and most practical systems require a numerical solution. Ray tracing (Monte Carlo) solutions are very accurate but extremely computationally expensive, and often require high-performance computing resources to execute. Modeling assumptions are common and can reduce simulation cost at the expense of accuracy, depending on their validity for the system in question. 
 
 Currently, there is no convenient or easy-to-use access point for CFD radiation models. As such, we present RadLib, a modular library of radiation models that can be applied alongside various simulation tools. RadLib focuses on calculation of radiation absorption coefficients, often the most difficult and time-consuming portion of radiation calculations, which permits its use with various solvers. The models are fully implemented and validated and all use a common interface, allowing researchers easy and convenient access to radiation modeling tools regardless of the field of application.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Model descriptions}
 \label{s:models}
@@ -208,6 +207,8 @@ where $C_{j-1}$ and $C_j$ are supplemental absorption cross-sections used to dis
 \end{equation}
 
 The Rank-Correlated SLW (RCSLW) model avoids specifying a reference state by relating thermodynamic states to one another instead. If two arbitrary absorption cross-sections define identical wavenumber intervals, the two cross-sections (neither of which is designated a reference cross-section) can be said to be rank-correlated. The inverse ALBDF, defined such that $C[F(C,\phi_g,T_b),\phi_g,T_b]=C$ and $F[C(F,\phi_g,T_b),\phi_g,T_b]=F$ for a given gas thermodynamic state $\phi_g$ and blackbody temperature $T_b$, is proven to have this property and can also be called the rank-correlated reordered absorption cross-sections \cite{Solovjov_2017}. As a result, the inverse ALBDF can be used to construct cross-section intervals for the RCSLW model that do not rely on a defined reference state or spectrum. RadLib's RCSLW model uses Method 1.2.2 as defined and recommended in \cite{Solovjov_2017}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Software Description}
 \label{s:architechture}
@@ -310,66 +311,68 @@ Currently, RadLib is only used within the authors' research group, where it is a
 % \item Indicate in what way the software is used in commercial settings and/or how it led to the creation of spin-off companies (if so).
 %\end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Conclusions}
 \label{}
 
 Set out the conclusion of this original software publication.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Conflict of Interest}
-%Please select the appropriate text:
-%
-%Potential conflict of interest exists:
-%We wish to draw the attention of the Editor to the following facts, which may be considered as potential conflicts of interest, and to significant financial contributions to this work. The nature of potential conflict of interest is described below: [Describe conflict of interest]
 
-%No conflict of interest exists:
-We wish to confirm that there are no known conflicts of interest associated with this publication and there has been no significant financial support for this work that could have influenced its outcome.
+There are no known conflicts of interest associated with this publication and there has been no significant financial support for     this work that could have influenced its outcome.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section*{Acknowledgements}
-\label{}
+\label{sec:acknowledgements}
 
 The authors extend special thanks to Hadi Bordbar for assistance with the WSGG model and to Vladimir Solovjov and Brent Webb of Brigham Young University for their insights and assistance with the RCSLW model. 
 
-%% The Appendices part is started with the command \appendix;
-%% appendix sections are then done as normal sections
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% \appendix
 
 %% \section{}
 %% \label{}
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% References:
 
 \bibliographystyle{elsarticle-num} 
 \bibliography{references} 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section*{Current executable software version}
 \label{}
 
-Ancillary data table required for sub version of the executable software: (x.1, x.2 etc.) kindly replace examples in right column with the correct information about your executables, and leave the left column as it is.
+%Ancillary data table required for sub version of the executable software: (x.1, x.2 etc.) kindly replace examples in right column with the correct information about your executables, and leave the left column as it is.
 
 \begin{table}[!h]
 \begin{tabular}{|l|p{6.5cm}|p{6.5cm}|}
 \hline
-\textbf{Nr.} & \textbf{(Executable) software metadata description} & \textbf{Please fill in this column} \\
+\textbf{Nr.} & \textbf{(Executable) software metadata description} & \textbf{Metadata} \\
 \hline
-S1 & Current software version & TODO 2.1 \\
+S1 & Current software version & 1.0 \\
 \hline
-S2 & Permanent link to executables of this version  & TODO For example: $https://github.com/combogenomics/$ $DuctApe/releases/tag/DuctApe-0.16.4$ \\
+S2 & Permanent link to executables of this version  & \href{https://github.com/BYUignite/radlib}{https://github.com/BYUignite/radlib} \\
 \hline
 S3 & Legal Software License & MIT license (MIT) \\
 \hline
 S4 & Computing platforms/Operating Systems & Linux, OS X, Microsoft Windows\\
 \hline
-S5 & Installation requirements \& dependencies & Python 3, Cython \\
+S5 & Installation requirements \& dependencies & CMake, C++, Python 3, Cython \\
 \hline
 S6 & If available, link to user manual - if formally published include a reference to the publication in the reference
-    list & TODO For example: $http://mozart.github.io/documentation/$ \\
+    list & \href{https://github.com/BYUignite/radlib}{https://github.com/BYUignite/radlib} \\
 \hline
 S7 & Support email for questions & davidlignell@byu.edu \\
 \hline
 \end{tabular}
-\caption{Software metadata (optional)}
+\caption{Software metadata.}
 \label{} 
 \end{table}
 
