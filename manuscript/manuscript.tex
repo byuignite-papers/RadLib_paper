@@ -152,27 +152,39 @@ With RadLib, we provide a convenient, easy-to-use access point for radiative pro
 \section{Model descriptions}
 \label{s:models}
 
-RadLib includes three models of varying complexity and accuracy to calculate the radiation absorption coefficients and their weighting factors for each gas considered by the model. Radiation absorption coefficients are typically calculated using correlations relating them local properties such as temperature, total pressure, or species partial pressure, depending on the model. Correlations come from curve fits to high-resolution radiation property databases. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$) and, optionally, soot volume fraction in its calculation of absorption coefficients and weighting factors. 
+To give context to the following discussion of radiative individual property models, we include here a brief description of the radiative transfer equation (RTE). Along a given path length $s$ in a direction $\hat{\Omega}$, the general RTE  for an absorbing, emitting, and non-scattering medium is described by 
+\begin{equation}
+	\label{e:RTE_general}
+	\frac{dI_{\eta}}{ds} = -\kappa_{\eta}I_{\eta} + \kappa_{\eta}I_{b \eta},
+\end{equation}
+where $I_{\eta}$ is the radiative spectral intensity, $I_{b\eta}$ is the Planck spectral distribution of blackbody intensity, and $\kappa_{\eta}$ is the spectral absorption coefficient of the medium. Radiation property models such as those implemented by RadLib are used to calculate the absorption coefficients $\kappa_{\eta}$. From this point, various approximations can be made to simplify the solution process. For example, integrating with respect to wavenumber and subdividing the absorption cross-section into gray gases gives the spectral line-weighted (SLW) form of the RTE,
+\begin{equation}
+\label{e:RTE_SLW}
+	\frac{dI_j}{ds} = -\kappa_jI_j + a_j\kappa_jI_b, \hspace{20pt} j=0,1,...,n,
+\end{equation}
+where $n$ is the number of gray gases in the model, $I_j$ is the intensity of gray gas $j$, and $\kappa_j$ represents the gray gas absorption coefficient for gas $j$. When multiple gray gases are used to approximate the radiative properties, the total radiative intensity $I$ can be calculated by summing the individual gray gas intensities calculated with Equation \ref{e:RTE_SLW}:
+\begin{equation}
+	I=\int_{\eta=0}^{\infty}I_{\eta}d\eta=\sum_{j=1}^n I_j.
+\end{equation}
+From there, the total radiative intensity can be used to calculate various radiative heat fluxes and, where appropriate, be incorporated into larger energy balances for a simulation.
 
-Once the radiative absorption coefficients are calculated, they are then used to solve the radiative transfer equation (RTE), which depends on the simulation configuration and assumptions. Solving the RTE is not the focus of this software, but RadLib's example cases do employ a simple implicit trapezoid method solver to calculate the radiative heat flux and volumetric heat source profiles between two parallel planes. [MORE DESCRIPTION OF SOLVER GOES HERE?]
+RadLib implements three models of varying complexity and accuracy to calculate the radiation absorption coefficients $\kappa$ and their weighting factors $a$ for each gas considered by the model. The absorption coefficients are typically calculated using correlations relating them local properties such as temperature, pressure, and composition. Correlations come from curve fits to high-resolution radiation property databases. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$) and soot in its calculation of absorption coefficients and weighting factors. 
 
-[OTHER THINGS THAT APPLY TO ALL MODELS GO HERE]
+Once the radiative absorption coefficients are calculated, they can then be used to solve the RTE, which depends on the simulation configuration and assumptions. Solving the RTE is not the focus of this software, but RadLib's example cases do employ a simple ray tracing solver to calculate the radiative heat flux and volumetric heat source profiles between two parallel planes. 
 
-[MAYBE INCLUDE SOME BASIC INFO ON LBL?]
+%[OTHER THINGS THAT APPLY TO ALL MODELS GO HERE]
 
 \subsection{Planck Mean absorption coefficients}
 \label{s:planckmean}
 
 RadLib's simplest model uses Planck Mean absorption coefficients calculated from the correlations given on the TNF Workshop site \citep{Smith_2003}. The temperature-dependent correlations are based on the RADCAL model in \citep{Grosshandler_1993}. The TNF radiation model is also documented in \citep{Barlow_2001}.
 
-Planck Mean absorption coefficients are commonly used to model radiation, especially in combustion systems, because the model is relatively easy to implement, computationally inexpensive, and reasonably accurate in many cases. The TNF Workshop correlations were developed for use with an optically thin radiation model, which assumes that radiation passes through a medium mostly undisturbed. In cases where the optically thin assumption applies, such as simple hydrogen jet flames, this model and the associated Planck Mean absorption coefficients can produce accurate results \citep{Barlow_1999}. In cases where the optically thin assumption is not reasonable, including many other combustion scenarios, this model does not produce accurate results. For example, it significantly overpredicts radiative losses from the TNF library's CH$_4$ flames \cite{Frank_2000,Zhu_2002,Coelho_2002}.
-
-Because RadLib does not specify case geometry or medium, there is no optically thin assumption inherent in its use of the Planck Mean absorption coefficients. However, the correlations were developed with the intention of use with an optically thin assumption, and, as a result, depend only on local temperature values. RadLib users must take care to consider these limitations before using this model. 
+Planck Mean absorption coefficients are commonly used to model radiation, especially in combustion systems, because the model is relatively easy to implement, computationally inexpensive, and reasonably accurate in some cases. The Planck Mean model is most appropriate under optically thin conditions with relatively low radiative transfer relative to other heat sources such as reactive heat release rates. In cases where the optically thin assumption applies, such as simple hydrogen jet flames, this model and the associated Planck Mean absorption coefficients can produce accurate results \citep{Barlow_1999}. In cases where the optically thin assumption is not reasonable, including many other combustion scenarios, the Planck Mean model does not produce accurate results. For example, it significantly overpredicts radiative losses from the TNF library's CH$_4$ flames \cite{Frank_2000,Zhu_2002,Coelho_2002}. The examples included with the code and illustrated in Section \ref{s:Examples} demonstrate the deficiencies of the Planck Mean model in comparison to the others included with RadLib.
 
 \subsection{Weighted sum of gray gases (WSGG)}
 \label{s:wsgg}
 The basic assumption of weighted sum of gray gases (WSGG) models in general is that the non-gray behavior of gas mixtures, in this case H$_2$O and CO$_2$, can be modeled by a weighted sum of several gray gases and one transparent gas (which represents the spectral windows between absorption bands). 
-RadLib uses the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. RadLib, in accordance with the Bordbar et al. WSGG method cited above, uses a mixture of four gray gases and one transparent gas. Absorption coefficients are calculated by 
+RadLib implements the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. It uses four gray gases and one transparent gas. Absorption coefficients are calculated by 
 \begin{equation}
  K_i=\sum_{k=0}^{4}d_{i,k}M_r^k,
 \end{equation}
@@ -184,29 +196,18 @@ where $a_i$ is the weighting factor for species $i$ and $T_r$ is a normalized te
 \begin{equation}
  b_{i,j}=\sum_{k=0}^{4}C_{i,j}M_r^k,
 \end{equation}
-where $C_{i,j}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. The model coefficients $d_{i,k}$ and $C_{i,j}$ can be found in the literature \citep{Bordbar_2014,Bordbar_2020}. RadLib uses the updated model coefficients from \citep{Bordbar_2020}, which extends the model presented in \citep{Bordbar_2014} to include all possible values of the H$_2$O-CO$_2$ molar ratio. 
+where $C_{i,j}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. The model coefficients $d_{i,k}$ and $C_{i,j}$ can be found in the literature \citep{Bordbar_2014,Bordbar_2020}. 
+
+Previous WSGG versions and other property models often considered weighting factors as a function of temperature only and assumed a fixed molar ratio of H$_2$O and CO$_2$. This version includes dependence on both temperature and an arbitrary molar fraction ratio, increasing its accuracy and flexibility. RadLib uses the updated model coefficients from \citep{Bordbar_2020}, which extends the limited range of H$_2$O-CO$_2$ molar ratios originally presented in \citep{Bordbar_2014}. 
+
 
 \subsection{Rank Correlated SLW (RCSLW)}
 \label{s:RCSLW}
 
 The Spectral Line Weighted-sum-of-gray gases (SLW) model represents a family of global approaches to radiative heat transfer in high-temperature gases that also includes Absorption Distribution Function (ADF) and Full Spectrum $k$-distribution (FSK) models, all of which are based on the same fundamental principle in modeling the gas absorption spectrum \cite{Solovjov_2016}. In order to extend their spectral models from uniform conditions (isothermal, homogeneous gases) to nonuniform conditions (non-isothermal, non-homogeneous gases), these models take a reference approach in which local gas states are corrected relative to a reference state. Reference approaches, however, generally lack consistent reference states and can yield significant errors in cases with large spatial temperature gradients \cite{Solovjov_2017}. The Rank Correlated SLW (RCSLW) model is a unique extension of the generalized SLW model that does not require a specified gas reference state and preserves the emission term of the spectrally integrated RTE. Recent comparison of advanced SLW modeling approaches revealed that "the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases" \citep{Badger_2019}. A brief overview of the general SLW and RCSLW models will be given here; detailed discussion can be found in the literature \cite{Solovjov_2000, Solovjov_2001, Solovjov_2008, Solovjov_2011, Solovjov_2014, Solovjov_2016, Solovjov_2017, Webb_2018}. 
 
-The radiative transfer equation (RTE) for an absorbing, emitting, and non-scattering medium along a given path length $s$ in a direction $\hat{\Omega}$ is given by 
-\begin{equation}
-	\frac{dI_{\eta}}{ds} = -\kappa_{\eta}I_{\eta} + \kappa_{\eta}I_{b \eta},
-\end{equation}
-where $I_{\eta}$ is the radiative spectral intensity, $I_{b\eta}$ is the Planck spectral distribution of blackbody intensity, and $\kappa_{\eta}$ is the spectral absorption coefficient of the medium. Integrating with respect to wavenumber and subdividing the absorption cross-section into gray gases gives the SLW form of the RTE:
-\begin{equation}
-\label{e:RTE_SLW}
-	\frac{dI_j}{ds} = -\kappa_jI_j + a_j\kappa_jI_b, \hspace{20pt} j=0,1,...,n.
-\end{equation}
-Here, $n$ is the number of gray gases in the model and $I_j$ is the intensity of gray gas $j$. $\kappa_j$ is the gray gas absorption coefficient, which can be calculated as $\kappa_j=N \sqrt{C_{j-1}C_j}$,
-where $C_{j-1}$ and $C_j$ are supplemental absorption cross-sections used to discretize the absorption spectrum \cite{Solovjov_2001}. The gray gas weights corresponding to each absorption coefficient are given by $a_j=F(C_j)-F(C_{j-1})$, where $F(C_j)$ is the absorption line blackbody distribution function (ALBDF) for species $j$, calculated from the detailed absorption spectrum of that species. The absorption cross-sections are chosen with respect to a thermodynamic reference state, which makes generalized SLW methods reference approaches. Once Equation ~\ref{e:RTE_SLW} is solved for each gray gas species, to total radiative intensity $I$ can be calculated by summing the gray gas intensities:
-\begin{equation}
-	I=\int_{\eta=0}^{\infty}I_{\eta}d\eta=\sum_{j=1}^n I_j.
-\end{equation}
-
-The Rank-Correlated SLW (RCSLW) model avoids specifying a reference state by relating thermodynamic states to one another instead. If two arbitrary absorption cross-sections define identical wavenumber intervals, the two cross-sections (neither of which is designated a reference cross-section) can be said to be rank-correlated. The inverse ALBDF, defined such that $C[F(C,\phi_g,T_b),\phi_g,T_b]=C$ and $F[C(F,\phi_g,T_b),\phi_g,T_b]=F$ for a given gas thermodynamic state $\phi_g$ and blackbody temperature $T_b$, is proven to have this property and can also be called the rank-correlated reordered absorption cross-sections \cite{Solovjov_2017}. As a result, the inverse ALBDF can be used to construct cross-section intervals for the RCSLW model that do not rely on a defined reference state or spectrum. RadLib's RCSLW model uses Method 1.2.2 as defined and recommended in \cite{Solovjov_2017}
+The RCSLW model begins with the SLW form of the RTE, given by Equation \ref{e:RTE_SLW}. The gray gas absorption coefficients $\kappa_j$ are calculated calculated as $\kappa_j=N \sqrt{C_{j-1}C_j}$,
+where $C_{j-1}$ and $C_j$ are supplemental absorption cross-sections used to discretize the absorption spectrum \cite{Solovjov_2001}. The gray gas weights $a_j$ corresponding to each absorption coefficient are given by $a_j=F(C_j)-F(C_{j-1})$, where $F(C_j)$ is the absorption line blackbody distribution function (ALBDF) for species $j$, calculated from the detailed absorption spectrum of that species. In general SLW methods, the absorption cross-sections are chosen with respect to a thermodynamic reference state, classifying them as reference approaches. The Rank-Correlated SLW (RCSLW) model avoids specifying a reference state by relating thermodynamic states to one another instead. If two arbitrary absorption cross-sections define identical wavenumber intervals, the two cross-sections (neither of which is designated a reference cross-section) can be said to be rank-correlated. The inverse ALBDF, defined such that $C[F(C,\phi_g,T_b),\phi_g,T_b]=C$ and $F[C(F,\phi_g,T_b),\phi_g,T_b]=F$ for a given gas thermodynamic state $\phi_g$ and blackbody temperature $T_b$, is proven to have this property and can also be called the rank-correlated reordered absorption cross-sections \cite{Solovjov_2017}. As a result, the inverse ALBDF can be used to construct cross-section intervals for the RCSLW model that do not rely on an arbitrary reference state or spectrum. RadLib's RCSLW model uses Method 1.2.2 as defined and recommended in \cite{Solovjov_2017}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
