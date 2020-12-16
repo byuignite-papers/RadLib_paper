@@ -194,9 +194,9 @@ where $\kappa_i$ is the absorption coefficient for gray gas species $i$, $d_{i,k
 \end{equation}
 where $a_i$ is the weighting factor for species $i$ and $T_r$ is a normalized temperature equal to $T/T_{ref}$ with $T_{ref}=1200$K. The value of $b_{i,j}$ is calculated by 
 \begin{equation}
- b_{i,j}=\sum_{k=0}^{4}C_{i,j}M_r^k,
+ b_{i,j}=\sum_{k=0}^{4}C_{i,j,k}M_r^k,
 \end{equation}
-where $C_{i,j}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. The model coefficients $d_{i,k}$ and $C_{i,j}$ can be found in the literature \citep{Bordbar_2014,Bordbar_2020}. 
+where $C_{i,j,k}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. The model coefficients $d_{i,k}$ and $C_{i,j,k}$ can be found in the literature \citep{Bordbar_2014,Bordbar_2020}. 
 
 Previous WSGG versions and other property models often considered weighting factors as a function of temperature only and assumed a fixed molar ratio of H$_2$O and CO$_2$. This version includes dependence on both temperature and an arbitrary molar fraction ratio, increasing its accuracy and flexibility. RadLib uses the updated model coefficients from \citep{Bordbar_2020}, which extends the limited range of H$_2$O-CO$_2$ molar ratios originally presented in \citep{Bordbar_2014}. 
 
