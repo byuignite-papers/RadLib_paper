@@ -186,9 +186,9 @@ Planck Mean absorption coefficients are commonly used to model radiation, especi
 The basic assumption of weighted sum of gray gases (WSGG) models in general is that the non-gray behavior of gas mixtures, in this case H$_2$O and CO$_2$, can be modeled by a weighted sum of several gray gases and one transparent gas (which represents the spectral windows between absorption bands). 
 RadLib implements the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. It uses four gray gases and one transparent gas. Absorption coefficients are calculated by 
 \begin{equation}
- K_i=\sum_{k=0}^{4}d_{i,k}M_r^k,
+ \kappa_i=\sum_{k=0}^{4}d_{i,k}M_r^k,
 \end{equation}
-where $K_i$ is the absorption coefficient for species $i$, $d_{i,k}$ is a species-specific correlated model coefficient, and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$. The weight factors are calculated by 
+where $\kappa_i$ is the absorption coefficient for gray gas species $i$, $d_{i,k}$ is a species-specific correlated model coefficient, and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$. The weight factors are calculated by 
 \begin{equation}
  a_i=\sum_{j=0}^{4}b_{i,j}T_r^j,
 \end{equation}
