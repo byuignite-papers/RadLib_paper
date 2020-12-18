@@ -1,3 +1,6 @@
 *latexmk
 *.fls
 *.spl
+*.out
+manuscript.pdf
+manuscript.synctex.gz

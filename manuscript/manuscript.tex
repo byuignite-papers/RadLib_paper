@@ -37,6 +37,7 @@
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
 %% for the whole article with \linenumbers.
 \usepackage{lineno}
+\usepackage{amsmath}
 
 \usepackage{float}
 \restylefloat{table}
@@ -139,40 +140,72 @@ C9 & Support email for questions & davidlignell@byu.edu \\
 \section{Motivation and significance}
 \label{s:motivation}
 
-Modeling radiative heat transfer, and particular radiation absorption coefficients, for CFD is complex and challenging. More specifically, combustion simulations, which can require many complex property models already, are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to simulation cost. This can lead to simulations that use oversimplified radiation models, but in cases where radiation is significant relative to the other physical phenomena, oversimplified models can negatively impact the accuracy of simulation results. In some cases, radiative gains or losses are small compared to other sources, sinks, or modes of heat transfer, and radiation can be safely neglected, but many practical engineering systems do not allow this. For example, simple jet flames demonstrate both possibilities: early in a flame's development, turbulent mixing typically dominates heat transfer and dictates flame behavior; late-stage flame phenomena like soot behavior and flame sheet breakthrough, however, increasingly depend on the magnitude of radiative heat losses and are difficult to simulate accurately without a robust radiation model. These problems motivated development of the RadLib library, which provides a framework and uniform interface for radiation property models and implements three powerful models in C++ and Python, giving researchers easier and more convenient access to advanced radiation property models and a consistent framework for further model development. 
+Modeling radiative heat transfer for CFD is complex and challenging. Combustion simulations, for example, which require many physics models, are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to simulation cost. This can lead to simulations that use oversimplified radiation models, but in cases where radiation is significant relative to the other physical phenomena, oversimplified models can negatively impact the accuracy of simulation results. In some cases, radiative gains or losses are small compared to other energy sources or heat transfer modes and radiation can be safely neglected, but many practical engineering systems do not allow this. For example, simple jet flames demonstrate both possibilities: early in a flame's development, turbulent mixing typically dominates heat transfer and dictates flame behavior; late-stage flame phenomena like soot behavior and flame sheet breakthrough, however, increasingly depend on the magnitude of radiative heat losses and are difficult to simulate accurately without a robust radiation model. These problems motivated development of the RadLib library, which provides a framework and uniform interface for radiation property models and implements three powerful models in C++ and Python, giving researchers more convenient access to advanced radiation property models and a consistent framework for further model development. 
 
-The core mechanisms of radiative phenomena are physically and mathematically complex. Unlike other modes of heat transfer, radiation is governed by a set of integro-differential equations that depend on both direction and wavelength, known as the radiative transfer equations (RTE). Solving the RTE for a given system also requires information about the radiative properties of the materials and media involved, typically radiation absorption coefficients. Depending on the model, absorption coefficients can be dependent on a number of local system properties such as temperature, pressure, and gas composition. As a result, computational radiation solvers require two parts: first, a solution approach for the radiative transfer equations (RTE); and second, a radiation property model. RadLib addresses the second part by providing a set of implemented and validated radiation property models that can be applied to various solution approaches for the RTE. 
+The core mechanisms of radiative phenomena are physically and mathematically complex. Unlike other modes of heat transfer, radiation is governed by a set of integro-differential equations that depend on both direction and wavelength, known as the radiative transfer equations (RTE). Solving the RTE for a given system also requires information about the radiative properties of the materials and media involved, typically radiation absorption coefficients. These absorption coefficients are dependent on a number of local system properties such as temperature, pressure, and gas composition. As a result, computational radiation solvers require two parts: first, a solution approach for the radiative transfer equations (RTE); and second, a radiation property model. RadLib addresses the second part by providing a set of implemented and validated radiation property models that can be applied to various solution approaches for the RTE.
 
 %Like combustion, the core mechanisms of radiation are physically and mathematically complex. Unlike other modes of heat transfer, radiation is governed by a set of integro-differential equations that depend on both direction and wavelength. Only the simplest systems have analytic solutions, and most practical systems require a numerical solution. Ray tracing solutions are very accurate but extremely computationally expensive, and often require high-performance computing resources to execute. Modeling assumptions are common and can reduce simulation cost at the expense of accuracy, depending on their validity for the system in question. 
 
-With RadLib, we provide a convenient, easy-to-use access point for radiative property models that can be interfaced with various RTE solution approaches suitable for CFD applications. RadLib is a modular C++ library with an optional Python interface used to compute the radiation properties of participating media, often the most difficult and time-consuming portion of radiation calculations. RadLib's current focus is calculating radiation absorption coefficients and weighting factors for use in global radiation models, but the flexible framework permits expansion to other radiative properties. Three models are fully implemented and validated and all use a common interface, allowing researchers easy and convenient access to radiation modeling tools regardless of the field of application.
+With RadLib, we provide a convenient, easy-to-use access point for radiative property models that can be interfaced with various RTE solution approaches suitable for CFD applications. RadLib is a modular C++ library with an optional Python interface used to compute the radiation properties of participating media, which can be a difficult and time-consuming portion of radiation calculations. RadLib's current focus is calculating radiation absorption coefficients and weighting factors for use in global radiation models, but the expansion to other radiative properties is possible. Three models are fully implemented and validated and use a common interface, allowing researchers convenient access to radiation modeling tools suitable for various applications.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Model descriptions}
 \label{s:models}
 
-To give context to the following discussion of radiative individual property models, we include here a brief description of the radiative transfer equation (RTE). Along a given path length $s$ in a direction $\hat{\Omega}$, the general RTE  for an absorbing, emitting, and non-scattering medium is described by 
+The RTE for intensity $I$ in (unit) direction $\mathbf{s}$ for an absorbing, emitting, and non-scattering medium is described by
+%
 \begin{equation}
 	\label{e:RTE_general}
-	\frac{dI_{\eta}}{ds} = -\kappa_{\eta}I_{\eta} + \kappa_{\eta}I_{b \eta},
+    \frac{dI_{\eta}}{ds} = -\kappa_{\eta}I_{\eta} + \kappa_{\eta}I_{b,\eta},
 \end{equation}
-where $I_{\eta}$ is the radiative spectral intensity, $I_{b\eta}$ is the Planck spectral distribution of blackbody intensity, and $\kappa_{\eta}$ is the spectral absorption coefficient of the medium. Radiation property models such as those implemented by RadLib are used to calculate the absorption coefficients $\kappa_{\eta}$. From this point, various approximations can be made to simplify the solution process. For example, integrating with respect to wavenumber and subdividing the absorption cross-section into gray gases gives the spectral line-weighted (SLW) form of the RTE,
-\begin{equation}
-\label{e:RTE_SLW}
+%
+where $I_{\eta}$ is the radiative spectral intensity, 
+%$I_{b\eta}$ is the Planck spectral distribution of blackbody intensity, 
+$I_{b\eta}$ is spectral blackbody intensity (or Planck function), 
+$\kappa_{\eta}$ is the spectral absorption coefficient of the medium, and $s$ is a pathlength along direction $\mathbf{s}$. Radiation property models such as those implemented by RadLib are used to calculate the absorption coefficients $\kappa_{\eta}$. 
+%
+The gas absorption spectrum is an extremely complex function consisting of millions of spectral lines (peaks) corresponding to quantum mechanical energy levels of the gas molecules.
+Direct solution of Eq.~(\ref{e:RTE_general}), involves so-called \emph{line-by-line} calculations that are computationally prohibitive for most practical calculations, and are used primarily for model validation. Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model \cite{Hottel_1967,Modest_2013}. For instance, integrating Eq.~(\ref{e:RTE_general}) over fixed spectral ranges $\eta_j$ and assuming gray (spectrally uniform) properties in each region $j$, (that is, in each \emph{gray gas} $j$), gives
+%
+\begin{equation} \label{e:RTE_wsgg}
 	\frac{dI_j}{ds} = -\kappa_jI_j + a_j\kappa_jI_b, \hspace{20pt} j=0,1,...,n,
 \end{equation}
-where $n$ is the number of gray gases in the model, $I_j$ is the intensity of gray gas $j$, and $\kappa_j$ represents the gray gas absorption coefficient for gas $j$. When multiple gray gases are used to approximate the radiative properties, the total radiative intensity $I$ can be calculated by summing the individual gray gas intensities calculated with Equation \ref{e:RTE_SLW}:
+%
+where $a_j$ is a weight factor defined as
+%
+\begin{align}
+    &a_j= \frac{\int_{\eta_j}I_{b,\eta}d\eta}{I_b},\\
+    &\sum_j a_j = 1.
+\end{align}
+%
+Given spatial profiles of $\kappa_j$ and $a_j$, Eq.~(\ref{e:RTE_wsgg}) can be computed for each of the $n+1$ gray gases. Normally, the $j=0$ gas is considered as a clear gas and represents \emph{transparent windows} in the spectrum for which $\kappa_0=0$.
+The total radiative intensity $I$ is calculated by summing the individual gray gas intensities:
+%
 \begin{equation}
 	I=\int_{\eta=0}^{\infty}I_{\eta}d\eta=\sum_{j=1}^n I_j.
 \end{equation}
-From there, the total radiative intensity can be used to calculate various radiative heat fluxes and, where appropriate, be incorporated into larger energy balances for a simulation.
+%
+In the above, $I$ is a function of direction $\mathbf{s}$. The heat flux vector $\mathbf{q}$ is found by integrating over directional solid angles ($\mathbf{s}\Omega$) on the sphere:
+%
+\begin{equation}
+    \mathbf{q} = \int_{4\pi}I(\mathbf{s})\mathbf{s}d\Omega.
+\end{equation}
+%
+The volumetric radiative heat source is then 
+%
+\begin{equation}
+    Q = -\nabla\cdot\mathbf{q}.
+\end{equation}
+%
 
-RadLib implements three models of varying complexity and accuracy to calculate the radiation absorption coefficients $\kappa$ and their weighting factors $a$ for each gas considered by the model. The absorption coefficients are typically calculated using correlations relating them local properties such as temperature, pressure, and composition. Correlations come from curve fits to high-resolution radiation property databases. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$) and soot in its calculation of absorption coefficients and weighting factors. 
+RadLib currently implements three models of varying complexity and accuracy to calculate the radiation absorption coefficients $\kappa_j$ and their weight factors $a_j$ for each gas $j$. The absorption coefficients are typically calculated using correlations relating them local properties such as temperature, pressure, and composition. Correlations come from curve fits to high-resolution radiation property databases. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$) and soot. 
 
-Once the radiative absorption coefficients are calculated, they can then be used to solve the RTE, which depends on the simulation configuration and assumptions. Solving the RTE is not the focus of this software, but RadLib's example cases do employ a simple ray tracing solver to calculate the radiative heat flux and volumetric heat source profiles between two parallel planes. 
+While solving the RTE is not the focus of this software, RadLib's example cases do employ a simple ray tracing solver to calculate the radiative heat flux and volumetric heat source profiles between two parallel planes. 
 
 %[OTHER THINGS THAT APPLY TO ALL MODELS GO HERE]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Planck Mean absorption coefficients}
 \label{s:planckmean}
@@ -181,8 +214,11 @@ RadLib's simplest model uses Planck Mean absorption coefficients calculated from
 
 Planck Mean absorption coefficients are commonly used to model radiation, especially in combustion systems, because the model is relatively easy to implement, computationally inexpensive, and reasonably accurate in some cases. The Planck Mean model is most appropriate under optically thin conditions with relatively low radiative transfer relative to other heat sources such as reactive heat release rates. In cases where the optically thin assumption applies, such as simple hydrogen jet flames, this model and the associated Planck Mean absorption coefficients can produce accurate results \citep{Barlow_1999}. In cases where the optically thin assumption is not reasonable, including many other combustion scenarios, the Planck Mean model does not produce accurate results. For example, it significantly overpredicts radiative losses from the TNF library's CH$_4$ flames \cite{Frank_2000,Zhu_2002,Coelho_2002}. The examples included with the code and illustrated in Section \ref{s:Examples} demonstrate the deficiencies of the Planck Mean model in comparison to the others included with RadLib.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Weighted sum of gray gases (WSGG)}
 \label{s:wsgg}
+
 The basic assumption of weighted sum of gray gases (WSGG) models in general is that the non-gray behavior of gas mixtures, in this case H$_2$O and CO$_2$, can be modeled by a weighted sum of several gray gases and one transparent gas (which represents the spectral windows between absorption bands). 
 RadLib implements the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. It uses four gray gases and one transparent gas. Absorption coefficients are calculated by 
 \begin{equation}
@@ -199,6 +235,8 @@ where $a_i$ is the weighting factor for species $i$ and $T_r$ is a normalized te
 where $C_{i,j,k}$ is another correlated model coefficient and $M_r$ is the molar ratio $Y_{\mathrm{H_2O}}/Y_{\mathrm{CO_2}}$ as above. The model coefficients $d_{i,k}$ and $C_{i,j,k}$ can be found in the literature \citep{Bordbar_2014,Bordbar_2020}. 
 
 Previous WSGG versions and other property models often considered weighting factors as a function of temperature only and assumed a fixed molar ratio of H$_2$O and CO$_2$. This version includes dependence on both temperature and an arbitrary molar fraction ratio, increasing its accuracy and flexibility. RadLib uses the updated model coefficients from \citep{Bordbar_2020}, which extends the limited range of H$_2$O-CO$_2$ molar ratios originally presented in \citep{Bordbar_2014}. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Rank Correlated SLW (RCSLW)}
 \label{s:RCSLW}
