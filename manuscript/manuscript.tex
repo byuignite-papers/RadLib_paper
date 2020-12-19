@@ -260,14 +260,23 @@ The correlations provided in \cite{Bordbar_2014} are valid for $0.01\le M_r\le4$
 \subsection{Rank Correlated SLW (RCSLW)} \label{s:RCSLW}
 
 The Spectral Line Weighted-Sum-of-Gray Gases (SLW) model represents a family of global approaches to radiative heat transfer in high-temperature gases that also includes Absorption Distribution Function (ADF) and Full Spectrum $k$-distribution (FSK) models, all of which are based on the same fundamental principle in modeling the gas absorption spectrum \cite{Solovjov_2016}. In order to extend their spectral models from uniform conditions (isothermal, homogeneous gases) to nonuniform conditions (non-isothermal, non-homogeneous gases), these models take a reference approach in which local gas states are corrected relative to a reference state. Reference approaches, however, generally lack consistent reference states and can yield significant errors in cases with large spatial temperature gradients \cite{Solovjov_2017}. The Rank Correlated SLW (RCSLW) model is a unique extension of the generalized SLW model that does not require a specified gas reference state and preserves the emission term of the spectrally integrated RTE. 
-%
 % TODO: what does this last phrase mean: preserves the emission...?
 %
-Recent comparison of advanced SLW modeling approaches revealed that ``the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases" \citep{Badger_2019}. A brief overview of the general SLW and RCSLW models will be given here; detailed discussion can be found in the literature \cite{Solovjov_2000, Solovjov_2001, Solovjov_2008, Solovjov_2011, Solovjov_2014, Solovjov_2016, Solovjov_2017, Webb_2018}. 
+Recent comparison of advanced SLW modeling approaches revealed that ``the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases" \citep{Badger_2019}. A brief overview of the RCSLW model is given here; detailed discussion can be found in the literature \cite{Solovjov_2000, Solovjov_2001, Solovjov_2008, Solovjov_2011, Solovjov_2014, Solovjov_2016, Solovjov_2017, Webb_2018}. 
+Solovjov et al.~\cite{Solovjov_2017} present a number of methods within a generalized framework, with method I.2.2 giving the best results. That is the method implemented and summarized here.
+%
 
-SLW models are similar to WSGG models but instead of integrating over simple sequential $\eta$ bands, spectral integration is done over wavenumbers in a given range of absorption cross section. So, in Eq.~(\ref{e:RTE_wsgg}), gas $j$ would refer to wavenumbers $\eta\in\Delta_j$ with $\Delta_j=\{\eta:\,\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$, using Solovjov's notation, where $C$ denotes absorption cross-section (where $\kappa=CN$, $N$ is molar density of the radiatively participating gas), and $\tilde{C}$ are supplemental cross sections defining interfaces between adjacent cross-section bands. 
+SLW models are similar to WSGG models but instead of integrating over a given range of $\eta$, with sequential $\eta$ bands defining gray gases $j$, spectral integration is done over wavenumbers in a given range of absorption cross section, with sequential bands of cross-section defining the gray gases $j$. So, in Eq.~(\ref{e:RTE_wsgg}), gas $j$ would refer to wavenumbers $\eta\in\Delta_j$ with $\Delta_j=\{\eta:\,\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$, using Solovjov's notation, where $C$ denotes absorption cross-section (where $\kappa=CN$ and $N$ is molar density of the radiatively participating gas), and $\tilde{C}$ are supplemental cross sections defining interfaces between adjacent cross-section bands. This ensures that the gas is in fact gray in a given band, by definition, at least to within the width $\tilde{C}_j-\tilde{C}_{j-1}$. In contrast, in traditional WSGG approaches, the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
 
-If $\tilde{C}_j$ are known for all $j$, then $\kappa_j = N\sqrt{C_{j-1}C_j}$. The weights $a_j$ are computed using the absorption line blackbody distribution function (ALBDF), denoted $F$, which gives the fraction of total blackbody emission from $\eta$ corresponding to absorbtion cross sections less than $C$: $F$ is a monotonically-increasing function of $C$, and depends on the thermodynamic state $\phi$, and the black temperature $T_b$ defining the Planck function: $F = F(C,\phi,T_b)$. The $a_j$ are then computed as
+The gas weights $a_j$, are the fraction of the blackbody emission from $\eta$ corresponding to a given cross-section band. This energy is computed using the absorption line blackbody distribution function (ALBDF) \cite{Pearson_2014}, which gives the fraction of total blackbody emission from $\eta$ corresponding to absorption cross sections less than $C$: 
+%
+\begin{linenomath}
+    \begin{equation} \label{e:albdf}
+    F(C,\phi,T) = \frac{1}{\sigma T^4}\int_{\{\eta:\,C(\eta,\phi)<C\}}E_b(\eta,T)d\eta,
+\end{equation}
+\end{linenomath}
+%
+so that
 %
 \begin{linenomath}
 \begin{equation}
@@ -275,8 +284,28 @@ a_j = F(\tilde{C}_j,\phi, T) - F(\tilde{C}_{j-1}, \phi,T).
 \end{equation}
 \end{linenomath}
 %
+%todo: deal with T versus Tb in e:albdf and previous eqn.
+Note that $F$ varies between zero and one, and is monotonic in $C$, allowing calculation of the inverse $C(F,\phi,T_b)$.
 
-Equation~(\ref{e:RTE_wsgg}) assumes the $\Delta_j$ intervals are independent of spatial position, but care must be taken since $C(\eta)$ depends on the thermodynamic state, which does vary spatially. Hence, the fixed $\Delta_j$ imply a corresponding variation in $C_j$ and $\tilde{C}_j$. 
+Equation~(\ref{e:RTE_wsgg}) assumes the sets $\Delta_j$ are independent of spatial position, but care must be taken since C depends on the thermodynamic state (denoted by vector $\phi$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C=C(\eta,\phi)$. Hence, the fixed $\Delta_j$ imply a corresponding variation in $C_j$ and $\tilde{C}_j$ from one spatial location to the next.
+ 
+The RCSLW model uses the notion of \emph{rank correlation} to account for this variation in the $C_j$, which in turn define the absorption coefficients $\kappa_j$. Solovjov defines two spectra arising from thermodynamic states $\phi_1$ and $\phi_2$ to be rank correlated if, for an arbirary wavenumber $\hat{\eta}$, the wave number sets $\Delta_1$ and $\Delta_2$ are equal, where $\Delta_1=\{\eta: C(\eta,\phi_1)<C(\hat{\eta},\phi_1)\}$, and $\Delta_2=\{\eta: C(\eta,\phi_2)<C(\hat{\eta},\phi_2)\}$. 
+Note in Eq.~(\ref{e:albdf}), that $\phi$ determines $C$, which then determines the set of $\eta$ integrated over. But for a \emph{given} set $\eta$, e.g., $\Delta_1$, $F$ can be considered as $F(C,T)$. Hence, if $\Delta_1=\Delta_2$, then at a fixed reference black temperature $T_{ref}$, we have $F(C_1,\phi_1,T_{ref})=F(C_2,\phi_2,T_{ref})$. One can then compute the inverse to find $C_1$ at $\phi_1$ and $C_2$ at $\phi_2$ (i.e., values at two spatial positions) corresponding to the same wavenumber interval. 
+
+In practice, for a given problem, a grid of $\tilde{F}_j$ points are specified, with $F_j$ points between $\tilde{F}_j$ and $\tilde{F}_{j-1}$. The corresponding $\tilde{C}_j$ and $C_j$ values at any spatial position can then be found by inversion: $C_j = C(F_j,\phi,T_{ref})$, and similarly for $\tilde{C}_j$ in terms of $\tilde{F}_j$. $\kappa_j$ and $a_j$ can then be computed as noted above.
+%TODO verify this in terms of the quadrature.
+
+
+
+
+
+
+
+
+
+
+
+
 
 %The RCSLW model begins with the SLW form of the RTE, given by Eq.~(\ref{e:RTE_SLW}). The gray gas absorption coefficients $\kappa_j$ are calculated calculated as $\kappa_j=N \sqrt{C_{j-1}C_j}$,
 %where $C_{j-1}$ and $C_j$ are supplemental absorption cross-sections used to discretize the absorption spectrum \cite{Solovjov_2001}. The gray gas weights $a_j$ corresponding to each absorption coefficient are given by $a_j=F(C_j)-F(C_{j-1})$, where $F(C_j)$ is the absorption line blackbody distribution function (ALBDF) for species $j$, calculated from the detailed absorption spectrum of that species. In general SLW methods, the absorption cross-sections are chosen with respect to a thermodynamic reference state, classifying them as reference approaches. The Rank-Correlated SLW (RCSLW) model avoids specifying a reference state by relating thermodynamic states to one another instead. If two arbitrary absorption cross-sections define identical wavenumber intervals, the two cross-sections (neither of which is designated a reference cross-section) can be said to be rank-correlated. The inverse ALBDF, defined such that $C[F(C,\phi_g,T_b),\phi_g,T_b]=C$ and $F[C(F,\phi_g,T_b),\phi_g,T_b]=F$ for a given gas thermodynamic state $\phi_g$ and blackbody temperature $T_b$, is proven to have this property and can also be called the rank-correlated reordered absorption cross-sections \cite{Solovjov_2017}. As a result, the inverse ALBDF can be used to construct cross-section intervals for the RCSLW model that do not rely on an arbitrary reference state or spectrum. ALBDFs for individual gray gases are multiplied together to obtain an overall ABLDF for the gas mixture \cite{Solovjov_2001}. RadLib's RCSLW model uses Method 1.2.2 as defined in and recommended by \cite{Solovjov_2017}.
