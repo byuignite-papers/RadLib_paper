@@ -216,8 +216,7 @@ While solving the RTE is not the focus of this software, RadLib's example cases 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Planck Mean absorption coefficients}
-\label{s:planckmean}
+\subsection{Planck Mean absorption coefficients} \label{s:planckmean}
 
 RadLib's simplest model uses Planck Mean absorption coefficients calculated from the correlations given on the TNF Workshop site \citep{Smith_2003}. The temperature-dependent correlations are based on the RADCAL model \citep{Grosshandler_1993}. The TNF radiation model is also documented in \citep{Barlow_2001}.
 
@@ -225,8 +224,7 @@ Planck Mean absorption coefficients are commonly used to model radiation, especi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Weighted sum of gray gases (WSGG)}
-\label{s:wsgg}
+\subsection{Weighted sum of gray gases (WSGG)} \label{s:wsgg}
 
 The WSGG model was outlined in Sec.~\ref{s:models}.
 RadLib implements the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. It uses four gray gases and one transparent gas, and considers gaseous species \ce{CO2} and \ce{H2O}. This version of the WSGG model has the advantage over some others in that it allows for arbitrary \ce{CO2} and \ce{H2O} compositions, increasing its accuracy and flexibility. Absorption coefficients are calculated by 
@@ -259,13 +257,29 @@ The correlations provided in \cite{Bordbar_2014} are valid for $0.01\le M_r\le4$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Rank Correlated SLW (RCSLW)}
-\label{s:RCSLW}
+\subsection{Rank Correlated SLW (RCSLW)} \label{s:RCSLW}
 
-The Spectral Line Weighted-sum-of-gray gases (SLW) model represents a family of global approaches to radiative heat transfer in high-temperature gases that also includes Absorption Distribution Function (ADF) and Full Spectrum $k$-distribution (FSK) models, all of which are based on the same fundamental principle in modeling the gas absorption spectrum \cite{Solovjov_2016}. In order to extend their spectral models from uniform conditions (isothermal, homogeneous gases) to nonuniform conditions (non-isothermal, non-homogeneous gases), these models take a reference approach in which local gas states are corrected relative to a reference state. Reference approaches, however, generally lack consistent reference states and can yield significant errors in cases with large spatial temperature gradients \cite{Solovjov_2017}. The Rank Correlated SLW (RCSLW) model is a unique extension of the generalized SLW model that does not require a specified gas reference state and preserves the emission term of the spectrally integrated RTE. Recent comparison of advanced SLW modeling approaches revealed that "the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases" \citep{Badger_2019}. A brief overview of the general SLW and RCSLW models will be given here; detailed discussion can be found in the literature \cite{Solovjov_2000, Solovjov_2001, Solovjov_2008, Solovjov_2011, Solovjov_2014, Solovjov_2016, Solovjov_2017, Webb_2018}. 
+The Spectral Line Weighted-Sum-of-Gray Gases (SLW) model represents a family of global approaches to radiative heat transfer in high-temperature gases that also includes Absorption Distribution Function (ADF) and Full Spectrum $k$-distribution (FSK) models, all of which are based on the same fundamental principle in modeling the gas absorption spectrum \cite{Solovjov_2016}. In order to extend their spectral models from uniform conditions (isothermal, homogeneous gases) to nonuniform conditions (non-isothermal, non-homogeneous gases), these models take a reference approach in which local gas states are corrected relative to a reference state. Reference approaches, however, generally lack consistent reference states and can yield significant errors in cases with large spatial temperature gradients \cite{Solovjov_2017}. The Rank Correlated SLW (RCSLW) model is a unique extension of the generalized SLW model that does not require a specified gas reference state and preserves the emission term of the spectrally integrated RTE. 
+%
+% TODO: what does this last phrase mean: preserves the emission...?
+%
+Recent comparison of advanced SLW modeling approaches revealed that ``the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases" \citep{Badger_2019}. A brief overview of the general SLW and RCSLW models will be given here; detailed discussion can be found in the literature \cite{Solovjov_2000, Solovjov_2001, Solovjov_2008, Solovjov_2011, Solovjov_2014, Solovjov_2016, Solovjov_2017, Webb_2018}. 
 
-The RCSLW model begins with the SLW form of the RTE, given by Eq.~(\ref{e:RTE_SLW}). The gray gas absorption coefficients $\kappa_j$ are calculated calculated as $\kappa_j=N \sqrt{C_{j-1}C_j}$,
-where $C_{j-1}$ and $C_j$ are supplemental absorption cross-sections used to discretize the absorption spectrum \cite{Solovjov_2001}. The gray gas weights $a_j$ corresponding to each absorption coefficient are given by $a_j=F(C_j)-F(C_{j-1})$, where $F(C_j)$ is the absorption line blackbody distribution function (ALBDF) for species $j$, calculated from the detailed absorption spectrum of that species. In general SLW methods, the absorption cross-sections are chosen with respect to a thermodynamic reference state, classifying them as reference approaches. The Rank-Correlated SLW (RCSLW) model avoids specifying a reference state by relating thermodynamic states to one another instead. If two arbitrary absorption cross-sections define identical wavenumber intervals, the two cross-sections (neither of which is designated a reference cross-section) can be said to be rank-correlated. The inverse ALBDF, defined such that $C[F(C,\phi_g,T_b),\phi_g,T_b]=C$ and $F[C(F,\phi_g,T_b),\phi_g,T_b]=F$ for a given gas thermodynamic state $\phi_g$ and blackbody temperature $T_b$, is proven to have this property and can also be called the rank-correlated reordered absorption cross-sections \cite{Solovjov_2017}. As a result, the inverse ALBDF can be used to construct cross-section intervals for the RCSLW model that do not rely on an arbitrary reference state or spectrum. ALBDFs for individual gray gases are multiplied together to obtain an overall ABLDF for the gas mixture \cite{Solovjov_2001}. RadLib's RCSLW model uses Method 1.2.2 as defined in and recommended by \cite{Solovjov_2017}.
+SLW models are similar to WSGG models but instead of integrating over simple sequential $\eta$ bands, spectral integration is done over wavenumbers in a given range of absorption cross section. So, in Eq.~(\ref{e:RTE_wsgg}), gas $j$ would refer to wavenumbers $\eta\in\Delta_j$ with $\Delta_j=\{\eta:\,\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$, using Solovjov's notation, where $C$ denotes absorption cross-section (where $\kappa=CN$, $N$ is molar density of the radiatively participating gas), and $\tilde{C}$ are supplemental cross sections defining interfaces between adjacent cross-section bands. 
+
+If $\tilde{C}_j$ are known for all $j$, then $\kappa_j = N\sqrt{C_{j-1}C_j}$. The weights $a_j$ are computed using the absorption line blackbody distribution function (ALBDF), denoted $F$, which gives the fraction of total blackbody emission from $\eta$ corresponding to absorbtion cross sections less than $C$: $F$ is a monotonically-increasing function of $C$, and depends on the thermodynamic state $\phi$, and the black temperature $T_b$ defining the Planck function: $F = F(C,\phi,T_b)$. The $a_j$ are then computed as
+%
+\begin{linenomath}
+\begin{equation}
+a_j = F(\tilde{C}_j,\phi, T) - F(\tilde{C}_{j-1}, \phi,T).
+\end{equation}
+\end{linenomath}
+%
+
+Equation~(\ref{e:RTE_wsgg}) assumes the $\Delta_j$ intervals are independent of spatial position, but care must be taken since $C(\eta)$ depends on the thermodynamic state, which does vary spatially. Hence, the fixed $\Delta_j$ imply a corresponding variation in $C_j$ and $\tilde{C}_j$. 
+
+%The RCSLW model begins with the SLW form of the RTE, given by Eq.~(\ref{e:RTE_SLW}). The gray gas absorption coefficients $\kappa_j$ are calculated calculated as $\kappa_j=N \sqrt{C_{j-1}C_j}$,
+%where $C_{j-1}$ and $C_j$ are supplemental absorption cross-sections used to discretize the absorption spectrum \cite{Solovjov_2001}. The gray gas weights $a_j$ corresponding to each absorption coefficient are given by $a_j=F(C_j)-F(C_{j-1})$, where $F(C_j)$ is the absorption line blackbody distribution function (ALBDF) for species $j$, calculated from the detailed absorption spectrum of that species. In general SLW methods, the absorption cross-sections are chosen with respect to a thermodynamic reference state, classifying them as reference approaches. The Rank-Correlated SLW (RCSLW) model avoids specifying a reference state by relating thermodynamic states to one another instead. If two arbitrary absorption cross-sections define identical wavenumber intervals, the two cross-sections (neither of which is designated a reference cross-section) can be said to be rank-correlated. The inverse ALBDF, defined such that $C[F(C,\phi_g,T_b),\phi_g,T_b]=C$ and $F[C(F,\phi_g,T_b),\phi_g,T_b]=F$ for a given gas thermodynamic state $\phi_g$ and blackbody temperature $T_b$, is proven to have this property and can also be called the rank-correlated reordered absorption cross-sections \cite{Solovjov_2017}. As a result, the inverse ALBDF can be used to construct cross-section intervals for the RCSLW model that do not rely on an arbitrary reference state or spectrum. ALBDFs for individual gray gases are multiplied together to obtain an overall ABLDF for the gas mixture \cite{Solovjov_2001}. RadLib's RCSLW model uses Method 1.2.2 as defined in and recommended by \cite{Solovjov_2017}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -303,8 +317,7 @@ The soot model used in the WSGG model can be applied to the RCSLW model as well.
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Software Description}
-\label{s:architechture}
+\section{Software Description} \label{s:architechture}
 
 RadLib is an object-oriented C++ class library that includes both C++ and Python interfaces. The RadLib package contains five subdirectories (upon initial download): \texttt{source} contains the RadLib source code; \texttt{build} contains installation files; \texttt{examples} contains instructive example cases, including a simple interface and solver for a parallel planes geometry; \texttt{data} contains ALBDF data tables required for the RCSLW model; and \texttt{docs} contains files used to generate code documentation with Doxygen (optional). 
 
@@ -325,8 +338,7 @@ Figure \ref{fig:flowchart} illustrates the basic structure use of the RadLib pac
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Illustrative Examples}
-\label{s:Examples}
+\section{Illustrative Examples} \label{s:Examples}
 
 Several examples are presented to illustrate the behavior of the models. The examples show heat flux $q$ or volumetric heat source $Q$ in one one-dimensional configurations with varying gas compositions and temperatures. We compare the PM, WSGG, and RCSLW models for each example. The examples correspond to those presented by Solvojov et al. (S) \cite{Solovjov_2017} and Bordbar et al. (B) \cite{Bordbar_2020}, and the number of each example corresponds to the example number in the respective reference. A ray-tracing code is used to solve the radiative transport equation between two parallel plates. 
 Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a cold slab where the cold slab's thickness varies; Example S2 is isothermal with a thick slab of high CO$_2$ next to a thin slab of low CO$_2$ with variable thickness; Example S3 uses parabolic temperature and H$_2$O mole fraction profiles; Example S4 has a triangular temperature profile between equally-spaced isothermal regions; Example S5 uses a half-sinusoid temperature profile that decreases from 1500 to 500 K; and Example B3 has symmetric temperature and H$_2$O mole fraction profiles with central peaks of 1800 K and 1, respectively (with $y_{CO2}=1-y_{H2O}$). Each case is presented alongside the line-by-line (LBL) data presented in the references. 
@@ -386,8 +398,7 @@ In all Examples, the RCSLW model is initialized using the mean temperature and c
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Impact}
-\label{s:impact}
+\section{Impact} \label{s:impact}
 
 Radiative heat transfer models are historically difficult to implement in CFD codes due to their complexity and high computational costs. Neglecting radiation or using simple models like the optically thin assumption is adequate for some cases with simple geometry or limited chemical reactions, but most simulations of interest to engineers and researchers require more advanced radiation modeling to yield accurate results. In such cases, radiation models that are incorrectly implemented or inappropriate for the simulation parameters can become additional sources of error that may be extremely difficult to separate from existing sources or error. Currently, researchers that require detailed radiation modeling must code and validate it themselves at the expense of valuable research time and funding. 
 
@@ -407,41 +418,30 @@ Currently, RadLib is only used within the authors' research group, where it is a
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Conclusions}
-\label{}
+\section{Conclusions} \label{s:conclusions}
 
 Set out the conclusion of this original software publication.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Conflict of Interest}
+\section{Conflict of Interest} \label{s:coi}
 
 There are no known conflicts of interest associated with this publication and there has been no significant financial support for     this work that could have influenced its outcome.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Acknowledgements}
-\label{sec:acknowledgements}
+\section*{Acknowledgements} \label{sec:acknowledgements}
 
 The authors extend special thanks to Hadi Bordbar for assistance with the WSGG model and to Vladimir Solovjov and Brent Webb of Brigham Young University for their insights and assistance with the RCSLW model. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% \appendix
-
-%% \section{}
-%% \label{}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% References:
 
 \bibliographystyle{elsarticle-num} 
 \bibliography{references} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Current executable software version}
-\label{}
+\section*{Current executable software version} \label{s:current_software}
 
 %Ancillary data table required for sub version of the executable software: (x.1, x.2 etc.) kindly replace examples in right column with the correct information about your executables, and leave the left column as it is.
 
