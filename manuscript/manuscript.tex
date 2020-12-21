@@ -296,7 +296,7 @@ Note that $F$ varies between zero and one, and is monotonic in $C$, allowing cal
 
 The WSGG RTE in Eq.~\ref{e:RTE_wsgg} assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but care must be taken since $C_\eta$ depends on the thermodynamic state (denoted by vector $\BS{\phi}$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$. Hence, spatially-fixed $\Delta_j$ with spatially varying $\BS{\phi}$ imply a spatial variation in $C_j$ and $\tilde{C}_j$.
  
-The RCSLW model uses the notion of \emph{rank correlation} to compute this variation in $C_j$ and $\tilde{C}_j$. Solovjov et~al.~\cite{Solovjov_2017} define two spectra at thermodynamic states $\BS{\phi}_1$ and $\BS{\phi}_2$ to be rank correlated if, for an arbirary wavenumber $\hat{\eta}$, the wavenumber sets $H_1(\BS{\phi}_1)$ and $H_2(\BS{\phi}_2)$ are equal, where 
+The RCSLW model uses the notion of \emph{rank correlation} to compute this variation in $C_j$ and $\tilde{C}_j$. Solovjov et~al.~\cite{Solovjov_2017} define two spectra at states $\BS{\phi}_1$ and $\BS{\phi}_2$ to be rank correlated if, for an arbirary wavenumber $\hat{\eta}$, the wavenumber sets $H_1(\BS{\phi}_1)$ and $H_2(\BS{\phi}_2)$ are equal, where 
 %
 \begin{linenomath}
 \begin{align}
@@ -306,12 +306,12 @@ The RCSLW model uses the notion of \emph{rank correlation} to compute this varia
 \end{linenomath}
 %
 
-Consider Eq.~\ref{e:albdf} at fixed argument $T=T_r$, and denote $C_\eta(\hat{\eta},\BS{\phi}_1)$ as $C_1$, and similarly for $C_2$; then we have
+Consider Eq.~\ref{e:albdf} at fixed argument $T=T_r$, and let $\hat{C}_1\equiv C_\eta(\hat{\eta},\BS{\phi}_1)$, and similarly for $\hat{C}_2$; then we have
 %
 \begin{linenomath}
     \begin{align} \label{e:albdf2}
-        F(C_1,\BS{\phi}_1,T) &= \frac{1}{\sigma T^4}\int_{H_1}E_b(\eta,T_r)d\eta, \\
-        F(C_2,\BS{\phi}_2,T) &= \frac{1}{\sigma T^4}\int_{H_2}E_b(\eta,T_r)d\eta.
+        F(\hat{C}_1,\BS{\phi}_1,T) &= \frac{1}{\sigma T^4}\int_{H_1(\BS{\phi_1})}E_b(\eta,T_r)d\eta, \\
+        F(\hat{C}_2,\BS{\phi}_2,T) &= \frac{1}{\sigma T^4}\int_{H_2(\BS{\phi_1})}E_b(\eta,T_r)d\eta.
     \end{align}
 \end{linenomath}
 %
