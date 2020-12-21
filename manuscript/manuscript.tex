@@ -271,7 +271,8 @@ Solovjov et al.~\cite{Solovjov_2017} present a number of methods within a genera
 
 SLW models are written in terms of absorption cross section $C_\eta(\eta)$, where $\kappa_\eta=C_\eta N$, and $N$ is the molar density of the radiatively participating gas. 
 %
-SLW models are similar to WSGG models, but instead of integrating within a sequential band of $\eta$ to define gray gas $j$, spectral integration is done over a set of (nonsquential) wavenumbers constituting a given band $j$ of $C_\eta$. Consider the set of wavenumbers $\tilde{H}_j=\{\eta:C_\eta<\tilde{C}_j\}$, then $\Delta_j=\tilde{H}_j-\tilde{H}_{j-1} = \{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}. (Here, we are using the notation in \cite{Solovjov_2017}.)
+SLW models are similar to WSGG models, but instead of integrating within a sequential band of $\eta$ to define gray gas $j$, spectral integration is done over a set of (nonsquential) wavenumbers constituting a given band $j$ of $C_\eta$. 
+Using Solovjov's notation~\cite{Solovjov_2017}, $\Delta_j=\{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}.
 %
 The SLW gases, then, are gray in a given band by definition, at least to within the width $\tilde{C}_j-\tilde{C}_{j-1}$. In contrast, in traditional WSGG approaches, the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
 
@@ -286,7 +287,7 @@ A gas weight $a_j$ is the fraction of blackbody emission from $\eta\in\Delta_j$ 
 so that
 %
 \begin{linenomath}
-\begin{equation}
+    \begin{equation}\label{e:aj}
     a_j = F(\tilde{C}_j,\BS{\phi}, T) - F(\tilde{C}_{j-1}, \BS{\phi},T).
 \end{equation}
 \end{linenomath}
@@ -296,47 +297,41 @@ Note that $F$ varies between zero and one, and is monotonic in $C$, allowing cal
 
 The WSGG RTE in Eq.~\ref{e:RTE_wsgg} assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but care must be taken since $C_\eta$ depends on the thermodynamic state (denoted by vector $\BS{\phi}$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$. Hence, spatially-fixed $\Delta_j$ with spatially varying $\BS{\phi}$ imply a spatial variation in $C_j$ and $\tilde{C}_j$.
  
-The RCSLW model uses the notion of \emph{rank correlation} to compute this variation in $C_j$ and $\tilde{C}_j$. Solovjov et~al.~\cite{Solovjov_2017} define two spectra at states $\BS{\phi}_1$ and $\BS{\phi}_2$ to be rank correlated if, for an arbirary wavenumber $\hat{\eta}$, the wavenumber sets $H_1(\BS{\phi}_1)$ and $H_2(\BS{\phi}_2)$ are equal, where 
-%
-\begin{linenomath}
-\begin{align}
-    H_1(\BS{\phi}_1)&=\{\eta: C_\eta(\eta,\BS{\phi}_1)<C_\eta(\hat{\eta},\BS{\phi}_1)\}, \\
-    H_2(\BS{\phi}_2)&=\{\eta: C_\eta(\eta,\BS{\phi}_2)<C_\eta(\hat{\eta},\BS{\phi}_2)\}. 
-\end{align}
-\end{linenomath}
-%
-
+The RCSLW model uses the notion of \emph{rank correlation} to compute this variation in $C_j$ and $\tilde{C}_j$. Solovjov et~al.~\cite{Solovjov_2017} define two spectra at states $\BS{\phi}_1$ and $\BS{\phi}_2$ to be rank correlated 
+if the set $H_1=\{\eta: C_\eta(\eta,\BS{\phi}_1)<C_\eta(\hat{\eta},\BS{\phi}_1)\}$ is equal to the set
+$H_2=\{\eta: C_\eta(\eta,\BS{\phi}_2)<C_\eta(\hat{\eta},\BS{\phi}_2)\}$.
+ 
 Consider Eq.~\ref{e:albdf} at fixed argument $T=T_r$, and let $\hat{C}_1\equiv C_\eta(\hat{\eta},\BS{\phi}_1)$, and similarly for $\hat{C}_2$; then we have
 %
 \begin{linenomath}
     \begin{align} \label{e:albdf2}
-        F(\hat{C}_1,\BS{\phi}_1,T) &= \frac{1}{\sigma T^4}\int_{H_1(\BS{\phi_1})}E_b(\eta,T_r)d\eta, \\
-        F(\hat{C}_2,\BS{\phi}_2,T) &= \frac{1}{\sigma T^4}\int_{H_2(\BS{\phi_1})}E_b(\eta,T_r)d\eta.
+        F(\hat{C}_1,\BS{\phi}_1,T_r) &= \frac{1}{\sigma T_r^4}\int_{\{\eta: C_\eta(\eta,\BS{\phi}_1)<C_\eta(\hat{\eta},\BS{\phi}_1)\}}E_b(\eta,T_r)d\eta, \\
+        F(\hat{C}_2,\BS{\phi}_2,T_r) &= \frac{1}{\sigma T_r^4}\int_{\{\eta: C_\eta(\eta,\BS{\phi}_2)<C_\eta(\hat{\eta},\BS{\phi}_2)\}}E_b(\eta,T_r)d\eta.
     \end{align}
 \end{linenomath}
 %
+(Note the distinction between $\hat{C}_1$ and $C_j$, where $\hat{C}_1$ is a cross section at $\hat{\eta}$ and state $\BS{\phi}_1$, and $C_j$ is the cross section of some gray gas $j$).
+In these equations, since the sets integrated over are the same: $H_1=H_2$, and since argument $T=T_r$ is the same, we have 
+%
+\begin{linenomath}
+    \begin{equation}\label{e:FeqF}
+    F(\hat{C}_1,\BS{\phi}_1,T_r)=F(\hat{C}_2,\BS{\phi}_2,T_r).
+\end{equation}
+\end{linenomath}
+%
+Recall that $F$ can be inverted, so if $\hat{C}_1$ and $\BS{\phi}_1$ are given, we can compute $F$ and then invert to obtain $\hat{C}_2$ at $\BS{\phi}_2$. But Eq.~\ref{e:FeqF} holds for arbitrary states $\BS{\phi}$, so we can also just specify a value of $F$, and then do the inversion to get $\hat{C}$ at given $\BS{\phi}$. At this point, we can drop the \emph{hat} notation and just write $F(C,\BS{\phi},T_r)$.
 
- 
-%Note in Eq.~\ref{e:albdf}, that $\BS{\phi}$ determines $C_\eta$, which then determines the set of $\eta$ integrated over. But for a \emph{given} set $\eta$, e.g., $H_1$, $F$ can be considered as $F(C,T)$. Hence, if $H_1=H_2$, then at a fixed reference black temperature $T_{ref}$, we have $F(C_1,\BS{\phi}_1,T_{ref})=F(C_2,\BS{\phi}_2,T_{ref})$. One can then compute the inverse to find $C_1$ at $\BS{\phi}_1$ and $C_2$ at $\BS{\phi}_2$ (i.e., values at two spatial positions) corresponding to the same wavenumber interval. 
+In the RCSLW model for a given problem, a collection of $\tilde{F}_j$ values are specified, with $F_j$ points between $\tilde{F}_j$ and $\tilde{F}_{j-1}$. The corresponding $\tilde{C}_j$ and $C_j$ values at any spatial position (and corresponding thermodynamic state $\BS{\phi}$) can then be found by inversion: $C_j = C(F_j,\BS{\phi},T_r)$, and similarly for $\tilde{C}_j$ in terms of $\tilde{F}_j$. $\kappa_j$ is then computed as $\kappa_j=C_jN$, and $a_j$ is computed from Eq.~\ref{e:aj}, where $T$ is taken as the local temperature, not $T_r$.
 
-In practice, for a given problem, a grid of $\tilde{F}_j$ points are specified, with $F_j$ points between $\tilde{F}_j$ and $\tilde{F}_{j-1}$. The corresponding $\tilde{C}_j$ and $C_j$ values at any spatial position can then be found by inversion: $C_j = C(F_j,\BS{\phi},T_{ref})$, and similarly for $\tilde{C}_j$ in terms of $\tilde{F}_j$. $\kappa_j$ and $a_j$ can then be computed as noted above.
-%TODO verify this in terms of the quadrature.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%The RCSLW model begins with the SLW form of the RTE, given by Eq.~\ref{e:RTE_SLW}. The gray gas absorption coefficients $\kappa_j$ are calculated calculated as $\kappa_j=N \sqrt{C_{j-1}C_j}$,
-%where $C_{j-1}$ and $C_j$ are supplemental absorption cross-sections used to discretize the absorption spectrum \cite{Solovjov_2001}. The gray gas weights $a_j$ corresponding to each absorption coefficient are given by $a_j=F(C_j)-F(C_{j-1})$, where $F(C_j)$ is the absorption line blackbody distribution function (ALBDF) for species $j$, calculated from the detailed absorption spectrum of that species. In general SLW methods, the absorption cross-sections are chosen with respect to a thermodynamic reference state, classifying them as reference approaches. The Rank-Correlated SLW (RCSLW) model avoids specifying a reference state by relating thermodynamic states to one another instead. If two arbitrary absorption cross-sections define identical wavenumber intervals, the two cross-sections (neither of which is designated a reference cross-section) can be said to be rank-correlated. The inverse ALBDF, defined such that $C[F(C,\phi_g,T_b),\phi_g,T_b]=C$ and $F[C(F,\phi_g,T_b),\phi_g,T_b]=F$ for a given gas thermodynamic state $\phi_g$ and blackbody temperature $T_b$, is proven to have this property and can also be called the rank-correlated reordered absorption cross-sections \cite{Solovjov_2017}. As a result, the inverse ALBDF can be used to construct cross-section intervals for the RCSLW model that do not rely on an arbitrary reference state or spectrum. ALBDFs for individual gray gases are multiplied together to obtain an overall ABLDF for the gas mixture \cite{Solovjov_2001}. RadLib's RCSLW model uses Method 1.2.2 as defined in and recommended by \cite{Solovjov_2017}.
+The ALBDF functions are provided by Pearson et~al.~\cite{Pearson_2014} for \ce{H2O}, \ce{CO2}, and \ce{CO} at pressures ranging from 0.1 to 50 atm, and temperatures from 300 to 3000 K in both tabulated and correlated form. The tabulated data are currently used in Radlib, coupled with multilinear interpolation. For gas mixtures, the multiplication method described in \cite{Solovjov_2000} is used, in which 
+%
+\begin{linenomath}
+\begin{equation}
+    F(C) = F_{CO2}(C/y_{CO2})F_{H2O}(C/y_{H2O})F_{CO}(C/y_{CO}), 
+\end{equation}
+\end{linenomath}
+%
+where the $\BS{\phi}$ and $T$ arguments of $F$ are omitted for clarity.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
