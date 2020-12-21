@@ -43,10 +43,13 @@
 \usepackage[version=4]{mhchem}
 \usepackage{booktabs}
 \usepackage{siunitx}
+\usepackage{bm}
 
 \restylefloat{table}
 
 \usepackage{hyperref}
+
+\newcommand{\BS}{\boldsymbol}
 
 \journal{SoftwareX}
 
@@ -266,13 +269,13 @@ Recent comparison of advanced SLW modeling approaches revealed that ``the Rank C
 Solovjov et al.~\cite{Solovjov_2017} present a number of methods within a generalized framework, with method I.2.2 giving the best results. That is the method implemented and summarized here.
 %
 
-SLW models are similar to WSGG models but instead of integrating over a given range of $\eta$, with sequential $\eta$ bands defining gray gases $j$, spectral integration is done over wavenumbers in a given range of absorption cross section, with sequential bands of cross-section defining the gray gases $j$. So, in Eq.~(\ref{e:RTE_wsgg}), gas $j$ would refer to wavenumbers $\eta\in\Delta_j$ with $\Delta_j=\{\eta:\,\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$, using Solovjov's notation, where $C$ denotes absorption cross-section (where $\kappa=CN$ and $N$ is molar density of the radiatively participating gas), and $\tilde{C}$ are supplemental cross sections defining interfaces between adjacent cross-section bands. This ensures that the gas is in fact gray in a given band, by definition, at least to within the width $\tilde{C}_j-\tilde{C}_{j-1}$. In contrast, in traditional WSGG approaches, the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
+SLW models are similar to WSGG models but instead of integrating over a given range of $\eta$, with sequential $\eta$ bands defining gray gases $j$, spectral integration is done over wavenumbers in a given range of absorption cross section, with sequential bands of cross-section defining the gray gases $j$. So, in Eq.~(\ref{e:RTE_wsgg}), gas $j$ would refer to wavenumbers in set $\Delta_j=\{\eta:\,\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$, using Solovjov's notation, where $C$ denotes absorption cross-section, and $\tilde{C}$ are supplemental cross sections defining interfaces between adjacent cross-section bands. The absorption cross section is related to absorption coefficient by $\kappa=CN$, where $N$ is molar density of the radiatively participating gas. The SLW gases, then, are gray in a given band, by definition, at least to within the width $\tilde{C}_j-\tilde{C}_{j-1}$. In contrast, in traditional WSGG approaches, the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
 
 The gas weights $a_j$, are the fraction of the blackbody emission from $\eta$ corresponding to a given cross-section band. This energy is computed using the absorption line blackbody distribution function (ALBDF) \cite{Pearson_2014}, which gives the fraction of total blackbody emission from $\eta$ corresponding to absorption cross sections less than $C$: 
 %
 \begin{linenomath}
     \begin{equation} \label{e:albdf}
-    F(C,\phi,T) = \frac{1}{\sigma T^4}\int_{\{\eta:\,C(\eta,\phi)<C\}}E_b(\eta,T)d\eta,
+        F(C,\BS{\phi},T) = \frac{1}{\sigma T^4}\int_{\{\eta:\,C(\eta,\BS{\phi})<C\}}E_b(\eta,T)d\eta,
 \end{equation}
 \end{linenomath}
 %
@@ -280,20 +283,21 @@ so that
 %
 \begin{linenomath}
 \begin{equation}
-a_j = F(\tilde{C}_j,\phi, T) - F(\tilde{C}_{j-1}, \phi,T).
+    a_j = F(\tilde{C}_j,\BS{\phi}, T) - F(\tilde{C}_{j-1}, \BS{\phi},T).
 \end{equation}
 \end{linenomath}
 %
 %todo: deal with T versus Tb in e:albdf and previous eqn.
-Note that $F$ varies between zero and one, and is monotonic in $C$, allowing calculation of the inverse $C(F,\phi,T_b)$.
+Note that $F$ varies between zero and one, and is monotonic in $C$, allowing calculation of the inverse $C(F,\BS{\phi},T_b)$.
 
-Equation~(\ref{e:RTE_wsgg}) assumes the sets $\Delta_j$ are independent of spatial position, but care must be taken since C depends on the thermodynamic state (denoted by vector $\phi$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C=C(\eta,\phi)$. Hence, the fixed $\Delta_j$ imply a corresponding variation in $C_j$ and $\tilde{C}_j$ from one spatial location to the next.
+Equation~(\ref{e:RTE_wsgg}) assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but care must be taken since C depends on the thermodynamic state (denoted by vector $\BS{\phi}$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C=C(\eta,\BS{\phi}(\mathbf{x}))$. Hence, the fixed $\Delta_j$ imply a corresponding spatial variation in $C_j$ and $\tilde{C}_j$.
  
-The RCSLW model uses the notion of \emph{rank correlation} to account for this variation in the $C_j$, which in turn define the absorption coefficients $\kappa_j$. Solovjov defines two spectra arising from thermodynamic states $\phi_1$ and $\phi_2$ to be rank correlated if, for an arbirary wavenumber $\hat{\eta}$, the wave number sets $\Delta_1$ and $\Delta_2$ are equal, where $\Delta_1=\{\eta: C(\eta,\phi_1)<C(\hat{\eta},\phi_1)\}$, and $\Delta_2=\{\eta: C(\eta,\phi_2)<C(\hat{\eta},\phi_2)\}$. 
-Note in Eq.~(\ref{e:albdf}), that $\phi$ determines $C$, which then determines the set of $\eta$ integrated over. But for a \emph{given} set $\eta$, e.g., $\Delta_1$, $F$ can be considered as $F(C,T)$. Hence, if $\Delta_1=\Delta_2$, then at a fixed reference black temperature $T_{ref}$, we have $F(C_1,\phi_1,T_{ref})=F(C_2,\phi_2,T_{ref})$. One can then compute the inverse to find $C_1$ at $\phi_1$ and $C_2$ at $\phi_2$ (i.e., values at two spatial positions) corresponding to the same wavenumber interval. 
+The RCSLW model uses the notion of \emph{rank correlation} to account for this variation in the $C_j$. Solovjov defines two spectra arising from thermodynamic states $\BS{\phi}_1$ and $\BS{\phi}_2$ to be rank correlated if, for an arbirary wavenumber $\hat{\eta}$, the wave number sets $\Delta_1$ and $\Delta_2$ are equal, where $\Delta_1=\{\eta: C(\eta,\BS{\phi}_1)<C(\hat{\eta},\BS{\phi}_1)\}$, and $\Delta_2=\{\eta: C(\eta,\BS{\phi}_2)<C(\hat{\eta},\BS{\phi}_2)\}$. 
+Note in Eq.~(\ref{e:albdf}), that $\BS{\phi}$ determines $C$, which then determines the set of $\eta$ integrated over. But for a \emph{given} set $\eta$, e.g., $\Delta_1$, $F$ can be considered as $F(C,T)$. Hence, if $\Delta_1=\Delta_2$, then at a fixed reference black temperature $T_{ref}$, we have $F(C_1,\BS{\phi}_1,T_{ref})=F(C_2,\BS{\phi}_2,T_{ref})$. One can then compute the inverse to find $C_1$ at $\BS{\phi}_1$ and $C_2$ at $\BS{\phi}_2$ (i.e., values at two spatial positions) corresponding to the same wavenumber interval. 
 
-In practice, for a given problem, a grid of $\tilde{F}_j$ points are specified, with $F_j$ points between $\tilde{F}_j$ and $\tilde{F}_{j-1}$. The corresponding $\tilde{C}_j$ and $C_j$ values at any spatial position can then be found by inversion: $C_j = C(F_j,\phi,T_{ref})$, and similarly for $\tilde{C}_j$ in terms of $\tilde{F}_j$. $\kappa_j$ and $a_j$ can then be computed as noted above.
+In practice, for a given problem, a grid of $\tilde{F}_j$ points are specified, with $F_j$ points between $\tilde{F}_j$ and $\tilde{F}_{j-1}$. The corresponding $\tilde{C}_j$ and $C_j$ values at any spatial position can then be found by inversion: $C_j = C(F_j,\BS{\phi},T_{ref})$, and similarly for $\tilde{C}_j$ in terms of $\tilde{F}_j$. $\kappa_j$ and $a_j$ can then be computed as noted above.
 %TODO verify this in terms of the quadrature.
+
 
 
 
