@@ -165,10 +165,10 @@ The RTE for intensity $I$ in (unit) direction $\mathbf{s}$ for an absorbing, emi
 %
 where $I_{\eta}$ is the radiative spectral intensity, 
 $I_{b\eta}$ is spectral blackbody intensity (or Planck function), 
-$\kappa_{\eta}$ is the spectral absorption coefficient of the medium, and $s$ is a pathlength along direction $\mathbf{s}$. Radiation property models such as those implemented by RadLib are used to calculate the absorption coefficients $\kappa_{\eta}$. 
+$\kappa_{\eta}$ is the spectral absorption coefficient of the medium, and $s$ is a path length along direction $\mathbf{s}$. Radiation property models such as those implemented by RadLib are used to calculate the absorption coefficients $\kappa_{\eta}$. 
 %
 The gas absorption spectrum is an extremely complex function consisting of millions of spectral lines (peaks) corresponding to quantum mechanical energy levels of the gas molecules.
-Direct solution of Eq.~\ref{e:RTE_general}, involves so-called \emph{line-by-line} calculations that are computationally prohibitive for most practical calculations, and are used primarily for model validation. Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model \cite{Hottel_1967,Modest_2013}. For instance, integrating Eq.~\ref{e:RTE_general} over fixed spectral ranges $\eta_j$ and assuming gray (spectrally uniform) properties in each region $j$, (that is, in each \emph{gray gas} $j$), gives
+Direct solution of Eq.~\ref{e:RTE_general}, involves so-called line-by-line calculations that are computationally prohibitive for most practical configurations, and are used primarily for model validation. Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model \cite{Hottel_1967,Modest_2013}. For instance, integrating Eq.~\ref{e:RTE_general} over fixed spectral ranges $\eta_j$ and assuming gray (spectrally uniform) properties in each region $j$, (that is, in each \emph{gray gas} $j$), gives
 %
 \begin{linenomath}
 \begin{equation} \label{e:RTE_wsgg}
@@ -185,7 +185,7 @@ where $a_j$ is a weight factor defined as
 \end{align}
 \end{linenomath}
 %
-Given spatial profiles of $\kappa_j$ and $a_j$, Eq.~\ref{e:RTE_wsgg} can be computed for each of the $n+1$ gray gases. Normally, the $j=0$ gas is considered as a clear gas and represents \emph{transparent windows} in the spectrum for which $\kappa_0=0$.
+Given spatial profiles of $\kappa_j$ and $a_j$, Eq.~\ref{e:RTE_wsgg} can be computed for each of the $n+1$ gray gases. Normally, the $j=0$ gas is considered as a clear gas and represents transparent windows in the spectrum for which $\kappa_0=0$.
 The total radiative intensity $I$ is calculated by summing the individual gray gas intensities:
 %
 \begin{linenomath}
@@ -256,7 +256,7 @@ where $a_j$ is the weighting factor for gas $j$ and $T_r$ is a scaled temperatur
 %
 where $C_{j,k,i}$ is another correlated model coefficient. The model coefficients $d_{j,k}$ and $C_{j,k,i}$ are provided by Bordbar et~al. \citep{Bordbar_2014,Bordbar_2020}. 
 
-The correlations provided in \cite{Bordbar_2014} are valid for $0.01\le M_r\le4$. In \cite{Bordbar_2020} this range was extended to arbitrary $M_r$ by interpolation of $\kappa_j$ and $a_j$ between the pure component values and the corresponding limit on $M_r$, that is, for \ce{CO2}: interpolation between values at $M_r=0.01$ and pure \ce{CO2}; and for \ce{H2O}: interpolation between values at $M_r=4$ and pure \ce{H2O}.
+The correlations provided by Bordbar et~al. (2014) \cite{Bordbar_2014} are valid for $0.01\le M_r\le4$. In Bordbar et~al. (2020) \cite{Bordbar_2020} this range was extended to arbitrary $M_r$. This was done by interpolation of $\kappa_j$ and $a_j$ between the pure component values and the corresponding limit on $M_r$. That is, for \ce{CO2}, $\kappa_j$ and $a_j$ are interpolated between values at $M_r=0.01$ and pure \ce{CO2}. For \ce{H2O}, $\kappa_j$ and $a_j$ are interpolated between values at $M_r=4$ and pure \ce{H2O}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -266,17 +266,47 @@ The Spectral Line Weighted-Sum-of-Gray Gases (SLW) model represents a family of 
 % TODO: what does this last phrase mean: preserves the emission...?
 %
 Recent comparison of advanced SLW modeling approaches revealed that ``the Rank Correlated SLW model is the most robust of all models, and demonstrates that it can achieve accurate solutions with as few as 3–5 gray gases" \citep{Badger_2019}. A brief overview of the RCSLW model is given here; detailed discussion can be found in the literature \cite{Solovjov_2000, Solovjov_2001, Solovjov_2008, Solovjov_2011, Solovjov_2014, Solovjov_2016, Solovjov_2017, Webb_2018}. 
-Solovjov et al.~\cite{Solovjov_2017} present a number of methods within a generalized framework, with method I.2.2 giving the best results. That is the method implemented and summarized here.
+In particular, Solovjov et~al. \cite{Solovjov_2017} present several RCSLW methods within a generalized framework; RadLib implements method I.2.2, which gives the best results and is summarized here.
 %
 
-SLW models are written in terms of absorption cross section $C_\eta(\eta)$, where $\kappa_\eta=C_\eta N$, and $N$ is the molar density of the radiatively participating gas. 
-%
-SLW models are similar to WSGG models, but instead of integrating within a sequential band of $\eta$ to define gray gas $j$, spectral integration is done over a set of (nonsquential) wavenumbers constituting a given band $j$ of $C_\eta$. 
-Using Solovjov's notation~\cite{Solovjov_2017}, $\Delta_j=\{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}.
-%
-The SLW gases, then, are gray in a given band by definition, at least to within the width $\tilde{C}_j-\tilde{C}_{j-1}$. In contrast, in traditional WSGG approaches, the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
 
-A gas weight $a_j$ is the fraction of blackbody emission from $\eta\in\Delta_j$ corresponding to a given cross-section band $j$. This energy is computed using the absorption line blackbody distribution function (ALBDF) \cite{Pearson_2014}, which gives the fraction of total blackbody emission from $\eta$ corresponding to absorption cross sections less than $C$: 
+
+
+
+
+
+
+
+%%%%% DOL original, with VBL suggested edits
+%  SLW models are similar to WSGG models, but instead of integrating within a sequential band of $\eta$ to define gray gas $j$, spectral integration is done over a set of (nonsquential) wavenumbers constituting a given band $j$ of absorption cross section $C_\eta$. 
+%  %
+%  (The absorption coefficient is related to absorption cross section by $\kappa_\eta=C_\eta N$, where $N$ is the molar density of the radiatively participating gas.)
+%  %
+%  Using Solovjov's notation~\cite{Solovjov_2017}, $\Delta_j=\{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}, (where $\tilde{C}$ denotes a cross section boundary between two bands/gases).
+%  %
+%  The SLW gases, then, are gray in a given band by construction, to within the width $\tilde{C}_j-\tilde{C}_{j-1}$. In contrast, in traditional WSGG approaches, the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
+
+
+
+%%%%% DOL restructuring paragraph based on VBL suggestions
+SLW models are similar to WSGG models, but SLW gases are gray in a given band by construction, whereas in traditional WSGG approaches the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
+%
+In SLW models, instead of integrating within a sequential band of $\eta$ (with highly variable $\kappa$) to define a gray gas $j$, as in other WSGG models, spectral integration is done over a set of (nonsequential) wavenumbers constituting a given band $j$ of absorption cross section $C_\eta$.
+%
+(The absorption coefficient is related simply to absorption cross section by $\kappa_\eta=C_\eta N$, where $N$ is the molar density of the radiatively participating gas.)
+%
+Using Solovjov's notation~\cite{Solovjov_2017}, $\Delta_j=\{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}, (where $\tilde{C}$ denotes a cross section boundary between two bands/gases).
+%
+Hence, in SLW, the gases in a given band are gray to within the width $\tilde{C}_j-\tilde{C}_{j-1}$.
+
+
+
+
+
+
+
+
+A gray gas weight $a_j$ is the fraction of blackbody emission from $\eta\in\Delta_j$ corresponding to a given cross-section band $j$. This weight $a_j$ is computed using the absorption line blackbody distribution function (ALBDF) \cite{Pearson_2014}, which gives the fraction of total blackbody emission from $\eta$ corresponding to absorption cross sections less than $C$: 
 %
 \begin{linenomath}
     \begin{equation} \label{e:albdf}
@@ -293,20 +323,20 @@ so that
 \end{linenomath}
 %
 %todo: deal with T versus Tb in e:albdf and previous eqn.
-Note that $F$ varies between zero and one, and is monotonic in $C$, allowing calculation of the inverse $C(F,\BS{\phi},T_b)$.
+Note that $F$ varies between zero and one, and is monotonic in $C$, allowing calculation of the inverse $C(F,\BS{\phi},T)$.
 
-The WSGG RTE in Eq.~\ref{e:RTE_wsgg} assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but care must be taken since $C_\eta$ depends on the thermodynamic state (denoted by vector $\BS{\phi}$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$. Hence, spatially-fixed $\Delta_j$ with spatially varying $\BS{\phi}$ imply a spatial variation in $C_j$ and $\tilde{C}_j$.
+The WSGG RTE in Eq.~\ref{e:RTE_wsgg} assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but care must be taken since $C_\eta$ depends on the thermodynamic state (denoted by vector $\BS{\phi}$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$. Hence, spatially-fixed $\Delta_j$ with spatially varying $\BS{\phi}$ implies a spatial variation in $C_j$ and $\tilde{C}_j$.
  
-The RCSLW model uses the notion of \emph{rank correlation} to compute this variation in $C_j$ and $\tilde{C}_j$. Solovjov et~al.~\cite{Solovjov_2017} define two spectra at states $\BS{\phi}_1$ and $\BS{\phi}_2$ to be rank correlated 
+The RCSLW model uses the notion of rank correlation to compute this variation in $C_j$ and $\tilde{C}_j$. Solovjov et~al.~\cite{Solovjov_2017} define two spectra at states $\BS{\phi}_1$ and $\BS{\phi}_2$ to be rank correlated 
 if the set $H_1=\{\eta: C_\eta(\eta,\BS{\phi}_1)<C_\eta(\hat{\eta},\BS{\phi}_1)\}$ is equal to the set
 $H_2=\{\eta: C_\eta(\eta,\BS{\phi}_2)<C_\eta(\hat{\eta},\BS{\phi}_2)\}$, for an arbitrary $\hat{\eta}$.
  
-Consider Eq.~\ref{e:albdf} at fixed argument $T=T_r$, and let $\hat{C}_1\equiv C_\eta(\hat{\eta},\BS{\phi}_1)$, and similarly for $\hat{C}_2$; then we have
+Consider Eq.~\ref{e:albdf} at fixed argument $T=T_r$, and let $\hat{C}_1\equiv C_\eta(\hat{\eta},\BS{\phi}_1)$, and $\hat{C}_2\equiv C_\eta(\hat{\eta},\BS{\phi}_2)$; then we have
 %
 \begin{linenomath}
     \begin{align} \label{e:albdf2}
-        F(\hat{C}_1,\BS{\phi}_1,T_r) &= \frac{1}{\sigma T_r^4}\int_{\{\eta: C_\eta(\eta,\BS{\phi}_1)<C_\eta(\hat{\eta},\BS{\phi}_1)\}}E_b(\eta,T_r)d\eta, \\
-        F(\hat{C}_2,\BS{\phi}_2,T_r) &= \frac{1}{\sigma T_r^4}\int_{\{\eta: C_\eta(\eta,\BS{\phi}_2)<C_\eta(\hat{\eta},\BS{\phi}_2)\}}E_b(\eta,T_r)d\eta.
+        F(\hat{C}_1,\BS{\phi}_1,T_r) &= \frac{1}{\sigma T_r^4}\int_{\{\eta:\,C_\eta(\eta,\BS{\phi}_1)<C_\eta(\hat{\eta},\BS{\phi}_1)\}}E_b(\eta,T_r)d\eta, \\
+        F(\hat{C}_2,\BS{\phi}_2,T_r) &= \frac{1}{\sigma T_r^4}\int_{\{\eta:\,C_\eta(\eta,\BS{\phi}_2)<C_\eta(\hat{\eta},\BS{\phi}_2)\}}E_b(\eta,T_r)d\eta.
     \end{align}
 \end{linenomath}
 %
