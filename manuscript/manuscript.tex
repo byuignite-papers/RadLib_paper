@@ -297,7 +297,7 @@ In SLW models, instead of integrating within a sequential band of $\eta$ (with h
 %
 Using Solovjov's notation~\cite{Solovjov_2017}, $\Delta_j=\{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}, (where $\tilde{C}$ denotes a cross section boundary between two bands/gases).
 %
-Hence, in SLW, the gases in a given band are gray to within the width $\tilde{C}_j-\tilde{C}_{j-1}$.
+Hence, in SLW the gases in a given band are gray to within the width $\tilde{C}_j-\tilde{C}_{j-1}$.
 
 
 
@@ -327,21 +327,32 @@ Note that $F$ varies between zero and one, and is monotonic in $C$, allowing cal
 
 The WSGG RTE in Eq.~\ref{e:RTE_wsgg} assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but care must be taken since $C_\eta$ depends on the thermodynamic state (denoted by vector $\BS{\phi}$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$. Hence, spatially-fixed $\Delta_j$ with spatially varying $\BS{\phi}$ implies a spatial variation in $C_j$ and $\tilde{C}_j$.
  
-The RCSLW model uses the notion of rank correlation to compute this variation in $C_j$ and $\tilde{C}_j$. Solovjov et~al.~\cite{Solovjov_2017} define two spectra at states $\BS{\phi}_1$ and $\BS{\phi}_2$ to be rank correlated 
-if the set $H_1=\{\eta: C_\eta(\eta,\BS{\phi}_1)<C_\eta(\hat{\eta},\BS{\phi}_1)\}$ is equal to the set
-$H_2=\{\eta: C_\eta(\eta,\BS{\phi}_2)<C_\eta(\hat{\eta},\BS{\phi}_2)\}$, for an arbitrary $\hat{\eta}$.
- 
-Consider Eq.~\ref{e:albdf} at fixed argument $T=T_r$, and let $\hat{C}_1\equiv C_\eta(\hat{\eta},\BS{\phi}_1)$, and $\hat{C}_2\equiv C_\eta(\hat{\eta},\BS{\phi}_2)$; then we have
+The RCSLW model uses the notion of rank correlation to compute this variation in $C_j$ and $\tilde{C}_j$. 
+We proceed loosely following Solovjov et~al. \cite{Solovjov_2014}.
+Consider two positions with thermodynamic states $\BS{\phi}_1$ and $\BS{\phi}_2$. These will have corresponding spectra $C_\eta(\eta,\BS{\phi}_1)$, and $C_\eta(\eta,\BS{\phi}_2)$.
+Now, let $\hat{C}_1\equiv C_\eta(\hat{\eta},\BS{\phi}_1)$ and $\hat{C}_2\equiv C_\eta(\hat{\eta},\BS{\phi}_2)$ denote the cross sections at some wavenumber $\hat{\eta}$. For each of the two spectra, we can define the set of wavenumbers that give cross sections less than $\hat{C}$:
 %
 \begin{linenomath}
-    \begin{align} \label{e:albdf2}
-        F(\hat{C}_1,\BS{\phi}_1,T_r) &= \frac{1}{\sigma T_r^4}\int_{\{\eta:\,C_\eta(\eta,\BS{\phi}_1)<C_\eta(\hat{\eta},\BS{\phi}_1)\}}E_b(\eta,T_r)d\eta, \\
-        F(\hat{C}_2,\BS{\phi}_2,T_r) &= \frac{1}{\sigma T_r^4}\int_{\{\eta:\,C_\eta(\eta,\BS{\phi}_2)<C_\eta(\hat{\eta},\BS{\phi}_2)\}}E_b(\eta,T_r)d\eta.
+\begin{align}
+    H_1&=\{\eta: C_\eta(\eta,\BS{\phi}_1)<\hat{C}_1\}, \\
+    H_2&=\{\eta: C_\eta(\eta,\BS{\phi}_2)<\hat{C}_2\}.
     \end{align}
 \end{linenomath}
 %
-(Note the distinction between $\hat{C}_1$ and $C_j$, where $\hat{C}_1$ is a cross section at $\hat{\eta}$ and state $\BS{\phi}_1$, and $C_j$ is the cross section of some gray gas $j$).
-In these equations, since the sets integrated over are the same: $H_1=H_2$, and since argument $T=T_r$ is the same, we have 
+If $H_1=H_2$ for arbitrary $\hat{\eta}$, the spectra corresponding to $\BS{\phi}_1$ and $\BS{\phi}_2$ are said to be rank correlated.
+% Solovjov provides some visual representations...
+
+This rank correlation is used as follows. Consider Eq.~\ref{e:albdf} evaluated at $C=\hat{C}_1$, $\BS{\phi}=\BS{\phi}_1$, $T=T_r$, and again at
+$C=\hat{C}_2$, $\BS{\phi}=\BS{\phi}_2$, $T=T_r$, where $T_r$ is some reference temperature:
+%
+\begin{linenomath}
+    \begin{align} \label{e:albdf2}
+        F(\hat{C}_1,\BS{\phi}_1,T_r) &= \frac{1}{\sigma T_r^4}\int_{H_1}E_b(\eta,T_r)d\eta, \\
+        F(\hat{C}_2,\BS{\phi}_2,T_r) &= \frac{1}{\sigma T_r^4}\int_{H_2}E_b(\eta,T_r)d\eta.
+    \end{align}
+\end{linenomath}
+%
+Since $H_1=H_2$, we have 
 %
 \begin{linenomath}
     \begin{equation}\label{e:FeqF}
@@ -349,9 +360,18 @@ In these equations, since the sets integrated over are the same: $H_1=H_2$, and 
 \end{equation}
 \end{linenomath}
 %
-Recall that $F$ can be inverted, so if $\hat{C}_1$ and $\BS{\phi}_1$ are given, we can compute $F$ and then invert to obtain $\hat{C}_2$ at $\BS{\phi}_2$. But Eq.~\ref{e:FeqF} holds for arbitrary states $\BS{\phi}$, so we can also just specify a value of $F$, and then do the inversion to get $\hat{C}$ at given $\BS{\phi}$. At this point, we can drop the \emph{hat} notation and just write $F(C,\BS{\phi},T_r)$.
+Recall that $F$ can be inverted, so if $\hat{C}_1$ and $\BS{\phi}_1$ are given, we can compute $F$ and then invert to obtain $\hat{C}_2$ at $\BS{\phi}_2$. Now, note that Eq.~\ref{e:FeqF} is assumed to hold for arbitrary states $\BS{\phi}_1$ and $\BS{\phi}_2$; hence, if some $F$ is given or specified, we can invert $F=F(\hat{C},\BS{\phi},T_r)$ to get $\hat{C}$ at corresponding state $\BS{\phi}$. At this point, we can drop the \emph{hat} notation and just write $F(C,\BS{\phi},T_r)$.
 
-In the RCSLW model for a given problem, a collection of $\tilde{F}_j$ values are specified, with $F_j$ points between $\tilde{F}_j$ and $\tilde{F}_{j-1}$; these apply to all spatial positions. The corresponding $\tilde{C}_j$ and $C_j$ values at any spatial position (and corresponding thermodynamic state $\BS{\phi}$) can then be found by inversion: $C_j = C(F_j,\BS{\phi},T_r)$, and similarly for $\tilde{C}_j$ in terms of $\tilde{F}_j$. $\kappa_j$ is then computed as $\kappa_j=C_jN$, and $a_j$ is computed from Eq.~\ref{e:aj}, where $T$ is taken as the local temperature, not $T_r$. The system average temperature may be used for $T_r$, as done in \cite{Solovjov_2001}, and in the examples below.
+Given the above summary development, the RCSLW model is applied as follows. 
+%
+\begin{itemize}
+    \item A reference temperature is specified. This is taken to be the average temperature on the domain of interest in \cite{Solovjov_2001}.
+    \item A collection of $\tilde{F}_j$ values are specified, with $F_j$ points between $\tilde{F}_j$ and $\tilde{F}_{j-1}$. These apply to all spatial positions. 
+    \item The corresponding $\tilde{C}_j$ and $C_j$ values at any spatial position and corresponding thermodynamic state $\BS{\phi}$ are found by inversion: $C_j = C(F_j,\BS{\phi},T_r)$, and $\tilde{C}_j = C(\tilde{F}_j,\BS{\phi},T_r)$
+    \item $\kappa_j$ is then computed as $\kappa_j=C_jN$. 
+    \item $a_j$ is computed from Eq.~\ref{e:aj}, where $T$ is taken as the local temperature.
+\end{itemize}
+%
 
 The ALBDF functions are provided by Pearson et~al.~\cite{Pearson_2014} for \ce{H2O}, \ce{CO2}, and \ce{CO} at pressures ranging from 0.1 to 50 atm, and temperatures from 300 to 3000 K in both tabulated and correlated form. The tabulated data are currently used in Radlib, coupled with multilinear interpolation. For gas mixtures, the multiplication method described in \cite{Solovjov_2000} is used, in which 
 %
