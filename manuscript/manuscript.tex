@@ -442,11 +442,11 @@ Figure \ref{fig:flowchart} illustrates the basic structure use of the RadLib pac
 
 \section{Illustrative Examples} \label{s:Examples}
 
-Several examples are presented to illustrate the behavior of the models. The examples show heat flux $q$ or volumetric heat source $Q$ in one one-dimensional configurations with varying gas compositions and temperatures. We compare the PM, WSGG, and RCSLW models for each example. The examples correspond to those presented by Solvojov et al. (S) \cite{Solovjov_2017} and Bordbar et al. (B) \cite{Bordbar_2020}, and the number of each example corresponds to the example number in the respective reference. A ray-tracing code is used to solve the radiative transport equation between two parallel plates. 
-Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a cold slab where the cold slab's thickness varies; Example S2 is isothermal with a thick slab of high CO$_2$ next to a thin slab of low CO$_2$ with variable thickness; Example S3 uses parabolic temperature and H$_2$O mole fraction profiles; Example S4 has a triangular temperature profile between equally-spaced isothermal regions; Example S5 uses a half-sinusoid temperature profile that decreases from 1500 to 500 K; and Example B3 has symmetric temperature and H$_2$O mole fraction profiles with central peaks of 1800 K and 1, respectively (with $y_{CO2}=1-y_{H2O}$). Each case is presented alongside the line-by-line (LBL) data presented in the references. 
+Several examples are presented to illustrate the behavior of the models. The examples show heat flux $q$ or volumetric heat source $Q$ in one one-dimensional configurations with varying gas compositions and temperatures. We compare the PM, WSGG, and RCSLW models for each example. The examples correspond to those presented by Solvojov et al. \cite{Solovjov_2017} (S), Bordbar et al. \cite{Bordbar_2020} (B), Solovjov et~al. \cite{Solovjov_2001} (Sb), and the number of each example corresponds to the example number in the respective reference. A ray-tracing code is used to solve the radiative transport equation between two parallel plates. 
+Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a cold slab where the cold slab's thickness varies; Example S2 is isothermal with a thick slab of high CO$_2$ next to a thin slab of low CO$_2$ with variable thickness; Example S3 uses parabolic temperature and H$_2$O mole fraction profiles; Example S4 has a triangular temperature profile between equally-spaced isothermal regions; Example S5 uses a half-sinusoid temperature profile that decreases from 1500 to 500 K; and Example B3 has symmetric temperature and H$_2$O mole fraction profiles with central peaks of 1800 K and 1, respectively (with $y_{CO2}=1-y_{H2O}$). Example Sb1 is a simple uniform temperature and composition profile with soot radiation. Each case is presented alongside the line-by-line (LBL) data presented in the references. 
 %
 \begin{table}
-    \caption{Summary of example cases presented. S1-S5 are from \cite{Solovjov_2017}; B3 is from \cite{Bordbar_2020}. All cases use $P=1$ atm and black walls.}
+    \caption{Summary of example cases presented. S1-S5 are from \cite{Solovjov_2017}; B3 is from \cite{Bordbar_2020}; Sb1 is from \cite{Solovjov_2001}. All cases use $P=1$ atm and black walls.}
     \label{t:examples}
     \centering
     \resizebox{\textwidth}{!}{
@@ -463,6 +463,7 @@ Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a 
         S5 & $T(x) = 1000 + 500\cos(\pi x/L)$    & $y_{H2O}=0.1$, $y_{CO2}=0$                            & 2       & 1500, 500      \\
         B3 & $T(x) = 400 + 1400\sin(\pi x/L)^2$  & $y_{H2O}(x) = 0.0001 + 0.9999\sin(\pi x/L)^2$         & 1       & 400, 400       \\
            &                                     & $y_{CO2}=1-y_{H2O}$                                   &         &                \\
+        Sb1& $T = 1000$                          & $y_{H2O} = 0.2$, $y_{CO2}=0.1$, $y_{CO}=0.03$         & 1       & cold, cold     \\
         \hline
     \end{tabular}
     }
@@ -493,8 +494,20 @@ Figure~\ref{f:examples} shows comparative results for the different radiation mo
     \end{center}
 \end{figure}
 %
-In general, the PM model performs poorly compared to the WSSGG and RCSLW models. A notable exception is Example S4. In Example S2, the PM $q(L)/\sigma T^4$ is off scale at an essentially constant at a value of unity. The PM absorption coefficient is 27.4 atm$^{-1}$m$^{-1}$, giving optical thicknesses of 0.09 and 0.36 m in the thick and thin layers, respectively, which are relatively small compared to the isothermal domain size greater than 0.5 m. Example S5 omits the PM model to more clearly show the behavior of the WSGG and RCSLW models. For that example, the PM values follow the shape of the other curves but $Q$ varies from around -80 at $x=0$ to a peak of 200 at x=$1.5$ m, and dropping to 100 kW/m$^3$ at $x=2$ m. In all examples, four gray ($n=4$) and one clear gas are computed for the RCSLW models to give a consistent comparison to the WSGG model. Example S5 shows the sensitivity of the RCSLW model to the number of gases used. When $n$ is increased to eight the RCSLW model improves to show nearly perfect agreement with the LBL data in Example S2.
+In general, the PM model performs poorly compared to the WSSGG and RCSLW models. A notable exception is Example S4. In Example S2, the PM $q(L)/\sigma T^4$ is off scale at an essentially constant at a value of unity. The PM absorption coefficient is 27.4 atm$^{-1}$m$^{-1}$, giving optical thicknesses of 0.09 and 0.36 m in the thick and thin layers, respectively, which are relatively small compared to the isothermal domain size greater than 0.5 m. Example S5 omits the PM model to more clearly show the behavior of the WSGG and RCSLW models. For that example, the PM values follow the shape of the other curves but $Q$ varies from around -80 at $x=0$ to a peak of 200 at x=$1.5$ m, and dropping to 100 kW/m$^3$ at $x=2$ m. In all examples, four gray ($n=4$) and one clear gas are computed for the RCSLW models to give a consistent comparison to the WSGG model. Example S5 shows the sensitivity of the RCSLW model to the number of gases used. The difference between $n=2$ and $n=8$ is very small for all examples shwon, except for Example S2. When $n$ is increased from four to eight for that example the RCSLW model improves to show nearly perfect agreement with the LBL data.
 In all Examples, the RCSLW model is initialized using the mean temperature and composition on the domain. In Example S5, the RCSLW model converges to the LBL solution when the model is initialized using the maximum temperature instead of the average temperature.
+
+Figure~\ref{f:exSb1} shows the results from Example Sb1, which includes soot radiation. Results for three values of the soot volume fraction are shown. Both the WSGG and RCSLW models perform very well for each case. 
+%
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=5.5 in]{ex_Sb1.pdf}
+    \caption{Results for Example Sb1 summarized in Table~\ref{t:examples}.}
+    \label{f:exSb1}
+    \end{center}
+\end{figure}
+%
+
 
 % TODO: do the cost comparison  <13-11-20, dol> %
 
@@ -505,6 +518,7 @@ In all Examples, the RCSLW model is initialized using the mean temperature and c
 Radiative heat transfer models are historically difficult to implement in CFD codes due to their complexity and high computational costs. Neglecting radiation or using simple models like the optically thin assumption is adequate for some cases with simple geometry or limited chemical reactions, but most simulations of interest to engineers and researchers require more advanced radiation modeling to yield accurate results. In such cases, radiation models that are incorrectly implemented or inappropriate for the simulation parameters can become additional sources of error that may be extremely difficult to separate from existing sources or error. Currently, researchers that require detailed radiation modeling must code and validate it themselves at the expense of valuable research time and funding. 
 
 RadLib makes researchers' work easier by consolidating various approaches into a modular library of interchangeable, prevalidated radiation models. Additionally, RadLib's modular framework is designed to easily accommodate new models as well, allowing researchers to compare new or existing models with very little overhead. Sometimes, it is not clear which radiation model may be the best fit for a particular simulation. When simulations are especially complex or computationally expensive, researchers may have to extrapolate from theory and literature to choose an appropriate radiation model rather than testing for their specific case. RadLib is designed to ease both of these obstacles by facilitating comparison between radiation models through a common interface and providing a practical means of testing various models without the restriction of prespecified geometry or case parameters. With RadLib, researchers can put more of their time and effort into useful results rather than code or model development. 
+
 
 Currently, RadLib is only used within the authors' research group, where it is applied to combustion CFD simulations using the One-Dimensional Turbulence (ODT) model \cite{Stephens_2020}, but its design and structure as a C++ library allows it to be incorporated easily into existing codes. It can be applied to  research questions in various other fields involving radiative heat transfer as well, including energy engineering or atmospheric and climate sciences. Radiation is a universal phenomenon, and RadLib can assist researchers in many areas with systems and processes that involve heat transfer. 
 
