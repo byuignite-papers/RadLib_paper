@@ -508,8 +508,29 @@ Figure~\ref{f:exSb1} shows the results from Example Sb1, which includes soot rad
 \end{figure}
 %
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO: do the cost comparison  <13-11-20, dol> %
+\subsection{Computational Cost} \label{s:cost}
+
+A comparison was made of the computational cost of the current models implemented. Calculations were performed on a 4 GHz Quad Core Intel Core i7 iMac, version 10.15.7. Figure~\ref{f:cost}a shows the cost to compute the gas properties $k$ and $a$. This was done by timing the C++ code execution to evaluate the gas properties one million times in a loop and then averaging the results. The figure shows times normalized by the time for the WSGG model, which required 8.0E-7~s. The costs of the models, relative to WSGG, is 0.098, 1.9, 4.9, 9.4, and 18, for PM, and RCSLW with $n=1$, 2, 4, 8 gray gases, respectively. The cost of the RCSLW model is very nearly proportional to the number of gray gases considered.
+%
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{c c}
+        (a) & (b) \\
+        \includegraphics[width=2.75 in]{fig_getka_c++.pdf} &
+        \includegraphics[width=2.75 in]{fig_exS3_c++.pdf}
+    \end{tabular}
+    \caption{Computational cost to evaluate gas properties (a) and to run Example S3. Results are normalized by the cost of the WSSG model.}
+    \label{f:cost}
+    \end{center}
+\end{figure}
+%
+
+Figure~\ref{f:cost}b shows the cost to evaluate Example S3. 
+In this case the costs of the models, relative to WSGG, is approximately 0.75, 1.1, 1.4, 1.9, and 2.9, for PM, and RCSLW with $n=1$, 2, 4, 8 gray gases, respectively. Here, the WSGG model took 0.0079 s. In running Example S3, the costs of the various models are much more similar than in evaluating gas properties alone due to the additional overhead required in performing the calculations. In the results presented, only the cost of evaluating the solution was included; initialization and input/output costs were neglected.
+
+Cost comparisons were also attempted with Python, but it is difficult to get meaningful results when mixing Python and C++. In particular, the cost of a single evaluation of the gas properties is small end valuating the gas properties in a Python loop results in the loop appearing to dominate the computational cost. Comparison between Python and C++ for Example S3 is somewhat more meaningful, but even here, for the six cases considered in Fig.~\ref{f:cost} the cost only varied by about 4\%. The cost of the WSGG model was 0.6~s, which is 7.6 times slower than the C++ version. It is possible that improvements in the Python speed are possible by further optimization of the Cython interface, but the Python radiative solver used in the examples is only meant to demonstrate the use of the library evaluation of gas properties.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
