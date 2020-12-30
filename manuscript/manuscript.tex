@@ -168,7 +168,7 @@ $I_{b\eta}$ is spectral blackbody intensity (or Planck function),
 $\kappa_{\eta}$ is the spectral absorption coefficient of the medium, and $s$ is a path length along direction $\mathbf{s}$. Radiation property models such as those implemented by RadLib are used to calculate the absorption coefficients $\kappa_{\eta}$. 
 %
 The gas absorption spectrum is an extremely complex function consisting of millions of spectral lines (peaks) corresponding to quantum mechanical energy levels of the gas molecules.
-Direct solution of Eq.~\ref{e:RTE_general}, involves so-called line-by-line calculations that are computationally prohibitive for most practical configurations, and are used primarily for model validation. Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model \cite{Hottel_1967,Modest_2013}. For instance, integrating Eq.~\ref{e:RTE_general} over fixed spectral ranges $\eta_j$ and assuming gray (spectrally uniform) properties in each region $j$, (that is, in each \emph{gray gas} $j$), gives
+Direct solution of Eq.~\ref{e:RTE_general}, involves so-called line-by-line calculations that are computationally prohibitive for most practical configurations and are used primarily for model validation. Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model \cite{Hottel_1967,Modest_2013}. For instance, integrating Eq.~\ref{e:RTE_general} over fixed spectral ranges $\eta_j$ and assuming gray (spectrally uniform) properties in each region $j$, (that is, in each gray gas $j$), gives
 %
 \begin{linenomath}
 \begin{equation} \label{e:RTE_wsgg}
@@ -194,7 +194,7 @@ The total radiative intensity $I$ is calculated by summing the individual gray g
 \end{equation}
 \end{linenomath}
 %
-In the above, $I$ is a function of direction $\mathbf{s}$. The heat flux vector $\mathbf{q}$ is found by integrating over directional solid angles ($\mathbf{s}\Omega$) on the sphere:
+Radiative intensity $I$ is a function of direction $\mathbf{s}$. The heat flux vector $\mathbf{q}$ is found by integrating over directional solid angles ($\mathbf{s}\Omega$) on the sphere:
 %
 \begin{linenomath}
 \begin{equation}
@@ -229,8 +229,8 @@ Planck Mean absorption coefficients are commonly used to model radiation, especi
 
 \subsection{Weighted sum of gray gases (WSGG)} \label{s:wsgg}
 
-The WSGG model was outlined in Sec.~\ref{s:models}.
-RadLib implements the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. It uses four gray gases and one transparent gas, and considers gaseous species \ce{CO2} and \ce{H2O}. This version of the WSGG model has the advantage over some others in that it allows for arbitrary \ce{CO2} and \ce{H2O} compositions, increasing its accuracy and flexibility. Absorption coefficients are calculated by 
+The WSGG model was introduced in Sec.~\ref{s:models}.
+RadLib implements the WSGG model presented by Bordbar et al. \citep{Bordbar_2014,Bordbar_2020}, which uses correlations based on the HITEMP 2010 database \cite{Rothman_2010}. It uses four gray gases and one transparent gas, and considers gaseous species \ce{CO2} and \ce{H2O}. This version of the WSGG model is advantageous because it allows for arbitrary \ce{CO2} and \ce{H2O} compositions, increasing its accuracy and flexibility. Absorption coefficients are calculated by 
 %
 \begin{linenomath}
 \begin{equation}
@@ -256,7 +256,7 @@ where $a_j$ is the weighting factor for gas $j$ and $T_r$ is a scaled temperatur
 %
 where $C_{j,k,i}$ is another correlated model coefficient. The model coefficients $d_{j,k}$ and $C_{j,k,i}$ are provided by Bordbar et~al. \citep{Bordbar_2014,Bordbar_2020}. 
 
-The correlations provided by Bordbar et~al. (2014) \cite{Bordbar_2014} are valid for $0.01\le M_r\le4$. In Bordbar et~al. (2020) \cite{Bordbar_2020} this range was extended to arbitrary $M_r$. This was done by interpolation of $\kappa_j$ and $a_j$ between the pure component values and the corresponding limit on $M_r$. That is, for \ce{CO2}, $\kappa_j$ and $a_j$ are interpolated between values at $M_r=0.01$ and pure \ce{CO2}. For \ce{H2O}, $\kappa_j$ and $a_j$ are interpolated between values at $M_r=4$ and pure \ce{H2O}.
+The correlations provided by Bordbar et~al. (2014) \cite{Bordbar_2014} are valid for $0.01\le M_r\le4$. In Bordbar et~al. (2020) \cite{Bordbar_2020} this range was extended to arbitrary $M_r$ by interpolating $\kappa_j$ and $a_j$ between the pure component values and the corresponding limit on $M_r$. That is, for \ce{CO2}, $\kappa_j$ and $a_j$ are interpolated between values at $M_r=0.01$ and pure \ce{CO2}; for \ce{H2O}, $\kappa_j$ and $a_j$ are interpolated between values at $M_r=4$ and pure \ce{H2O}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -269,42 +269,15 @@ Recent comparison of advanced SLW modeling approaches revealed that ``the Rank C
 In particular, Solovjov et~al. \cite{Solovjov_2017} present several RCSLW methods within a generalized framework; RadLib implements method I.2.2, which gives the best results and is summarized here.
 %
 
-
-
-
-
-
-
-
-
-%%%%% DOL original, with VBL suggested edits
-%  SLW models are similar to WSGG models, but instead of integrating within a sequential band of $\eta$ to define gray gas $j$, spectral integration is done over a set of (nonsquential) wavenumbers constituting a given band $j$ of absorption cross section $C_\eta$. 
-%  %
-%  (The absorption coefficient is related to absorption cross section by $\kappa_\eta=C_\eta N$, where $N$ is the molar density of the radiatively participating gas.)
-%  %
-%  Using Solovjov's notation~\cite{Solovjov_2017}, $\Delta_j=\{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}, (where $\tilde{C}$ denotes a cross section boundary between two bands/gases).
-%  %
-%  The SLW gases, then, are gray in a given band by construction, to within the width $\tilde{C}_j-\tilde{C}_{j-1}$. In contrast, in traditional WSGG approaches, the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
-
-
-
-%%%%% DOL restructuring paragraph based on VBL suggestions
 SLW models are similar to WSGG models, but SLW gases are gray in a given band by construction, whereas in traditional WSGG approaches the gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \cite{Badger_2019}. 
 %
-In SLW models, instead of integrating within a sequential band of $\eta$ (with highly variable $\kappa$) to define a gray gas $j$, as in other WSGG models, spectral integration is done over a set of (nonsequential) wavenumbers constituting a given band $j$ of absorption cross section $C_\eta$.
+Instead of integrating within a sequential band of $\eta$ (with highly variable $\kappa$) to define a gray gas $j$ as in other WSGG models, SLW models perform their spectral integration over a set of nonsequential wavenumbers constituting a given band $j$ of absorption cross sections $C_\eta$.
 %
-(The absorption coefficient is related simply to absorption cross section by $\kappa_\eta=C_\eta N$, where $N$ is the molar density of the radiatively participating gas.)
+The absorption coefficient is related to the absorption cross section by $\kappa_\eta=C_\eta N$, where $N$ is the molar density of the radiatively participating gas.
 %
-Using Solovjov's notation~\cite{Solovjov_2017}, $\Delta_j=\{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}, (where $\tilde{C}$ denotes a cross section boundary between two bands/gases).
+Using Solovjov's notation~\cite{Solovjov_2017}, $\Delta_j=\{\eta:\tilde{C}_{j-1}<C_\eta<\tilde{C}_j\}$ is the set of wavenumbers constituting gas $j$ in Eq.~\ref{e:RTE_wsgg}, where $\tilde{C}$ denotes a cross section boundary between two bands/gases.
 %
-Hence, in SLW the gases in a given band are gray to within the width $\tilde{C}_j-\tilde{C}_{j-1}$.
-
-
-
-
-
-
-
+Hence, in SLW models, the gases in a given band are gray to within the width $\tilde{C}_j-\tilde{C}_{j-1}$.
 
 A gray gas weight $a_j$ is the fraction of blackbody emission from $\eta\in\Delta_j$ corresponding to a given cross-section band $j$. This weight $a_j$ is computed using the absorption line blackbody distribution function (ALBDF) \cite{Pearson_2014}, which gives the fraction of total blackbody emission from $\eta$ corresponding to absorption cross sections less than $C$: 
 %
@@ -328,7 +301,6 @@ Note that $F$ varies between zero and one, and is monotonic in $C$, allowing cal
 The WSGG RTE in Eq.~\ref{e:RTE_wsgg} assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but care must be taken since $C_\eta$ depends on the thermodynamic state (denoted by vector $\BS{\phi}$ with nominal components $T$, $P$, and $y_i$), which does vary spatially. That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$. Hence, spatially-fixed $\Delta_j$ with spatially varying $\BS{\phi}$ implies a spatial variation in $C_j$ and $\tilde{C}_j$.
  
 The RCSLW model uses the notion of rank correlation to compute this variation in $C_j$ and $\tilde{C}_j$. 
-We proceed loosely following Solovjov et~al. \cite{Solovjov_2014}.
 Consider two positions with thermodynamic states $\BS{\phi}_1$ and $\BS{\phi}_2$. These will have corresponding spectra $C_\eta(\eta,\BS{\phi}_1)$, and $C_\eta(\eta,\BS{\phi}_2)$.
 Now, let $\hat{C}_1\equiv C_\eta(\hat{\eta},\BS{\phi}_1)$ and $\hat{C}_2\equiv C_\eta(\hat{\eta},\BS{\phi}_2)$ denote the cross sections at some wavenumber $\hat{\eta}$. For each of the two spectra, we can define the set of wavenumbers that give cross sections less than $\hat{C}$:
 %
@@ -364,13 +336,13 @@ Recall that $F$ can be inverted, so if $\hat{C}_1$ and $\BS{\phi}_1$ are given, 
 
 Given the above summary development, the RCSLW model is applied as follows. 
 %
-\begin{itemize}
+\begin{enumerate}
     \item A reference temperature is specified. This is taken to be the average temperature on the domain of interest in \cite{Solovjov_2001}.
     \item A collection of $\tilde{F}_j$ values are specified, with $F_j$ points between $\tilde{F}_j$ and $\tilde{F}_{j-1}$. These apply to all spatial positions. 
     \item The corresponding $\tilde{C}_j$ and $C_j$ values at any spatial position and corresponding thermodynamic state $\BS{\phi}$ are found by inversion: $C_j = C(F_j,\BS{\phi},T_r)$, and $\tilde{C}_j = C(\tilde{F}_j,\BS{\phi},T_r)$
     \item $\kappa_j$ is then computed as $\kappa_j=C_jN$. 
     \item $a_j$ is computed from Eq.~\ref{e:aj}, where $T$ is taken as the local temperature.
-\end{itemize}
+\end{enumerate}
 %
 
 The ALBDF functions are provided by Pearson et~al.~\cite{Pearson_2014} for \ce{H2O}, \ce{CO2}, and \ce{CO} at pressures ranging from 0.1 to 50 atm, and temperatures from 300 to 3000 K in both tabulated and correlated form. The tabulated data are currently used in Radlib, coupled with multilinear interpolation. For gas mixtures, the multiplication method described in \cite{Solovjov_2000} is used, in which 
@@ -413,9 +385,9 @@ where $T$ is the temperature and $C_2=0.014388$ \si{m.K} is a Planck function co
 
 In the Planck Mean model, which treats a gas mixture as one gray gas, the soot absorption coefficient calculated from Eq.~\ref{e:soot2} is added to the gas absorption coefficient. This gives $\kappa_s=1817f_vT$ \si{m^{-1}}.
  
-In the WSGG model, Bordbar suggested incorporating soot as follows \cite{Bordbar_personal}. The soot absorption coefficient is similarly calculated from Eq.~\ref{e:soot2} but is then added to each of the gases separately. Because soot radiates across all wavelengths, its absorption coefficient is added to the values of all four gray gases and the clear gas. The gas weights $a_j$ are not changed. This model yeilds the expected behavior for the soot-only and gas-only limits.
+In the WSGG model, Bordbar suggested incorporating soot as follows \cite{Bordbar_personal}. The soot absorption coefficient is similarly calculated from Eq.~\ref{e:soot2} but is then added to each of the gases separately. Because soot radiates across all wavelengths, its absorption coefficient is added to the values of all four gray gases and the clear gas. The gas weights $a_j$ are not changed. This model yeilds the expected behavior in the soot-only and gas-only limits.
 
-The soot model used in the WSGG model can be applied to the RCSLW model as well. However, the formulation of the RCSLW model allows for a spectral soot treatment in the same manner as for the gas species~\cite{Solovjov_2001}. Calculation of the soot ALBDF is facilitated by the simple $\eta$ dependence of $\kappa_{s,\eta}$ in Eq.~\ref{e:soot1}. The fraction of the black energy at wavenumbers below $\eta$ is computed directly using a series expansion from Chang and Rhee \cite{Chang_1984,Solovjov_2001}. The soot ALBDF is then included in the product of species ALBDFs to obtain the mixture ALBDF. 
+The soot model used in the WSGG model can be applied to the RCSLW model as well. However, the formulation of the RCSLW model allows for a spectral soot treatment in the same manner as the gas species~\cite{Solovjov_2001}. Calculation of the soot ALBDF is facilitated by the simple $\eta$ dependence of $\kappa_{s,\eta}$ in Eq.~\ref{e:soot1}. The fraction of the black energy at wavenumbers below $\eta$ is computed directly using a series expansion from Chang and Rhee \cite{Chang_1984,Solovjov_2001}. The soot ALBDF is then included in the product of species ALBDFs to obtain the mixture ALBDF. 
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -521,7 +493,7 @@ A comparison was made of the computational cost of the current models implemente
         \includegraphics[width=2.75 in]{fig_getka_c++.pdf} &
         \includegraphics[width=2.75 in]{fig_exS3_c++.pdf}
     \end{tabular}
-    \caption{Computational cost to evaluate gas properties (a) and to run Example S3. Results are normalized by the cost of the WSSG model.}
+    \caption{Computational cost to evaluate gas properties (a) and to run Example S3 (b). Results are normalized by the cost of the WSSG model.}
     \label{f:cost}
     \end{center}
 \end{figure}
@@ -582,7 +554,7 @@ The authors extend special thanks to Hadi Bordbar for assistance with the WSGG m
 
 %Ancillary data table required for sub version of the executable software: (x.1, x.2 etc.) kindly replace examples in right column with the correct information about your executables, and leave the left column as it is.
 
-\begin{table}[!h]
+\begin{table}[!ht]
 \begin{tabular}{|l|p{6.5cm}|p{6.5cm}|}
 \hline
 \textbf{Nr.} & \textbf{(Executable) software metadata description} & \textbf{Metadata} \\
@@ -604,7 +576,7 @@ S7 & Support email for questions & davidlignell@byu.edu \\
 \hline
 \end{tabular}
 \caption{Software metadata.}
-\label{} 
+\label{t:softmd} 
 \end{table}
 
 \end{document}
