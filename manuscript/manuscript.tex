@@ -95,8 +95,7 @@
 \address{Department of Chemical Engineering, Brigham Young University, Provo, UT 84602, United States}
 
 \begin{abstract}
-%% Text of abstract 
-Ca. 100 words
+RadLib is a modular C++ library of radiation property models that can be applied to variety of systems involving radiative heat transfer, including CFD simulations. RadLib includes three major radiation property models---Planck Mean (PM) absorption coefficients, the weighted sum of gray gases (WSGG) model, and the rank-correlation spectral line weighted-sum-of-gray-gases (RCSLW) model---but its modular design and multiple interface options (C++ and Python) permit convenient expansion to additional models. Several example cases illustrate the use of the models with a simple ray-tracing solver and compare them in terms of accuracy and computational cost relative to line-by-line solutions. RadLib provides researchers with convenient access to radiation property models and a proven framework for further development. 
 \end{abstract}
 
 \begin{keyword}
@@ -441,7 +440,6 @@ Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a 
     }
 \end{table}
 %
-
 The examples are provided with the RadLib code and implemented in both C++ and Python. A Juptyer notebook is provided with the Python examples that runs the examples, displays the plots, and saves the plots to PDF files. Python and Cython versions of the one-dimensional solver \texttt{parallel\textunderscore planes.py} are provided for convenience. 
 
 These cases are intended to illustrate the use of the RadLib library and are not exhaustive. Details about these examples and their motivations can be found in their respective references. While ommitted here for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in \cite{Solovjov_2017,Bordbar_2020} such that these examples also serve as a validation of the implementation of the models.
@@ -512,7 +510,6 @@ Radiative heat transfer models are historically difficult to implement in CFD co
 
 RadLib makes researchers' work easier by consolidating various approaches into a modular library of interchangeable, prevalidated radiation models. Additionally, RadLib's modular framework is designed to easily accommodate new models as well, allowing researchers to compare new or existing models with very little overhead. Sometimes, it is not clear which radiation model may be the best fit for a particular simulation. When simulations are especially complex or computationally expensive, researchers may have to extrapolate from theory and literature to choose an appropriate radiation model rather than testing for their specific case. RadLib is designed to ease both of these obstacles by facilitating comparison between radiation models through a common interface and providing a practical means of testing various models without the restriction of prespecified geometry or case parameters. With RadLib, researchers can put more of their time and effort into useful results rather than code or model development. 
 
-
 Currently, RadLib is only used within the authors' research group, where it is applied to combustion CFD simulations using the One-Dimensional Turbulence (ODT) model \cite{Stephens_2020}, but its design and structure as a C++ library allows it to be incorporated easily into existing codes. It can be applied to  research questions in various other fields involving radiative heat transfer as well, including energy engineering or atmospheric and climate sciences. Radiation is a universal phenomenon, and RadLib can assist researchers in many areas with systems and processes that involve heat transfer. 
 
 %Author guidelines for this section
@@ -529,13 +526,13 @@ Currently, RadLib is only used within the authors' research group, where it is a
 
 \section{Conclusions} \label{s:conclusions}
 
-Set out the conclusion of this original software publication.
+RadLib is a C++ library of radiation property models developed to address the complexity and difficulty inherent in implementing radiative property models in CFD simulations. At present, it includes three major radiation property models---Planck Mean (PM) absorption coefficients, the weighted sum of gray gases (WSGG) model, and the rank-correlation spectral line weighted-sum-of-gray-gases (RCSLW) model---but its modular design and multiple interface options permit convenient expansion to additional property models. To that end, the basic structure and use of the RadLib library has been laid out. In addition, the RadLib package includes example cases in several variations of a parallel planes geometry using a simple ray tracing solver to illustrate the use of the three radiation property models. In general, the RCSLW model outperforms both the PM and WSGG models in terms of accuracy, but, under the appropriate conditions, the PM and WSGG models can also perform well and boast lower computational costs than the RCSLW model. As a whole, RadLib provides a convenient access point for researchers that require radiation property models for simulation tools and can be applied to research problems in a wide variety of fields. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Conflict of Interest} \label{s:coi}
 
-There are no known conflicts of interest associated with this publication and there has been no significant financial support for     this work that could have influenced its outcome.
+There are no known conflicts of interest associated with this publication and there has been no significant financial support for this work that could have influenced its outcome.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
