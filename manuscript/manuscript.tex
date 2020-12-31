@@ -1,32 +1,35 @@
-%% 
-%% Copyright 2007, 2008, 2009 Elsevier Ltd
-%% 
-%% This file is part of the 'Elsarticle Bundle'.
-%% ---------------------------------------------
-%% 
-%% It may be distributed under the conditions of the LaTeX Project Public
-%% License, either version 1.2 of this license or (at your option) any
-%% later version.  The latest version of this license is in
-%%    http://www.latex-project.org/lppl.txt
-%% and version 1.2 or later is part of all distributions of LaTeX
-%% version 1999/12/01 or later.
-%% 
-%% The list of all files belonging to the 'Elsarticle Bundle' is
-%% given in the file `manifest.txt'.
-%% 
-
-%% Template article for Elsevier's document class `elsarticle'
-%% with numbered style bibliographic references
-%% SP 2008/03/01
-
-\documentclass[preprint,12pt, a4paper]{elsarticle}
+%% This template can be used to write a paper for
+%% Computer Physics Communications using LaTeX.
+%% For authors who want to write a computer program description,
+%% an example Program Summary is included that only has to be
+%% completed and which will give the correct layout in the
+%% preprint and the journal.
+%% The `elsarticle' style is used and more information on this style
+%% can be found at 
+%% http://www.elsevier.com/wps/find/authorsview.authors/elsarticle.
+%%
+%%
+\documentclass[preprint,12pt]{elsarticle}
 
 %% Use the option review to obtain double line spacing
-%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+%% \documentclass[preprint,review,12pt]{elsarticle}
 
-%% For including figures, graphicx.sty has been loaded in
-%% elsarticle.cls. If you prefer to use the old commands
-%% please give \usepackage{epsfig}
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+%% if you use PostScript figures in your article
+%% use the graphics package for simple commands
+%% \usepackage{graphics}
+%% or use the graphicx package for more complicated commands
+%% \usepackage{graphicx}
+%% or use the epsfig package if you prefer to use the old commands
+%% \usepackage{epsfig}
 
 %% The amssymb package provides various useful mathematical symbols
 \usepackage{amssymb}
@@ -35,8 +38,33 @@
 
 %% The lineno packages adds line numbers. Start line numbering with
 %% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
-%% for the whole article with \linenumbers.
+%% for the whole article with \linenumbers after \end{frontmatter}.
+%% \usepackage{lineno}
 
+%% natbib.sty is loaded by default. However, natbib options can be
+%% provided with \biboptions{...} command. Following options are
+%% valid:
+
+%%   round  -  round parentheses are used (default)
+%%   square -  square brackets are used   [option]
+%%   curly  -  curly braces are used      {option}
+%%   angle  -  angle brackets are used    <option>
+%%   semicolon  -  multiple citations separated by semi-colon
+%%   colon  - same as semicolon, an earlier confusion
+%%   comma  -  separated by comma
+%%   numbers-  selects numerical citations
+%%   super  -  numerical citations as superscripts
+%%   sort   -  sorts multiple citations according to order in ref. list
+%%   sort&compress   -  like sort, but also compresses numerical citations
+%%   compress - compresses without sorting
+%%
+%% \biboptions{comma,round}
+
+% \biboptions{}
+
+%% This list environment is used for the references in the
+%% Program Summary
+%%
 \usepackage{lineno}
 \usepackage{amsmath}
 \usepackage{float}
@@ -51,7 +79,22 @@
 
 \newcommand{\BS}{\boldsymbol}
 
-\journal{SoftwareX}
+\newcounter{bla}
+\newenvironment{refnummer}{%
+\list{[\arabic{bla}]}%
+{\usecounter{bla}%
+ \setlength{\itemindent}{0pt}%
+ \setlength{\topsep}{0pt}%
+ \setlength{\itemsep}{0pt}%
+ \setlength{\labelsep}{2pt}%
+ \setlength{\listparindent}{0pt}%
+ \settowidth{\labelwidth}{[9]}%
+ \setlength{\leftmargin}{\labelwidth}%
+ \addtolength{\leftmargin}{\labelsep}%
+ \setlength{\rightmargin}{0pt}}}
+ {\endlist}
+
+\journal{Computer Physics Communications}
 
 \begin{document}
 
@@ -60,13 +103,14 @@
 %% Title, authors and addresses
 
 %% use the tnoteref command within \title for footnotes;
-%% use the tnotetext command for theassociated footnote;
+%% use the tnotetext command for the associated footnote;
 %% use the fnref command within \author or \address for footnotes;
-%% use the fntext command for theassociated footnote;
+%% use the fntext command for the associated footnote;
 %% use the corref command within \author for corresponding author footnotes;
-%% use the cortext command for theassociated footnote;
+%% use the cortext command for the associated footnote;
 %% use the ead command for the email address,
 %% and the form \ead[url] for the home page:
+%%
 %% \title{Title\tnoteref{label1}}
 %% \tnotetext[label1]{}
 %% \author{Name\corref{cor1}\fnref{label2}}
@@ -80,11 +124,18 @@
 \title{RadLib: a radiative heat transfer model library for CFD}
 
 %% use optional labels to link authors explicitly to addresses:
-%% \author[label1,label2]{}
-%% \address[label1]{}
-%% \address[label2]{}
+%% \author[label1,label2]{<author name>}
+%% \address[label1]{<address>}
+%% \address[label2]{<address>}
 
-%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+%\author[a]{First Author\corref{author}}
+%\author[a,b]{Second Author}
+%\author[b]{Third Author}
+
+%\cortext[author] {Corresponding author.\\\textit{E-mail address:} firstAuthor@somewhere.edu}
+%\address[a]{First Address}
+%\address[b]{Second Address}
+
 \author{Victoria B. Stephens}
 \author{Sally Jensen}
 \author{Isaac Wheeler}
@@ -98,49 +149,48 @@
 RadLib is a modular C++ library of radiation property models that can be applied to variety of systems involving radiative heat transfer, including CFD simulations. RadLib includes three major radiation property models---Planck Mean (PM) absorption coefficients, the weighted sum of gray gases (WSGG) model, and the rank-correlation spectral line weighted-sum-of-gray-gases (RCSLW) model---but its modular design and C++ and Python interface options permit convenient expansion to additional models. Several example cases illustrate the use of the models with an included ray-tracing solver and compare them in terms of accuracy relative to line-by-line solutions. The computational cost of the models is also compared. RadLib provides researchers with convenient access to validated radiation property models and a framework for further development. 
 \end{abstract}
 
+
+%In addition to the manuscript you must supply: the program source code; a README file giving the names and a brief description of the files/directory structure that make up the package and clear instructions on the installation and execution of the program; sample input and output data for at least one comprehensive test run; and, where appropriate, a user manual.
+
+%A compressed archive program file or files, containing these items, should be uploaded at the "Attach Files" stage of the EM submission.
+
+%For files larger than 1Gb, if difficulties are encountered during upload the author should contact the Technical Editor at cpc.mendeley@gmail.com.
+
+
 \begin{keyword}
-%% keywords here, in the form: keyword \sep keyword
 radiative heat transfer \sep reacting flows  \sep CFD \sep WSGG \sep RCSLW
 \end{keyword}
 
 \end{frontmatter}
 
-\begin{table}[H]
-\begin{tabular}{|l|p{6.5cm}|p{6.5cm}|}
-\hline
-\textbf{Nr.} & \textbf{Code metadata description} & \textbf{Metadata} \\
-\hline
-C1 & Current code version & TODO 2.1 \\
-\hline
-C2 & Permanent link to code/repository used for this code version & $github.com/BYUignite/radlib$ \\
-\hline
-C3 & Code Ocean compute capsule & (in review) \\
-\hline
-C4 & Legal Code License   & MIT license (MIT) \\
-\hline
-C5 & Code versioning system used & Git \\
-\hline
-C6 & Software code languages, tools, and services used & C++, Python 3 \\
-\hline
-C7 & Compilation requirements, operating environments \& dependencies & CMake, C++, Python 3, Cython \\
-\hline
-C8 & If available Link to developer documentation/manual & TODO \\
-\hline
-C9 & Support email for questions & davidlignell@byu.edu \\
-\hline
-\end{tabular}
-\caption{Code metadata.}
-\label{} 
-\end{table}
-
-
 \linenumbers
 
-% TODO tag software version
+% PROGRAM SUMMARY.
+
+{\bf PROGRAM SUMMARY/NEW VERSION PROGRAM SUMMARY}
+  %Delete as appropriate.
+
+\begin{small}
+\noindent
+{\em Program Title:} RadLib                                         \\
+{\em CPC Library link to program files:} (to be added by Technical Editor) \\
+{\em Developer's repository link:} https://github.com/BYUignite/radlib \\
+{\em Code Ocean capsule:} https://codeocean.com/capsule/0997975/tree \\
+{\em Licensing provisions(please choose one):} MIT \\
+{\em Programming language:} C++, Python                                   \\
+{\em Nature of problem(approx. 50-250 words):} \\
+Radiation property models can be difficult to understand and implement, often requiring a high degree of specialization. This presents a problem for practitioners who wish to use/implement radiation models for which such models consitute only a small but important part of a larger simulation. Turbulent combustion simulations are one such example. Often, rudimentary assumptions are made and this can negatively impact results. \\
+{\em Solution method(approx. 50-250 words):}\\
+We provide a well-written, documented, and validated radiation property library that is open source, and uses modern versioning build tools. C++ and Python interfaces are provided along with several examples demonstrating usage of the model. The library can be extended to other models and interfaces. \\ 
+{\em Additional comments including restrictions and unusual features (approx. 50-250 words):}\\
+The library is intended to be used in Linux-like terminal applications.  
+   \\
+
+\end{small}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Motivation and significance} \label{s:motivation}
+\section{Introduction} \label{s:motivation}
 
 Modeling radiative heat transfer for CFD is complex and challenging. Combustion simulations, for example, which require many physics models, are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to simulation cost. This can lead to simulations that use oversimplified radiation models, but in cases where radiation is significant relative to the other physical phenomena, oversimplified models can negatively impact the accuracy of simulation results. In some cases, radiative gains or losses are small compared to other energy sources or heat transfer modes and radiation can be safely neglected, but many practical engineering systems do not allow this. For example, simple jet flames demonstrate both possibilities: early in a flame's development, turbulent mixing typically dominates heat transfer and dictates flame behavior; late-stage flame phenomena like soot behavior and flame sheet breakthrough, however, increasingly depend on the magnitude of radiative heat losses and are difficult to simulate accurately without a robust radiation model. These problems motivated development of the RadLib library, which provides a framework and uniform interface for radiation property models and implements three powerful models in C++ and Python, giving researchers more convenient access to advanced radiation property models and a consistent framework for further model development. 
 
@@ -411,7 +461,7 @@ Figure \ref{fig:flowchart} illustrates the basic structure use of the RadLib pac
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Illustrative Examples} \label{s:Examples}
+\section{Validation and Examples} \label{s:Examples}
 
 Several examples are presented to illustrate the behavior of the models. The examples show heat flux $q$ or volumetric heat source $Q$ in one one-dimensional configurations with varying gas compositions and temperatures. We compare the PM, WSGG, and RCSLW models for each example. The examples correspond to those presented by Solvojov et al. \cite{Solovjov_2017} (S), Bordbar et al. \cite{Bordbar_2020} (B), Solovjov et~al. \cite{Solovjov_2001} (Sb), and the number of each example corresponds to the example number in the respective reference. A ray-tracing code is used to solve the radiative transport equation between two parallel plates. 
 Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a cold slab where the cold slab's thickness varies; Example S2 is isothermal with a thick slab of high CO$_2$ next to a thin slab of low CO$_2$ with variable thickness; Example S3 uses parabolic temperature and H$_2$O mole fraction profiles; Example S4 has a triangular temperature profile between equally-spaced isothermal regions; Example S5 uses a half-sinusoid temperature profile that decreases from 1500 to 500 K; and Example B3 has symmetric temperature and H$_2$O mole fraction profiles with central peaks of 1800 K and 1, respectively (with $y_{CO2}=1-y_{H2O}$). Example Sb1 is a simple uniform temperature and composition profile with soot radiation. Each case is presented alongside the line-by-line (LBL) data presented in the references. 
@@ -504,7 +554,7 @@ Cost comparisons were also attempted with Python, but it is difficult to get mea
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Impact} \label{s:impact}
+\section{Discussion} \label{s:impact}
 
 Radiative heat transfer models are historically difficult to implement in CFD codes due to their complexity and high computational costs. Neglecting radiation or using simple models like the optically thin assumption is adequate for some cases with simple geometry or limited chemical reactions, but most simulations of interest to engineers and researchers require more advanced radiation modeling to yield accurate results. In such cases, radiation models that are incorrectly implemented or inappropriate for the simulation parameters can become additional sources of error that may be extremely difficult to separate from existing sources or error. Currently, researchers that require detailed radiation modeling must code and validate it themselves at the expense of valuable research time and funding. 
 
@@ -547,34 +597,6 @@ The authors extend special thanks to Hadi Bordbar for assistance with the WSGG m
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section*{Current executable software version} \label{s:current_software}
-
-%Ancillary data table required for sub version of the executable software: (x.1, x.2 etc.) kindly replace examples in right column with the correct information about your executables, and leave the left column as it is.
-
-\begin{table}[!ht]
-\begin{tabular}{|l|p{6.5cm}|p{6.5cm}|}
-\hline
-\textbf{Nr.} & \textbf{(Executable) software metadata description} & \textbf{Metadata} \\
-\hline
-S1 & Current software version & 1.0 \\
-\hline
-S2 & Permanent link to executables of this version  & \href{https://github.com/BYUignite/radlib}{https://github.com/BYUignite/radlib} \\
-\hline
-S3 & Legal Software License & MIT license (MIT) \\
-\hline
-S4 & Computing platforms/Operating Systems & Linux, OS X, Microsoft Windows\\
-\hline
-S5 & Installation requirements \& dependencies & CMake, C++, Python 3, Cython \\
-\hline
-S6 & If available, link to user manual - if formally published include a reference to the publication in the reference
-    list & \href{https://github.com/BYUignite/radlib}{https://github.com/BYUignite/radlib} \\
-\hline
-S7 & Support email for questions & davidlignell@byu.edu \\
-\hline
-\end{tabular}
-\caption{Software metadata.}
-\label{t:softmd} 
-\end{table}
-
 \end{document}
 \endinput
+
