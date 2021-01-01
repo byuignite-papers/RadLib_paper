@@ -1,0 +1,8 @@
+*latexmk
+*.fls
+*.spl
+*.out
+*.xml
+*.bcf
+manuscript.pdf
+manuscript.synctex.gz
