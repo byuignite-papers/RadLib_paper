@@ -5,43 +5,45 @@
 This manuscript introduces “RadLib,” a C++ library to calculate absorption coefficients for use in radiative heat transfer calculations. The library has reasonable value to the research community, despite a few limitations in its scope and design. The library is self-contained (doesn’t have any external dependencies), which is convenient.
 
 I have a number of comments on the manuscript as well as the software itself which the authors should consider to improve the manuscript and software.
-Manuscript:
+
+### Manuscript:
 1.	There is no general user documentation provided in section 3. Figure 1 includes information that is more algorithmic than illustrative of the API.
 2.	Section 5 makes several editorial claims that are quite subjective, and not well-supported:
-a.	First sentence: “historically difficult to implement … complexity and high computational costs”
-i.	Property evaluation is not the expensive part of a radiation calculation. Solving the RTE is the expensive part.
-ii.	I wouldn’t characterize the property evaluation as particularly complex in comparison with other aspects of combustion simulations (kinetics, thermodynamics, transport properties).
-b.	At the end of the first paragraph, the authors seem to imply that RadLib will solve the challenges of radiation modeling. Again, it is the RTE solver, not the property evaluation, that is the largest time-sink in terms of computer and human resources. 
-c.	These kinds of statements persist throughout the second paragraph as well. There are limitations in RadLib such as lack of scattering treatment for particle-laden flows, inability to include more species, lack of any line-by-line capabilities, etc. The library checks a few useful boxes, but the verbiage here seems to take more credit than the authors may be due.
+	1. First sentence: “historically difficult to implement … complexity and high computational costs”
+		- Property evaluation is not the expensive part of a radiation calculation. Solving the RTE is the expensive part.
+        - I wouldn’t characterize the property evaluation as particularly complex in comparison with other aspects of combustion simulations (kinetics, thermodynamics, transport properties).
+    1.	At the end of the first paragraph, the authors seem to imply that RadLib will solve the challenges of radiation modeling. Again, it is the RTE solver, not the property evaluation, that is the largest time-sink in terms of computer and human resources. 
+    1.	These kinds of statements persist throughout the second paragraph as well. There are limitations in RadLib such as lack of scattering treatment for particle-laden flows, inability to include more species, lack of any line-by-line capabilities, etc. The library checks a few useful boxes, but the verbiage here seems to take more credit than the authors may be due.
 3.	Section 5 claims that “RadLib’s modular framework is designed to easily accommodate new models as well,” which is a bit of an overstatement. See comments below w.r.t. assumptions on species considered, hard-coded polynomial coefficients, etc. all of which reduce extensibility.
 4.	There are several minor issues that need to be addressed:
-a.	Abstract: “well-written” is subjective and should be removed.
-b.	Introduction: second sentence: “Combustion simulations…” is a run-on sentence.
-c.	Page 10: “[INSERT RUNTIME COMPARISONS HERE]”
-d.	Section 7 heading: “Interes”
-Software deficiencies & suggestions:
+    1. Abstract: “well-written” is subjective and should be removed.
+    1. Introduction: second sentence: “Combustion simulations…” is a run-on sentence.
+    1.	Page 10: “[INSERT RUNTIME COMPARISONS HERE]”
+    1.	Section 7 heading: “Interes”
+
+### Software deficiencies & suggestions:
 1.	API doxygen documentation is non-standard. It appears that the doxygen documentation is provided in the .cc files rather than the header files, which is where it is typically found. Downstream developers would typically be working from headers and the installed library, so it is convention to have doxygen documentation in the header only. This also reduces clutter in the implementation files.
 2.	make_examples.sh:
-a.	will only work with a g++ compiler in the user’s path.
-b.	Is referred to as build_examples.sh in the README.md file
-c.	is redundant with the cmake build system and isn’t portable. It should probably be removed.
+    1.	will only work with a g++ compiler in the user’s path.
+    1.	Is referred to as build_examples.sh in the README.md file
+    1.	is redundant with the cmake build system and isn’t portable. It should probably be removed.
 3.	It appears that there are no tests associated with the library. This is a bit surprising - I would expect regression test coverage on the basic API functionality.
 4.	CMake build system:
-a.	Consider installing a “RadLib.cmake” file for downstream usage by CMake-based projects. This helps downstream build systems configure for RadLib usage (setting include paths, etc.).
-b.	probably shouldn’t specify optimize or debug flags directly, as CMake will provide appropriate values on most platforms.
-c.	the default build type isn’t defaulting to Release for me; it remains blank.
-d.	I suggest not using verbose makefiles by default.
-e.	Using GLOB to install the headers is not the appropriate CMake approach.
-f.	the data files are not copied into the examples build directory, meaning that the example executables do not run.
-i.	The run-examples.sh script is not helpful as it is not installed into the build directory where the executables are produced and doesn’t have path information to actually run the executables.
-g.	Using “doxygen” as a target is not ideal since it conflicts with the “doxygen” executable name. It still works fine though...
+    1.	Consider installing a “RadLib.cmake” file for downstream usage by CMake-based projects. This helps downstream build systems configure for RadLib usage (setting include paths, etc.).
+    1.	probably shouldn’t specify optimize or debug flags directly, as CMake will provide appropriate values on most platforms.
+    1.	the default build type isn’t defaulting to Release for me; it remains blank.
+    1.	I suggest not using verbose makefiles by default.
+    1.	Using GLOB to install the headers is not the appropriate CMake approach.
+    1.	the data files are not copied into the examples build directory, meaning that the example executables do not run.
+    1.	The run-examples.sh script is not helpful as it is not installed into the build directory where the executables are produced and doesn’t have path information to actually run the executables.
+    1.	Using “doxygen” as a target is not ideal since it conflicts with the “doxygen” executable name. It still works fine though...
 5.	It appears that line-by-line data from HITEMP/HITRAN files cannot be loaded into RadLib. That’s an unfortunate limitation, but not a deal-breaker. 
 6.	It looks like the software hard-codes Plank mean absorption coefficients as (fourth-order?) polynomial fits? Same for WSGG. There is no discussion of why this was chosen, how the coefficients were determined, or a characterization of its accuracy. Do you observe any problematic behavior with the fourth order polynomials over temperatures from 300 to 3000 K?  Are these interpolants or regression of data?
 7.	The two previous items combined lead to a significant limitation of RadLib: one cannot easily add new species or modify existing data that is used to generate the absorption coefficients since there has been internal preprocessing of (an unknown subset of) the HITEMP/HITRAN databases to produce curve fits. And given that this process is opaque, it isn’t reproducible.
 8.	RadLib only considers CO2 and H2O for WSGG, which is fairly limited. Even for Plank mean, only H2O, CO2, CO and CH4 are considered. NO and OH would be nice to include. It appears that including additional species would be a non-trivial undertaking.
 9.	Documentation:
-a.	Generating the documentation directly via doxygen v. 1.8.20 gives numerous warnings about obsolete tags and then fails because it is looking for a relative path “../../docs/doxygen” that doesn’t exist. This should be fixed.
-b.	Generating the doxygen documentation via the build system target (“make doxygen”) does seem to work fine.
+    1.	Generating the documentation directly via doxygen v. 1.8.20 gives numerous warnings about obsolete tags and then fails because it is looking for a relative path “../../docs/doxygen” that doesn’t exist. This should be fixed.
+    1.	Generating the doxygen documentation via the build system target (“make doxygen”) does seem to work fine.
 
 
 ## Reviewer 2
@@ -62,7 +64,6 @@ The models included in RadLib are already well-established and well-validated in
 
 Considering all these, I think that this CPiP submission is definitely within the scope of the journal and of interest to the research community. However, the following concerns must be addressed before the submission is considered for publication.
 
-
 1) I could not successfully build and run the library in two different Linux systems. In both cases, first, the cmake returned an error:
 "CMake Error at c++/CMakeLists.txt:34 (install): install TARGETS given no ARCHIVE DESTINATION for static library target "radlib"."
 I could resolve this by adding ARCHIVE DESTINATION line on the c++/CMakeLists.txt file.
@@ -77,7 +78,6 @@ I would strongly recommend that the authors modify the installation instructions
 
 5) On page 13, the authors present a paragraph describing Figs. 2 and 3 - the comparison of various radiation property models present in RadLib in one-dimensional configurations. The comparisons are presented simply as observations without any explanation or reasoning why the models behave the way as seen in Fig. 2 and 3. If I understand correctly, the focus of the work presented here is not the comparison of the accuracy of the three models but to showcase the library. Therefore, these comparisons - specifically without any explanation of the results - may not be essential to the current manuscript, and can be shortened. These results do serve as descriptions of example cases provided in RadLib. On the same page, the authors say that "While ommitted [should be omitted] here for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in [11, 14] such that these examples also serve as a validation of the implementation of the
 models." The authors should avoid qualitative description such as "essentially identical" in the context of validation and present a quantitative (e.g., % error) metric wherever possible. A strong validation is important for programs like this.
-
 
 6) The computational cost tables for two cases show a significantly different trend, which the authors attribute to "additional overhead required in performing the calculations." Can the authors be more specific as to what these overheads may be? They say that they have neglected the initialization and input/output costs. Also, do these CPU times presented include the cost for the ray-tracing solver as well? Are the grids kept the same for all configurations?
 
