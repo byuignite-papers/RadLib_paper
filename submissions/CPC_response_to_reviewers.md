@@ -19,7 +19,8 @@ I have a number of comments on the manuscript as well as the software itself whi
     1. Abstract: “well-written” is subjective and should be removed.
     1. Introduction: second sentence: “Combustion simulations…” is a run-on sentence.
     1.	Page 10: “[INSERT RUNTIME COMPARISONS HERE]”
-    1.	Section 7 heading: “Interes”
+    	**This was a placeholder that should not have been included in the document. It has been removed.**
+    3.	Section 7 heading: “Interes”
 
 ### Software deficiencies & suggestions:
 1.	API doxygen documentation is non-standard. It appears that the doxygen documentation is provided in the .cc files rather than the header files, which is where it is typically found. Downstream developers would typically be working from headers and the installed library, so it is convention to have doxygen documentation in the header only. This also reduces clutter in the implementation files.
@@ -53,11 +54,14 @@ solvers such as P1 and DOM, it would further improve the quality of this study. 
 
 1. RADCAL data were used to generate the PlanckMean absorption coefficient. Based on the reviewer's experience, the PlanckMean absorption coefficients can have meaningful differences when generated from RADCAL and from HiTEMP2010. It is recommended a more recent database being used for the library.
 2. Page 10, missing information on [INSERT RUNTIME COMPARISONS HERE].
-3. In Figure 2, the RCSLM seems to consistently perform better than WSGG, except in Example S2. In addition, WSGG performs worse than PM in Example S4. Can the authors explain why?
-4. Equation 6 appears to be inaccurate.
-5. Typo: page 4, line 49, "relating them" -> "relating the"
 
-	<span style="color:blue">The phrase has been amended to ". . .using correlations relating them to local properties such as. . .".</span>
+	**This was a placeholder statement that should not have been included in the document. It has been removed.**
+	
+4. In Figure 2, the RCSLM seems to consistently perform better than WSGG, except in Example S2. In addition, WSGG performs worse than PM in Example S4. Can the authors explain why?
+5. Equation 6 appears to be inaccurate.
+6. Typo: page 4, line 49, "relating them" -> "relating the"
+
+	**The phrase has been amended to ". . .using correlations relating them to local properties such as. . .".**
 
 ## Reviewer 3
 
@@ -97,15 +101,24 @@ MINOR:
 
 5) Page, 4: "Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model [1, 2]." This sentence is somewhat misleading. It may be more appropriate to think of WSGG models as special cases of SLW or FSK models.
 
+	**The authors agree that this statement could be potentially misleading. The second half of the sentence (beginning with ". . .and are usually. . .") has been removed.*
+
 6) In lines 48-52 on Page 4, the authors say that the absorption coefficients are calculated using some correlations after some curve-fitting to spectroscopic databases. I am not sure what the authors refer to as correlations. There may be some correlations involved in WSGG models, but it is not clear to me where are correlations involved in RCSLW.
 
 7) On page 7, the authors mention that the PM model can be "reasonably accurate" in some cases and go on to say that, "The Planck Mean model is most appropriate under optically thin conditions  with  relatively  low  radiative  transfer  relative  to  other  heat  sources such  as  reactive  heat  release  rates." The Planck Mean model will be appropriate in optically thin cases as there is very little reabsorption. This may or may not be connected with "relatively  low  radiative  transfer  relative  to  other  heat  sources." In fact, if the radiative heat transfer is much lower than chemical heat release, neglecting radiation altogether may also be reasonable! Although, the definition of "relatively low" is subjective.
 
 8) On the same page, lines 40-41, "This version of  the  WSGG  model  is  advantageous  because  it  allows  for  arbitrary  CO2 and  H2O  compositions,  increasing  its  accuracy  and  flexibility." Can the authors provide some references that show the increased accuracy and/or flexibility of this WSGG over any other WSGG?
-9) With respect to Eqn 8, Mr is defined as molar ratio y_H2O/y_CO2. Are the authors using y as a symbol for mole fraction rather than mass fraction as is conventionally done?
+
+	**Two references for the chosen WSGG model are given earlier in the paragraph. The second (Bordbar et al. 2020) includes detailed comparisons between this model, its immediate predecessor (see Bordbar et al. 2014), five other WSGG models, and line-by-line calculations for four different test cases that show high accuracy over a wide range of molar ratio values. While other models may have performed better in individual tests, this model demonstrated consistent accuracy over a range of scenarios. For clarity, this reference has been added to the end of the aforementioned sentence so as to better indicate where to obtain relevant information.**
+
+10) With respect to Eqn 8, Mr is defined as molar ratio y_H2O/y_CO2. Are the authors using y as a symbol for mole fraction rather than mass fraction as is conventionally done?
 
 10) Please remove the words "[INSERT RUNTIME COMPARISONS HERE]" on Page 10.
 
+	**This was a placeholder that should not have been included in the document. It has been removed.**
+
 11) In lines 29-30 on page 13, please insert the units for Q in -80 and 200.
+
+	**Appropriate units have been added to the specified values.**
 
 12) In the Discussion (page 16), the authors write, "Neglecting radiation or using simple models like the optically thin assumption is adequate for some cases with simple geometry or limited chemical reactions…" This can be misleading. I am not sure if either the simple geometry or the limited chemical reactions give any indication of the importance of radiation. Rather, something like a radiant fraction or optical thickness may be a more appropriate metric to justify neglecting radiation or using an optically thin model.
