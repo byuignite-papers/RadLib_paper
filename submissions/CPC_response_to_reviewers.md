@@ -19,7 +19,9 @@ I have a number of comments on the manuscript as well as the software itself whi
     1. Abstract: “well-written” is subjective and should be removed.
     1. Introduction: second sentence: “Combustion simulations…” is a run-on sentence.
     1.	Page 10: “[INSERT RUNTIME COMPARISONS HERE]”
+    
     	**This was a placeholder that should not have been included in the document. It has been removed.**
+	
     3.	Section 7 heading: “Interes”
 
 ### Software deficiencies & suggestions:
@@ -101,7 +103,7 @@ MINOR:
 
 5) Page, 4: "Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model [1, 2]." This sentence is somewhat misleading. It may be more appropriate to think of WSGG models as special cases of SLW or FSK models.
 
-	**The authors agree that this statement could be potentially misleading. The second half of the sentence (beginning with ". . .and are usually. . .") has been removed.*
+	**The authors agree that this statement could be potentially misleading. The second half of the sentence (beginning with ". . .and are usually. . .") has been removed.**
 
 6) In lines 48-52 on Page 4, the authors say that the absorption coefficients are calculated using some correlations after some curve-fitting to spectroscopic databases. I am not sure what the authors refer to as correlations. There may be some correlations involved in WSGG models, but it is not clear to me where are correlations involved in RCSLW.
 
