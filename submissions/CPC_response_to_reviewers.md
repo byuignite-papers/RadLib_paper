@@ -51,11 +51,13 @@ I have a number of comments on the manuscript as well as the software itself whi
 A radiation spectral property library is developed in this study using C++. A Planck-mean absorption coefficient based model, a WSGG model and a RCSLM model from the literature are implemented  in the package. Verification results are presented and discussed. Although the authors addressed an important issue of radiation modeling, the contribution is marginal in the reviewer's opinion. No new models/methods are proposed in this study. As the authors correctly pointed out, the solver for radiative transfer equation is equally important, which is not included in the library. The coupling of a spectral model to a specific RTE solver, can have different levels of challenges depending on the combination. The design of the library doesn't really address any of the RTE-related issues, nor provide any new solutions to simplify the coupling of spectral models to RTEs. If the authors can demonstrate that the library can be coupled with popular CFD software and popular RTE
 solvers such as P1 and DOM, it would further improve the quality of this study. A few other concerns are listed as follows:
 
-1) RADCAL data were used to generate the PlanckMean absorption coefficient. Based on the reviewer's experience, the PlanckMean absorption coefficients can have meaningful differences when generated from RADCAL and from HiTEMP2010. It is recommended a more recent database being used for the library.
-2) Page 10, missing information on [INSERT RUNTIME COMPARISONS HERE].
-3) In Figure 2, the RCSLM seems to consistently perform better than WSGG, except in Example S2. In addition, WSGG performs worse than PM in Example S4. Can the authors explain why?
-4) Equation 6 appears to be inaccurate.
-5) Typo: page 4, line 49, "relating them" -> "relating the"
+1. RADCAL data were used to generate the PlanckMean absorption coefficient. Based on the reviewer's experience, the PlanckMean absorption coefficients can have meaningful differences when generated from RADCAL and from HiTEMP2010. It is recommended a more recent database being used for the library.
+2. Page 10, missing information on [INSERT RUNTIME COMPARISONS HERE].
+3. In Figure 2, the RCSLM seems to consistently perform better than WSGG, except in Example S2. In addition, WSGG performs worse than PM in Example S4. Can the authors explain why?
+4. Equation 6 appears to be inaccurate.
+5. Typo: page 4, line 49, "relating them" -> "relating the"
+
+	<span style="color:blue">The phrase has been amended to ". . .using correlations relating them to local properties such as. . .".</span>
 
 ## Reviewer 3
 
