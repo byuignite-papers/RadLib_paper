@@ -14,31 +14,30 @@ I have a number of comments on the manuscript as well as the software itself whi
 		- Property evaluation is not the expensive part of a radiation calculation. Solving the RTE is the expensive part.
         - I wouldn’t characterize the property evaluation as particularly complex in comparison with other aspects of combustion simulations (kinetics, thermodynamics, transport properties).
 
-    1. At the end of the first paragraph, the authors seem to imply that RadLib will solve the challenges of radiation modeling. Again, it is the RTE solver, not the property evaluation, that is the largest time-sink in terms of computer and human resources. 
+    2. At the end of the first paragraph, the authors seem to imply that RadLib will solve the challenges of radiation modeling. Again, it is the RTE solver, not the property evaluation, that is the largest time-sink in terms of computer and human resources. 
 
-    1. These kinds of statements persist throughout the second paragraph as well. There are limitations in RadLib such as lack of scattering treatment for particle-laden flows, inability to include more species, lack of any line-by-line capabilities, etc. The library checks a few useful boxes, but the verbiage here seems to take more credit than the authors may be due.
+    3. These kinds of statements persist throughout the second paragraph as well. There are limitations in RadLib such as lack of scattering treatment for particle-laden flows, inability to include more species, lack of any line-by-line capabilities, etc. The library checks a few useful boxes, but the verbiage here seems to take more credit than the authors may be due.
 
 3. Section 5 claims that “RadLib’s modular framework is designed to easily accommodate new models as well,” which is a bit of an overstatement. See comments below w.r.t. assumptions on species considered, hard-coded polynomial coefficients, etc. all of which reduce extensibility.
 
 	**In order to avoid subjective language, this sentence has been revised as follows: "RadLib's modular framework can also accomodate new models, . . .". Specific extensibility issues are addressed below with their respective reviewer comments.**
 
-4.There are several minor issues that need to be addressed:
+4. There are several minor issues that need to be addressed: 
+	1. Abstract: “well-written” is subjective and should be removed. 
 
-	1. Abstract: “well-written” is subjective and should be removed.
+		**The offending sentence (actually located in the "Solution method" section of the Program Summary) has been revised to eliminate subjective language.**
 	
-	**The offending sentence (actually located in the "Solution method" section of the Program Summary) has been revised to eliminate subjective language.**
+	2. Introduction: second sentence: “Combustion simulations…” is a run-on sentence.	
 	
-	2.Introduction: second sentence: “Combustion simulations…” is a run-on sentence.	
-	
-	**Technically, no, this is not a run-on sentence, but its structure is awkward and inhibits readability. It has been revised to the following: "For example, combustion simulations are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to overall simulation cost."**
+		**Technically, no, this is not a run-on sentence, but its structure is awkward and inhibits readability. It has been revised to the following: "For example, combustion simulations are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to overall simulation cost."**
 	
     3. Page 10: “[INSERT RUNTIME COMPARISONS HERE]”
     
-	**This was a placeholder that should not have been included in the document. It has been removed.**
+		**This was a placeholder that should not have been included in the document. It has been removed.**
 	
 	4. Section 7 heading: “Interes”
 	
-	**Fixed section heading. Now correctly reads "Declaration of Competing Interests".**
+		**Fixed section heading. Now correctly reads "Declaration of Competing Interests".**
 
 ### Software deficiencies & suggestions:
 
@@ -67,9 +66,11 @@ I have a number of comments on the manuscript as well as the software itself whi
 
 6. It looks like the software hard-codes Plank mean absorption coefficients as (fourth-order?) polynomial fits? Same for WSGG. There is no discussion of why this was chosen, how the coefficients were determined, or a characterization of its accuracy. Do you observe any problematic behavior with the fourth order polynomials over temperatures from 300 to 3000 K?  Are these interpolants or regression of data?
 
-	**This discussion was purposely omitted because it does not align with the goal of the paper, which is to present RadLib as a software tool for calculating radiation property data, not to evaluate or compare the included models. All of the reviewer's questions are addressed in detail in the referenced literature (Planck Mean coefficients in [3,5] and WSGG in [10,11]). The authors believe that this is an issue of scope rather than missing information, but they are willing to extend the discussion at the editor's discretion.**
+	**This discussion was purposely omitted because it does not align with the goal of the paper, which is to present RadLib as a software tool for calculating radiation property data, not to evaluate or compare the included models. All of the reviewer's questions are addressed in detail in the referenced literature (Planck Mean coefficients in [3,5] and WSGG in [10,11]). The authors believe that this is an issue of scope rather than missing information but are willing to extend the discussion at the editor's discretion.**
 
 7. The two previous items combined lead to a significant limitation of RadLib: one cannot easily add new species or modify existing data that is used to generate the absorption coefficients since there has been internal preprocessing of (an unknown subset of) the HITEMP/HITRAN databases to produce curve fits. And given that this process is opaque, it isn’t reproducible.
+
+	**The authors acknowledge that modifying existing models in RadLib is non-trivial, but would like to note that the paper does not claim that the implemented models are easily modified, only that the RadLib framework can be used to implement and validate additional models. Additionally, the authors disagree with the reviewer's statement regarding opacity and reproducability. The referenced literature (see above) clearly outlines the data sources and preprocessing methods applied; this information was omitted from the current paper for the reasons stated above. Given the provided sources, the process is neither opaque nor non-reproducible.**
 
 8. RadLib only considers CO2 and H2O for WSGG, which is fairly limited. Even for Plank mean, only H2O, CO2, CO and CH4 are considered. NO and OH would be nice to include. It appears that including additional species would be a non-trivial undertaking.
 
@@ -89,6 +90,8 @@ A radiation spectral property library is developed in this study using C++. A Pl
 
 1. RADCAL data were used to generate the PlanckMean absorption coefficient. Based on the reviewer's experience, the PlanckMean absorption coefficients can have meaningful differences when generated from RADCAL and from HiTEMP2010. It is recommended a more recent database being used for the library.
 
+	**The Planck Mean absorption coefficients model as implemented in RadLib refers specifically to the radiation model in [3,5], which is one of the most common radiation models applied to turbulent combustion simulations. It was chosen because of its popularity and widespread use in combustion simulations (despite its limitations). That said, there is value in using the most current tools. Given the reviewer's experience with variance in the Planck Mean absorption coefficients as calculated from various databases, the authors will strongly consider adding an updated Planck Mean model using the most current available data.**
+
 2. Page 10, missing information on [INSERT RUNTIME COMPARISONS HERE].
 
 	**This was a placeholder statement that should not have been included in the document. It has been removed.**
@@ -97,7 +100,7 @@ A radiation spectral property library is developed in this study using C++. A Pl
 
 4. Equation 6 appears to be inaccurate.
 
-	**Upon review, the authors find no errors in Equation 6, which matches Equation 20.65 of the general band model (of which the WSGG model is a subset) derivation in [2] and appears to be consistent with the other equations near it. **
+	**Upon review, the authors find no errors in Equation 6, which matches Equation 20.65 of the general band model (of which the WSGG model is a subset) derivation in [2] and appears to be consistent with the other equations in the paper.**
 
 5. Typo: page 4, line 49, "relating them" -> "relating the"
 
@@ -118,9 +121,15 @@ I would strongly recommend that the authors modify the installation instructions
 
 2) The library includes PM, one WSGG, and a RCSLW model. The authors should clearly indicate the rationale of these choices (i.e., why only these three models) early on in the manuscript. Since this is intended for researchers who, presumably, are not experts in radiation modeling, the inclusion of these three models can be misleading. One might think that these three models are the most appropriate models for their simulations.
 
+**TO DO: add something to introduction to address this**
+
 3) RadLib is intended to be expanded with new radiation property models in the future and interfaced with a user-supplied solver module for RTE. A brief discussion on how to interface such an external solver module should be presented. There is an example of a ray-tracing solver presented in the code files, but a brief discussion on coupling one's own RTE solver is important in the manuscript. Additionally, a brief discussion on how a user can add a new radiative property model should also be included.
 
 4) The Planck-mean absorption coefficient included in RadLib is based on TNF workshop data (from 2003). According to the references cited, these are fairly old correlations. If the authors use these data, I am concerned that the model parameters and correlations used in RadLib for the PM model may be obsolete and inaccurate. Can the authors please comment on this?
+
+	**The authors purposely chose the TNF workshop data for calculating Planck Mean absorption coefficients because it is one of the most common and widely used radiation models applied to turbulent combustion simulations, despite its age and limitations. The paper includes a brief discussion on the limited applicability of this model, especially for combustion simulations, and demonstrates its deficiencies in the example cases. It is true that this model is neither current nor particularly accurate, and the authors are strongly considering adding an updated Planck Mean model using the most current available data.**
+	
+	**TO DO: add discussion to address the age of the model and why we chose to include it anyway**
 
 5) On page 13, the authors present a paragraph describing Figs. 2 and 3 - the comparison of various radiation property models present in RadLib in one-dimensional configurations. The comparisons are presented simply as observations without any explanation or reasoning why the models behave the way as seen in Fig. 2 and 3. If I understand correctly, the focus of the work presented here is not the comparison of the accuracy of the three models but to showcase the library. Therefore, these comparisons - specifically without any explanation of the results - may not be essential to the current manuscript, and can be shortened. These results do serve as descriptions of example cases provided in RadLib. On the same page, the authors say that "While ommitted [should be omitted] here for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in [11, 14] such that these examples also serve as a validation of the implementation of the
 models." The authors should avoid qualitative description such as "essentially identical" in the context of validation and present a quantitative (e.g., % error) metric wherever possible. A strong validation is important for programs like this.
@@ -133,17 +142,27 @@ MINOR:
 
 1) It should be clarified that RadLib only provides radiation properties for non-scattering media.
 
+**TO DO: add this**
+
 2) In the program summary the description of the nature of the program is somewhat confusing from a grammatical construction standpoint. Particularly, the following part, "This presents a problem for practitioners who wish to use/implement radiation models for which [refers to what?] such models consitute [constitute?] only a small but important part of a larger simulation.  Turbulent combustion simulations are one such example [example of what?].  Often, rudimentary assumptions [in what?] are made and this can negatively impact results."
+
+**TO DO: revise program summary**
 
 3) In Page 2, "In some cases, radiative gains or losses are small compared to other energy sources or heat transfer modes and radiation can be safely neglected, ... difficult to simulate accurately without a robust radiation model." Please provide some references to support these arguments.
 
+**TO DO: add requested references**
+
 4) Please explain all the symbols used in equations. For example, eta in Eqn. 1 (and subsequent equations), Eb  in Eqn. 11.
+
+**TO DO: explain and/or list equation symbols not already addressed**
 
 5) Page, 4: "Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model [1, 2]." This sentence is somewhat misleading. It may be more appropriate to think of WSGG models as special cases of SLW or FSK models.
 
 	**The authors agree that this statement could be potentially misleading. The second half of the sentence (beginning with ". . .and are usually. . .") has been removed.**
 
 6) In lines 48-52 on Page 4, the authors say that the absorption coefficients are calculated using some correlations after some curve-fitting to spectroscopic databases. I am not sure what the authors refer to as correlations. There may be some correlations involved in WSGG models, but it is not clear to me where are correlations involved in RCSLW.
+
+	**The RCSLW model's key tool is the absorption line blackbody distribution function (ALBDF), which is calculated using sppectral data available from databases like HITEMP. This is discussed briefly at the end of Section 2.3 on pages 8-9. For more information on how spectral data is used to calculate the ALBDFs, please see reference [22].**
 
 7) On page 7, the authors mention that the PM model can be "reasonably accurate" in some cases and go on to say that, "The Planck Mean model is most appropriate under optically thin conditions  with  relatively  low  radiative  transfer  relative  to  other  heat  sources such  as  reactive  heat  release  rates." The Planck Mean model will be appropriate in optically thin cases as there is very little reabsorption. This may or may not be connected with "relatively  low  radiative  transfer  relative  to  other  heat  sources." In fact, if the radiative heat transfer is much lower than chemical heat release, neglecting radiation altogether may also be reasonable! Although, the definition of "relatively low" is subjective.
 
