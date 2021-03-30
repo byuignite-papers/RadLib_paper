@@ -7,7 +7,8 @@ This manuscript introduces “RadLib,” a C++ library to calculate absorption c
 I have a number of comments on the manuscript as well as the software itself which the authors should consider to improve the manuscript and software.
 
 ### Manuscript:
-1.There is no general user documentation provided in section 3. Figure 1 includes information that is more algorithmic than illustrative of the API.
+
+1. There is no general user documentation provided in section 3. Figure 1 includes information that is more algorithmic than illustrative of the API.
 
 2. Section 5 makes several editorial claims that are quite subjective, and not well-supported:
 	1. First sentence: “historically difficult to implement … complexity and high computational costs”
