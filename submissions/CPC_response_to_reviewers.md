@@ -177,6 +177,8 @@ MINOR:
 
 10) With respect to Eqn 8, Mr is defined as molar ratio y_H2O/y_CO2. Are the authors using y as a symbol for mole fraction rather than mass fraction as is conventionally done?
 
+	**This is correct. The molar ratio was defined using these variables by Bordbar et al. [10,11] for the WSGG model and have been retained for consistency.**
+
 10) Please remove the words "[INSERT RUNTIME COMPARISONS HERE]" on Page 10.
 
 	**This was a placeholder that should not have been included in the document. It has been removed.**
