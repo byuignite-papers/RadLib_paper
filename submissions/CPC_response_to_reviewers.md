@@ -6,9 +6,13 @@ This manuscript introduces “RadLib,” a C++ library to calculate absorption c
 
 I have a number of comments on the manuscript as well as the software itself which the authors should consider to improve the manuscript and software.
 
+**The authors would like to thank the reviewer for their time and knowledge. While we disagree with some of the reviewer's comments and suggestions, they are, overall, constructive and helpful to the paper's development.**
+
 ### Manuscript:
 
 1. There is no general user documentation provided in section 3. Figure 1 includes information that is more algorithmic than illustrative of the API.
+
+	**Section 3 has been revised and extended to include more information on how users can include and interact with the RadLib library, including explicit references to example files that further illustrate usage of the library.**
 
 2. Section 5 makes several editorial claims that are quite subjective, and not well-supported:
 	1. First sentence: “historically difficult to implement … complexity and high computational costs”
@@ -55,7 +59,10 @@ I have a number of comments on the manuscript as well as the software itself whi
     1.	Is referred to as build_examples.sh in the README.md file
     1.	is redundant with the cmake build system and isn’t portable. It should probably be removed.
 3. It appears that there are no tests associated with the library. This is a bit surprising - I would expect regression test coverage on the basic API functionality.
-4. CMake build system:
+
+**TO DO: consult Josh about appropriate tests for RadLib**
+
+5. CMake build system:
     1.	Consider installing a “RadLib.cmake” file for downstream usage by CMake-based projects. This helps downstream build systems configure for RadLib usage (setting include paths, etc.).
     1.	probably shouldn’t specify optimize or debug flags directly, as CMake will provide appropriate values on most platforms.
     1.	the default build type isn’t defaulting to Release for me; it remains blank.
@@ -79,7 +86,7 @@ I have a number of comments on the manuscript as well as the software itself whi
 
 8. RadLib only considers CO2 and H2O for WSGG, which is fairly limited. Even for Plank mean, only H2O, CO2, CO and CH4 are considered. NO and OH would be nice to include. It appears that including additional species would be a non-trivial undertaking.
 
-	**All WSGG correlations consider only CO2-H2O mixtures with the exception of specialized subset of WSGG models that consider CO2-H2O-soot mixtures. This WSGG model was chosen for RadLib due to its popularity, relative simplicity, and good performance. Note that WSGG models usually address radiation in combustion environments. RadLib implements the WSGG model presented by Bordbar et al. in references [10] and [11], which was developed specifically for use in oxy-fired combustion simulations. CO2 and H2O are the major products of all combustion processes, and CO is a major product of rich combustion. NO and OH are minor species that, while important to other aspects of combustion processes, do not typically participate significantly in radiative heat transfer processes. For more information, please refer to Section 20.6 of reference [2] and/or Section 3.4.1 of *Radiative Heat Transfer in Turbulent Combustion Systems* by Modest and Haworth.** 
+	**All WSGG correlations consider only CO2-H2O mixtures with the exception of specialized subset of WSGG models that consider CO2-H2O-soot mixtures. This WSGG model was chosen for RadLib due to its popularity, relative simplicity, and good performance. RadLib implements the WSGG model presented by Bordbar et al. in references [10] and [11], which was developed specifically for use in oxy-fired combustion simulations. CO2 and H2O are the major products of all combustion processes, and CO is a major product of rich combustion. NO and OH are minor species that, while important to other aspects of combustion processes, do not typically participate significantly in radiative heat transfer processes. For more information, please refer to Section 20.6 of reference [2] and/or Section 3.4.1 of *Radiative Heat Transfer in Turbulent Combustion Systems* by Modest and Haworth.** 
 
 	**It should also be noted that the Planck Mean absorption coefficients model as implemented in RadLib refers specifically to the radiation model in [3,5], which is one of the most common radiation models applied to turbulent combustion simulations. This is why Section 2.1 explicitly references the TNF radiation model and its calculated Planck Mean absorption coefficients. As implemented, the model is not intended to be general or extensible to other gas species and was never presented as such. Adding additional species would indeed be a non-trivial undertaking, but that is neither the goal nor purpose of RadLib as a software package, which presents and validates models rather than evaluating them.**
 
@@ -92,6 +99,10 @@ I have a number of comments on the manuscript as well as the software itself whi
 ## Reviewer 2
 
 A radiation spectral property library is developed in this study using C++. A Planck-mean absorption coefficient based model, a WSGG model and a RCSLM model from the literature are implemented  in the package. Verification results are presented and discussed. Although the authors addressed an important issue of radiation modeling, the contribution is marginal in the reviewer's opinion. No new models/methods are proposed in this study. As the authors correctly pointed out, the solver for radiative transfer equation is equally important, which is not included in the library. The coupling of a spectral model to a specific RTE solver, can have different levels of challenges depending on the combination. The design of the library doesn't really address any of the RTE-related issues, nor provide any new solutions to simplify the coupling of spectral models to RTEs. If the authors can demonstrate that the library can be coupled with popular CFD software and popular RTE solvers such as P1 and DOM, it would further improve the quality of this study. A few other concerns are listed as follows:
+
+**The authors would like to thank the reviewer for their comments and suggestions. We have already begun working on coupling RadLib to CFD software (that includes a DOM model for the RTE solution, among other features) in order to demonstrate RadLib's capabilities.**
+
+**TO DO: couple RadLib to ODT for demonstration purposes**
 
 1. RADCAL data were used to generate the PlanckMean absorption coefficient. Based on the reviewer's experience, the PlanckMean absorption coefficients can have meaningful differences when generated from RADCAL and from HiTEMP2010. It is recommended a more recent database being used for the library.
 
@@ -113,10 +124,11 @@ A radiation spectral property library is developed in this study using C++. A Pl
 
 ## Reviewer 3
 
-The Computer Program in Physics (CPiP) submission titled, "RadLib: a radiative heat transfer model library for CFD" by Stephens et al reports a library of radiative property models that is modular and can be interfaced with other radiation model components. The manuscript is well-written and well-organized. The works cited are reasonable. RadLib contains a gray Planck-mean (PM) model, a weighted sum of gray gases (WSGG) model, and the rank-correlated SLW model. This is definitely an important tool for the combustion community, where the radiation modeling is often oversimplified mainly because of the lack of readily available appropriate radiation model libraries! I am not aware of any open-source libraries that combine the three property models presented here.
-The models included in RadLib are already well-established and well-validated in the radiation community. The library is written in C++ and is supposed to work in any Linux-like system. The code is well commented, although the associated documentation needs to be improved (see major comment #1).
+The Computer Program in Physics (CPiP) submission titled, "RadLib: a radiative heat transfer model library for CFD" by Stephens et al reports a library of radiative property models that is modular and can be interfaced with other radiation model components. The manuscript is well-written and well-organized. The works cited are reasonable. RadLib contains a gray Planck-mean (PM) model, a weighted sum of gray gases (WSGG) model, and the rank-correlated SLW model. This is definitely an important tool for the combustion community, where the radiation modeling is often oversimplified mainly because of the lack of readily available appropriate radiation model libraries! I am not aware of any open-source libraries that combine the three property models presented here. The models included in RadLib are already well-established and well-validated in the radiation community. The library is written in C++ and is supposed to work in any Linux-like system. The code is well commented, although the associated documentation needs to be improved (see major comment #1).
 
 Considering all these, I think that this CPiP submission is definitely within the scope of the journal and of interest to the research community. However, the following concerns must be addressed before the submission is considered for publication.
+
+**The authors would like to thank the reviewer for their insightful comments and suggestions. As members of the combustion community, we heartily agree that a tool like RadLib could benefit researchers and facilitate radiation model development for combustion CFD.**
 
 1) I could not successfully build and run the library in two different Linux systems. In both cases, first, the cmake returned an error:
 "CMake Error at c++/CMakeLists.txt:34 (install): install TARGETS given no ARCHIVE DESTINATION for static library target "radlib"."
@@ -129,6 +141,10 @@ I would strongly recommend that the authors modify the installation instructions
 **TO DO: add something to introduction to address this**
 
 3) RadLib is intended to be expanded with new radiation property models in the future and interfaced with a user-supplied solver module for RTE. A brief discussion on how to interface such an external solver module should be presented. There is an example of a ray-tracing solver presented in the code files, but a brief discussion on coupling one's own RTE solver is important in the manuscript. Additionally, a brief discussion on how a user can add a new radiative property model should also be included.
+
+	**Section 3 has been revised and extended to include more information on how users can include and interact with the RadLib library, including explicit references to example files that further illustrate usage of the library.**
+	
+	**TO DO: add discussion and/or documentation on how to add new property models**
 
 4) The Planck-mean absorption coefficient included in RadLib is based on TNF workshop data (from 2003). According to the references cited, these are fairly old correlations. If the authors use these data, I am concerned that the model parameters and correlations used in RadLib for the PM model may be obsolete and inaccurate. Can the authors please comment on this?
 
@@ -171,6 +187,10 @@ MINOR:
 
 7) On page 7, the authors mention that the PM model can be "reasonably accurate" in some cases and go on to say that, "The Planck Mean model is most appropriate under optically thin conditions  with  relatively  low  radiative  transfer  relative  to  other  heat  sources such  as  reactive  heat  release  rates." The Planck Mean model will be appropriate in optically thin cases as there is very little reabsorption. This may or may not be connected with "relatively  low  radiative  transfer  relative  to  other  heat  sources." In fact, if the radiative heat transfer is much lower than chemical heat release, neglecting radiation altogether may also be reasonable! Although, the definition of "relatively low" is subjective.
 
+	**These statements regarding PM absorption coefficients are generally true. In combustion simulations, low radiative heat transfer relative to other heat sources, including chemical heat release and convective heat transfer, usually does, in fact, indicate very low radiative reabsorption rates. Sectiom 2.1 has been revised to clarify this connection. The quoted sentence now reads as follows: "The Planck Mean model is most appropriate under optically thin conditions in which low radiative transfer relative to other heat sources, including but not limited to chemical heat release and buoyancy-driven convection in combustion systems, indicates that very little radiative reabsorption is occuring."**
+	
+	**The reviewer may be interested to know that there are, in fact, numerous computational studies of combustion systems in which radiative heat transfer is entirely neglected on the basis that it is overwhelmed by or insignificant compared to reactive and/or convective heat release. This is typically only true of highly controlled systems and/or combustion fuels consisting of small gaseous hydrocarbons like H2 and CH4 and few impurities. Because their parameters and boundary conditions are well-characterized, such systems are common in "canonical flame" libraries that comprise many of the validation targets used in combustion CFD. Most practical and everyday combustion systems, however, are neither highly controlled nor dependent on simple fuels---wildfires, coal and biomass fueled processes, and oxy-fired combustion, among other things, come to mind---and such justifications for neglecting or simplifying radiation treatments become increasingly tenuous. The phrase "relatively low" is indeed subjective, and it is liberally applied in the field of computational combustion. We, the authors, created and now present RadLib as a tool that can, ideally, enable researchers to apply more appropriate radiation modeling to simulation studies that might otherwise rely on such subjective assumptions. The paper touches on these ideas in the introduction and discussion sections, but does not go into detail for the sake of brevity.**
+	
 8) On the same page, lines 40-41, "This version of  the  WSGG  model  is  advantageous  because  it  allows  for  arbitrary  CO2 and  H2O  compositions,  increasing  its  accuracy  and  flexibility." Can the authors provide some references that show the increased accuracy and/or flexibility of this WSGG over any other WSGG?
 
 	**Two references for the chosen WSGG model are given earlier in the paragraph. The second (Bordbar et al. 2020) includes detailed comparisons between this model, its immediate predecessor (see Bordbar et al. 2014), five other WSGG models, and line-by-line calculations for four different test cases that show high accuracy over a wide range of molar ratio values. While other models may have performed better in individual tests, this model demonstrated consistent accuracy over a range of scenarios. For clarity, this reference has been added to the end of the aforementioned sentence so as to better indicate where to obtain relevant information.**
@@ -188,3 +208,5 @@ MINOR:
 	**Appropriate units have been added to the specified values.**
 
 12) In the Discussion (page 16), the authors write, "Neglecting radiation or using simple models like the optically thin assumption is adequate for some cases with simple geometry or limited chemical reactions…" This can be misleading. I am not sure if either the simple geometry or the limited chemical reactions give any indication of the importance of radiation. Rather, something like a radiant fraction or optical thickness may be a more appropriate metric to justify neglecting radiation or using an optically thin model.
+
+	**This issue was partially addressed in the discussion above (see point 7). In combustion simulations, things like simple geometry and small domain sizes limit the extent of any chemical heat release or convective heat transfer, which usually indicates that radiative heat transfer plays a more prominent role than it would otherwise. In order to clarify this association, the sentence in question has been revised to read as follows: "Neglecting radiation or using simple models like the Planck Mean model is adequate for some cases with simple geometry or limited chemical heat release, which are usually associated with optical thinness and low rates of radiative reabsorption, but most combustion simulations of interest to engineers and researchers require more advanced radiation modeling to yield accurate results."**
