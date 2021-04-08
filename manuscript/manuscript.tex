@@ -192,19 +192,13 @@ The library is intended to be used in Linux-like terminal applications.
 
 \section{Introduction} \label{s:motivation}
 
-Modeling radiative heat transfer for CFD is complex and challenging. For example, combustion simulations are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to overall simulation cost. This can lead to simulations that use oversimplified radiation models, but in cases where radiation is significant relative to the other physical phenomena, oversimplified models can negatively impact the accuracy of simulation results. In some cases, radiative gains or losses are small compared to other energy sources or heat transfer modes and radiation can be safely neglected, but many practical engineering systems do not allow this. For example, simple jet flames demonstrate both possibilities: early in a flame's development, turbulent mixing typically dominates heat transfer and dictates flame behavior; late-stage flame phenomena like soot behavior and flame sheet breakthrough, however, increasingly depend on the magnitude of radiative heat losses and are difficult to simulate accurately without a robust radiation model. These problems motivated development of the RadLib library, which provides a framework and uniform interface for radiation property models and implements three powerful models in C++ and Python, giving researchers more convenient access to advanced radiation property models and a consistent framework for further model development. 
+Combustion CFD is uniquely challenging because it involves numerous tightly coupled physical phenomena---including multicomponent mass transfer, convective and radiative heat transfer, turbulent fluid dynamics, multi-phase and particle flows, and complex chemical reaction kinetics---that span many orders of magnitude in both length and time scales. Specifically, combustion simulations are often complicated by a lack of accurate radiation modeling, which can be difficult to implement and computationally expensive relative to overall simulation cost. Historically, radiative heat transfer modeling in combustion problems is either neglected or oversimplified, resulting in significant over- or underprediction of flame temperatures by up to 200$^{\circ}$C, respectively \citep{Modest_2016}. Additionally, some late-stage flame phenomena, particularly soot behavior and flame sheet breakthrough, increasingly depend on and influence the magnitude of radiative heat losses and are difficult to simulate accurately without robust radiation modeling \cite{Modest_2013}. These problems motivated development of the RadLib library, which provides a consistent framework for radiation property modeling and implements three powerful models in C++ and Python, giving researchers more convenient access to advanced radiation property models and a consistent framework for further model development. 
+%
+%Modeling radiative heat transfer for CFD is complex and challenging. For example, combustion simulations are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to overall simulation cost. This can lead to simulations that use oversimplified radiation models, but in cases where radiation is significant relative to the other physical phenomena, oversimplified models can negatively impact the accuracy of simulation results. In some cases, radiative gains or losses are small compared to other energy sources or heat transfer modes and radiation can be safely neglected, but many practical engineering systems do not allow this. For example, simple jet flames demonstrate both possibilities: early in a flame's development, turbulent mixing typically dominates heat transfer and dictates flame behavior; late-stage flame phenomena like soot behavior and flame sheet breakthrough, however, increasingly depend on the magnitude of radiative heat losses and are difficult to simulate accurately without a robust radiation model. 
 
-The core mechanisms of radiative phenomena are physically and mathematically complex. Unlike other modes of heat transfer, radiation is governed by a set of integro-differential equations that depend on both direction and wavelength, known as the radiative transfer equations (RTE). Solving the RTE for a given system also requires information about the radiative properties of the materials and media involved, typically radiation absorption coefficients. These absorption coefficients are dependent on a number of local system properties such as temperature, pressure, and gas composition. As a result, computational radiation solvers require two parts: first, a solution approach for the radiative transfer equations (RTE); and second, a radiation property model. RadLib addresses the second part by providing a set of implemented and validated radiation property models that can be applied to various solution approaches for the RTE.
+The core mechanisms of radiative phenomena are physically and mathematically complex. Unlike other modes of heat transfer, radiation is governed by a set of integro-differential equations that depend on both direction and wavelength, known as the radiative transfer equations (RTE). Computational radiation solvers require two distinct but interconnected parts: (1) a solution approach for the radiative transfer equations (RTE) and (2) a radiation property model. RadLib addresses the second part by providing a set of implemented and validated radiation property models that can be applied to various solution approaches for the RTE. 
 
-%Like combustion, the core mechanisms of radiation are physically and mathematically complex. Unlike other modes of heat transfer, radiation is governed by a set of integro-differential equations that depend on both direction and wavelength. Only the simplest systems have analytic solutions, and most practical systems require a numerical solution. Ray tracing solutions are very accurate but extremely computationally expensive, and often require high-performance computing resources to execute. Modeling assumptions are common and can reduce simulation cost at the expense of accuracy, depending on their validity for the system in question. 
-
-With RadLib, we provide a convenient, easy-to-use access point for radiative property models that can be interfaced with various RTE solution approaches suitable for CFD applications. RadLib is a modular C++ library with an optional Python interface used to compute the radiation properties of participating media, which can be a difficult and time-consuming portion of radiation calculations. RadLib's current focus is calculating radiation absorption coefficients and weighting factors for use in global radiation models, but the expansion to other radiative properties is possible. Three models are fully implemented and validated and use a common interface, allowing researchers convenient access to radiation modeling tools suitable for various applications.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Model descriptions} \label{s:models}
-
-The RTE for intensity $I$ in (unit) direction $\mathbf{s}$ for an absorbing, emitting, and non-scattering medium is described by
+For an absorbing, emitting, and non-scattering medium, the RTE for intensity $I$ at a specified wavenumber $\eta$ in unit direction $\mathbf{s}$ is described by
 % 
 \begin{linenomath}
 \begin{equation} \label{e:RTE_general}
@@ -212,12 +206,11 @@ The RTE for intensity $I$ in (unit) direction $\mathbf{s}$ for an absorbing, emi
 \end{equation}
 \end{linenomath}
 %
-where $I_{\eta}$ is the radiative spectral intensity, 
-$I_{b\eta}$ is spectral blackbody intensity (or Planck function), 
-$\kappa_{\eta}$ is the spectral absorption coefficient of the medium, and $s$ is a path length along direction $\mathbf{s}$. Radiation property models such as those implemented by RadLib are used to calculate the absorption coefficients $\kappa_{\eta}$. 
-%
-The gas absorption spectrum is an extremely complex function consisting of millions of spectral lines (peaks) corresponding to quantum mechanical energy levels of the gas molecules.
-Direct solution of Eq.~\ref{e:RTE_general}, involves so-called line-by-line calculations that are computationally prohibitive for most practical configurations and are used primarily for model validation. Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties \cite{Hottel_1967,Modest_2013}. For instance, integrating Eq.~\ref{e:RTE_general} over fixed spectral ranges $\eta_j$ and assuming gray (spectrally uniform) properties in each region $j$, (that is, in each gray gas $j$), gives
+where $I_{\eta}$ is the radiative spectral intensity, $I_{b,\eta}$ is the spectral blackbody radiative intensity (or Planck function), $\kappa_{\eta}$ is the spectral absorption coefficient of the medium, and $s$ is a path length along direction $\mathbf{s}$. Solving the RTE requires information about the radiative properties of the materials and media in the system. Radiative property data typically takes the form of radiation absorption coefficients $\kappa$, which are provided by a radiation property model. Gas absorption spectra consist of millions of spectral lines corresponding to the individual quantum mechanical energy levels of gas molecules, reflecting varying degrees of dependence on local system properties like temperature, pressure, and gas composition. Radiation property models, including those implemented in RadLib, typically use high-resolution spectral databases like HITRAN and HITEMP \cite{Rothman_2010} to calculate spectral absorption coefficients, reducing or simplifying the huge amount of spectral data using correlations and modeling assumptions \cite{Zhang_2002b}. 
+
+Direct solution of the spectral RTE involves so-called line-by-line calculations in which the RTE is solved for each individual spectral line, potentially millions of evaluations; this is computationally prohibitive for most practical configurations and used primarily for model validation. Traditional band models rely on estimated or averaged "line-of-sight" property values that, as a result, cannot be incorporated into the RTE. Modern band models require high-resolution databases and reorder rather than averaging absorption coefficients, but tend to lose accuracy when applied to nonhomogeneous media and may still require large numbers of RTE evaluations \citep{Modest_2016}. 
+
+Global models are an important class of radiation property models that use spectrally-integrated radiation properties \cite{Hottel_1967,Modest_2013,Modest_2016}. Assuming spectrally uniform (gray) properties over a region $j$ (that is, for a gray gas $j$), we can integrate Eq.~\ref{e:RTE_general} over the fixed wavenumber ranges $\eta_j$ defined by $j$ to obtain 
 %
 \begin{linenomath}
 \begin{equation} \label{e:RTE_wsgg}
@@ -225,7 +218,7 @@ Direct solution of Eq.~\ref{e:RTE_general}, involves so-called line-by-line calc
 \end{equation}
 \end{linenomath}
 %
-where $a_j$ is a weight factor defined as
+where $I_b$ is the spectrally integrated blackbody intensity, $I_j$ is the radiative intensity in the region defined by gray gas $j$, $\kappa_j$ is the spectrally integrated absorption coefficient for gray gas $j$, and $a_j$ is a weighting factor defined by
 %
 \begin{linenomath}
 \begin{align}
@@ -234,8 +227,7 @@ where $a_j$ is a weight factor defined as
 \end{align}
 \end{linenomath}
 %
-Given spatial profiles of $\kappa_j$ and $a_j$, Eq.~\ref{e:RTE_wsgg} can be computed for each of the $n+1$ gray gases. Normally, the $j=0$ gas is considered as a clear gas and represents transparent windows in the spectrum for which $\kappa_0=0$.
-The total radiative intensity $I$ is calculated by summing the individual gray gas intensities:
+Given spatial profiles of $\kappa_j$ and $a_j$, Eq.~\ref{e:RTE_wsgg} can be computed for each of the $n+1$ gray gases, where $j=0$ is defined as a clear gas that represents transparent windows in the spectrum for which $\kappa_0=0$. This "gray gas" approach allows us to calculate the total radiative intensity $I$ by summing the individual gray gas intensities rather than integrating over the entire wavenumber spectrum: 
 %
 \begin{linenomath}
 \begin{equation}
@@ -243,28 +235,37 @@ The total radiative intensity $I$ is calculated by summing the individual gray g
 \end{equation}
 \end{linenomath}
 %
-Radiative intensity $I$ is a function of direction $\mathbf{s}$. The heat flux vector $\mathbf{q}$ is found by integrating over directional solid angles ($\mathbf{s}\Omega$) on the sphere:
-%
-\begin{linenomath}
-\begin{equation}
-    \mathbf{q} = \int_{4\pi}I(\mathbf{s})\mathbf{s}d\Omega.
-\end{equation}
-\end{linenomath}
-%
-The volumetric radiative heat source is then 
-%
-\begin{linenomath}
-\begin{equation}
-    Q = -\nabla\cdot\mathbf{q}.
-\end{equation}
-\end{linenomath}
-%
+%The heat flux $\mathbf{q}$ and volumetric radiative heat source $Q$ can then be calculated by integrating over directional solid angles ($\mathbf{s}\Omega$) on the sphere and finding the divergence or the resulting vector field, respectively:
+%%
+%\begin{linenomath}
+%\begin{equation}
+%    \mathbf{q} = \int_{4\pi}I(\mathbf{s})\mathbf{s}d\Omega.
+%\end{equation}
+%\end{linenomath}
+%%
+%\begin{linenomath}
+%\begin{equation}
+%    Q = -\nabla\cdot\mathbf{q}.
+%\end{equation}
+%\end{linenomath}
+%%
+Global models are especially attractive to computational combustion researchers because they significantly reduce the required number of RTE evaluations. 
 
-RadLib currently implements three models of varying complexity and accuracy to calculate the radiation absorption coefficients $\kappa_j$ and their weight factors $a_j$ for each gas $j$. The absorption coefficients are typically calculated using correlations relating them to local properties such as temperature, pressure, and composition. Correlations come from curve fits to high-resolution radiation property databases. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$) and soot. 
+With RadLib, we aim to provide researchers with a convenient, easy-to-use access point for radiative property models that can be interfaced with various RTE solution approaches suitable for CFD applications. RadLib is a modular C++ library with an optional Python interface. Currently, RadLib only calculates radiation absorption coefficients and weighting factors for use in global radiation models, but expansion to other radiative properties and model types is possible. Three models---the Planck Mean absorption coefficient (PM) model, the weighted sum of gray gases (WSGG) model, and the rank correlated spectral line weighted-sum-of-gray-gases (RCSLW) model---are fully implemented and validated. All models use a common interface to facilitate researchers' access to and use of radiation modeling tools suitable for combustion CFD applications.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Model descriptions} \label{s:models}
+
+At present, RadLib includes three radiation property models of varying complexity and accuracy. 
+
+
+ to calculate the radiation absorption coefficients $\kappa_j$ and their weight factors $a_j$ for each gas $j$. The absorption coefficients are typically calculated using correlations relating them to local properties such as temperature, pressure, and composition. Correlations come from curve fits to high-resolution radiation property databases. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$) and soot. Note that the property models implemented in RadLib apply only to non-scattering media. 
 
 While solving the RTE is not the focus of this software, RadLib's example cases do employ a simple ray tracing solver to calculate the radiative heat flux and volumetric heat source profiles between two parallel planes. 
 
-%[OTHER THINGS THAT APPLY TO ALL MODELS GO HERE]
+Absorption coefficients and other radiative property data may take on different forms depending on the RTE solution approach, but can generally be classified as either spectral (wavenumber-dependent) or global (integrated over wavenumber). Spectral absorption coefficients can be applied to the spectral RTE (\ref{e:RTE_general}), while global absorption coefficients are used in the spectrally-integrated RTE (\ref{e:RTE_wsgg}). 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -609,8 +610,11 @@ not-for-profit sectors.
 H.~Hottel, A.~Sarofim, Radiative Transfer, {McGraw-Hill}, New York, 1967.
 
 \bibitem{Modest_2013}
-M.~F. Modest, Radiative Heat Transfer, third edition Edition, {Academic Press},
+M.~F. Modest, Radiative Heat Transfer, third edition, {Academic Press},
   New York, 2013.
+  
+\bibitem{Modest_2016}
+M.~F. Modest, D.~C. Haworth, Radiative Heat Transfer in Turbulent Combustion Systems, {Springer}, New York, 2016.
 
 \bibitem{Smith_2003}
 N.~Smith, J.~Gore, J.~Kim, Q.~Tang,
@@ -820,6 +824,9 @@ V.~Stephens, D.~Lignell, One-dimensional turbulence ({ODT}): computationally
   100641.
 \newblock \href {http://dx.doi.org/10.1016/j.softx.2020.100641}
   {\path{doi:10.1016/j.softx.2020.100641}}.
+  
+\bibitem{Zhang_2002b}
+H.~Zhang, M.~F.~Modest, Evaluation of the Planck-mean absorption coefficients from HITRAN and HITEMP databases, Journal of Quantitative Spectroscopy \& Radiative Transfer 73~(6) (2002) 649--653.
 
 \end{thebibliography}
 
