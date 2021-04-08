@@ -74,7 +74,7 @@ I have a number of comments on the manuscript as well as the software itself whi
 
 5. It appears that line-by-line data from HITEMP/HITRAN files cannot be loaded into RadLib. That’s an unfortunate limitation, but not a deal-breaker. 
 
-	**At present, RadLib's models cannot accommodate such data input, but this is a limitation of the models themselves, not the software. The appropriate line-by-line data is included within the RadLib package, which the authors consider a convenience rather than a hindrance. The ability to load database files directly into RadLib could be useful to researchers looking to extend RadLib's model library, however. The authors appreciate the suggestion and will consider it for future development.**
+	**At present, RadLib's models cannot accommodate such data input, but this is a limitation of the models themselves, not the software. The appropriate line-by-line data is included within the RadLib package, which the authors consider a convenience rather than a hindrance. The ability to load database files directly into RadLib could be useful to researchers looking to extend RadLib's model library to include modern spectral models, however. The authors appreciate the suggestion and will consider it for future development.**
 
 6. It looks like the software hard-codes Plank mean absorption coefficients as (fourth-order?) polynomial fits? Same for WSGG. There is no discussion of why this was chosen, how the coefficients were determined, or a characterization of its accuracy. Do you observe any problematic behavior with the fourth order polynomials over temperatures from 300 to 3000 K?  Are these interpolants or regression of data?
 
@@ -113,6 +113,10 @@ A radiation spectral property library is developed in this study using C++. A Pl
 	**This was a placeholder statement that should not have been included in the document. It has been removed.**
 	
 3. In Figure 2, the RCSLM seems to consistently perform better than WSGG, except in Example S2. In addition, WSGG performs worse than PM in Example S4. Can the authors explain why?
+
+	**Um, no?**
+	
+	**TO DO: remove or explain weird example cases**
 
 4. Equation 6 appears to be inaccurate.
 
@@ -155,15 +159,25 @@ I would strongly recommend that the authors modify the installation instructions
 5) On page 13, the authors present a paragraph describing Figs. 2 and 3 - the comparison of various radiation property models present in RadLib in one-dimensional configurations. The comparisons are presented simply as observations without any explanation or reasoning why the models behave the way as seen in Fig. 2 and 3. If I understand correctly, the focus of the work presented here is not the comparison of the accuracy of the three models but to showcase the library. Therefore, these comparisons - specifically without any explanation of the results - may not be essential to the current manuscript, and can be shortened. These results do serve as descriptions of example cases provided in RadLib. On the same page, the authors say that "While ommitted [should be omitted] here for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in [11, 14] such that these examples also serve as a validation of the implementation of the
 models." The authors should avoid qualitative description such as "essentially identical" in the context of validation and present a quantitative (e.g., % error) metric wherever possible. A strong validation is important for programs like this.
 
+**TO DO: decide on whether or not to keep example plots in the paper**
+
 6) The computational cost tables for two cases show a significantly different trend, which the authors attribute to "additional overhead required in performing the calculations." Can the authors be more specific as to what these overheads may be? They say that they have neglected the initialization and input/output costs. Also, do these CPU times presented include the cost for the ray-tracing solver as well? Are the grids kept the same for all configurations?
 
+**TO DO**
+
 7) In line 53 on page 4, the authors claim to have CH4 property in RadLib but none of the validation cases contain CH4. Furthermore, for RCSLW, the refer to Pearson's work as a source for data of CO2, H2O, and CO without indicating the source data for CH4.
+
+	**The Plank Mean absorption coefficients model sourced from the TNF workshop and associated literature [3,5] includes CH4, so it can be done, but none of the examples include it.** 
+
+**TO DO: ask DOL how to handle this**
 
 MINOR:
 
 1) It should be clarified that RadLib only provides radiation properties for non-scattering media.
 
-**TO DO: add this**
+	**This clarification has been made explicitly in Section 2.**
+	
+	**TO DO: make sure this is mentioned in other relevant places**
 
 2) In the program summary the description of the nature of the program is somewhat confusing from a grammatical construction standpoint. Particularly, the following part, "This presents a problem for practitioners who wish to use/implement radiation models for which [refers to what?] such models consitute [constitute?] only a small but important part of a larger simulation.  Turbulent combustion simulations are one such example [example of what?].  Often, rudimentary assumptions [in what?] are made and this can negatively impact results."
 
@@ -171,7 +185,7 @@ MINOR:
 
 3) In Page 2, "In some cases, radiative gains or losses are small compared to other energy sources or heat transfer modes and radiation can be safely neglected, ... difficult to simulate accurately without a robust radiation model." Please provide some references to support these arguments.
 
-**TO DO: add requested references**
+	**References have been added throughout to bolster weakly supported arguments. Note that the quoted statement and related discussion has been moved to Section 5 due to unrelated revisions.**
 
 4) Please explain all the symbols used in equations. For example, eta in Eqn. 1 (and subsequent equations), Eb  in Eqn. 11.
 
