@@ -152,9 +152,7 @@ I would strongly recommend that the authors modify the installation instructions
 
 4) The Planck-mean absorption coefficient included in RadLib is based on TNF workshop data (from 2003). According to the references cited, these are fairly old correlations. If the authors use these data, I am concerned that the model parameters and correlations used in RadLib for the PM model may be obsolete and inaccurate. Can the authors please comment on this?
 
-	**The authors purposely chose the TNF workshop data for calculating Planck Mean absorption coefficients because it is one of the most common and widely used radiation models applied to turbulent combustion simulations, despite its age and limitations. The paper includes a brief discussion on the limited applicability of this model, especially for combustion simulations, and demonstrates its deficiencies in the example cases. It is true that this model is neither current nor particularly accurate, and the authors are strongly considering adding an updated Planck Mean model using the most current available data.**
-	
-	**TO DO: add discussion to address the age of the model and why we chose to include it anyway**
+	**The authors purposely chose the TNF workshop data for calculating Planck Mean absorption coefficients because it is one of the most common and widely used radiation models applied to turbulent combustion simulations, despite its age and limitations. Section 2.1 has been revised to include a more explicit dicsussion of why the TNF radiation model was chosen and concerns related to its relative age and limited applicability. Section 4 includes example cases that clearly demonstrate the deficiencies of the PM model compared to the other models included with RadLib, and some additional discussion is available there.**
 
 5) On page 13, the authors present a paragraph describing Figs. 2 and 3 - the comparison of various radiation property models present in RadLib in one-dimensional configurations. The comparisons are presented simply as observations without any explanation or reasoning why the models behave the way as seen in Fig. 2 and 3. If I understand correctly, the focus of the work presented here is not the comparison of the accuracy of the three models but to showcase the library. Therefore, these comparisons - specifically without any explanation of the results - may not be essential to the current manuscript, and can be shortened. These results do serve as descriptions of example cases provided in RadLib. On the same page, the authors say that "While ommitted [should be omitted] here for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in [11, 14] such that these examples also serve as a validation of the implementation of the
 models." The authors should avoid qualitative description such as "essentially identical" in the context of validation and present a quantitative (e.g., % error) metric wherever possible. A strong validation is important for programs like this.
@@ -163,21 +161,17 @@ models." The authors should avoid qualitative description such as "essentially i
 
 6) The computational cost tables for two cases show a significantly different trend, which the authors attribute to "additional overhead required in performing the calculations." Can the authors be more specific as to what these overheads may be? They say that they have neglected the initialization and input/output costs. Also, do these CPU times presented include the cost for the ray-tracing solver as well? Are the grids kept the same for all configurations?
 
-**TO DO**
+	**Section 4.1 already includes details of the computational cost calculations presented in Figure 4. The left hand plot (a) refers to one million evaluations of the absorption coefficients directly, while the right hand plot (b) refers to the cost to evaluate Example S3, which, like all of the example cases described in the first paragraph of Section 4, includes the ray-tracing solver. The quoted sentence has been revised to specify that the ray-tracing solver is primarily responsible for the additional overhead. Grids are identical for each configuration. Note that the RadLib library does not generate or manipulate grids as it is not involved in the RTE solution. The ray-tracing solver used in the example cases is provided for convenience and demonstration purposes.**
 
 7) In line 53 on page 4, the authors claim to have CH4 property in RadLib but none of the validation cases contain CH4. Furthermore, for RCSLW, the refer to Pearson's work as a source for data of CO2, H2O, and CO without indicating the source data for CH4.
 
-	**The Plank Mean absorption coefficients model sourced from the TNF workshop and associated literature [3,5] includes CH4, so it can be done, but none of the examples include it.** 
-
-**TO DO: ask DOL how to handle this**
+	**CH4 is present only in the PM model sourced from the TNF Workshop [3,5], which includes CH4 absorption coefficients because most of the TNF Workshop target flames are fueled by Ch4. In general, CH4 is not a significant radiatively participating species in combustion systems, but it is included for completeness.**
 
 MINOR:
 
 1) It should be clarified that RadLib only provides radiation properties for non-scattering media.
 
-	**This clarification has been made explicitly in Section 2.**
-	
-	**TO DO: make sure this is mentioned in other relevant places**
+	**This clarification has been made explicitly in Section 2 and now appears throughout the text where appropriate.**
 
 2) In the program summary the description of the nature of the program is somewhat confusing from a grammatical construction standpoint. Particularly, the following part, "This presents a problem for practitioners who wish to use/implement radiation models for which [refers to what?] such models consitute [constitute?] only a small but important part of a larger simulation.  Turbulent combustion simulations are one such example [example of what?].  Often, rudimentary assumptions [in what?] are made and this can negatively impact results."
 
@@ -189,7 +183,7 @@ MINOR:
 
 4) Please explain all the symbols used in equations. For example, eta in Eqn. 1 (and subsequent equations), Eb  in Eqn. 11.
 
-**TO DO: explain and/or list equation symbols not already addressed**
+	**Text surrounding equations has been revised throughout to ensure explicit definitions of variables.**
 
 5) Page, 4: "Global models are an important class of radiation property models that make use of spectrally-integrated radiation properties and are usually versions of the weighted sum of gray gases (WSGG) model [1, 2]." This sentence is somewhat misleading. It may be more appropriate to think of WSGG models as special cases of SLW or FSK models.
 
