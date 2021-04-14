@@ -179,9 +179,9 @@ radiative heat transfer \sep reacting flows  \sep CFD \sep WSGG \sep RCSLW
 {\em Licensing provisions(please choose one):} MIT \\
 {\em Programming language:} C++, Python                                   \\
 {\em Nature of problem(approx. 50-250 words):} \\
-Radiation property models can be difficult to understand and implement, often requiring a high degree of specialization. This presents a problem for practitioners who wish to use/implement radiation models for which such models consitute only a small but important part of a larger simulation. Turbulent combustion simulations are one such example. Often, rudimentary assumptions are made and this can negatively impact results. \\
+Radiative heat transfer in combustion CFD problems is typically neglected or oversimplified, resulting in significant error and inaccuracy in combustion simulations. Radiation modeling, however, often requires a high degree of specialization due to its complexity and the challenges associated with implementation in existing CFD codes, which presents a substantial obstacle to researchers who wish to address the inaccuracies introduced by insufficient radiative heat transfer modeling in combustion simulations. \\
 {\em Solution method(approx. 50-250 words):}\\
-We provide an open source radiation property library that uses modern versioning build tools, including C++ and Python interfaces and examples demonstrating usage of the models. The library can be extended to other models and interfaces. \\ 
+We present RadLib, an open-source C++ library of validated radiation property models that can be applied alongside various RTE solution methods to ease some of the obstacles associated with radiation modeling for combustion CFD. The package includes multiple interface options (C++ and Python), several illustrative examples with a provided ray-tracing solver, and a framework for expansion to include additional radiation property models and interfaces.\\ 
 {\em Additional comments including restrictions and unusual features (approx. 50-250 words):}\\
 The library is intended to be used in Linux-like terminal applications.  
    \\
@@ -454,7 +454,7 @@ The \texttt{source} and \texttt{examples} directories are further divided into \
 
 RadLib installation is automated with CMake. First, navigate to the \texttt{build} directory. If the user requires an installation location other than the default \texttt{installed} directory, edit the \texttt{user\textunderscore config} file before running CMake. To compile the package, run the command \texttt{cmake -C user\textunderscore config ../source}. Upon successful completion, run \texttt{make} and then \texttt{make install} to complete the process. To use RadLib in C++ projects, include the generated C++ library file, located at \texttt{installled/lib/libradlib.a}, and/or header files, located in \texttt{installed/include}, according to the project's build scheme. To use RadLib in Python, update the system \texttt{PYTHONPATH} environment variable and import the module, named \texttt{pyrad}, into the project. 
 
-The interfaces, solver, and examples included with the library serve to demonstrate its use and validate the implementation and results. Figure \ref{fig:flowchart} illustrates the basic structure use of the RadLib package within a generic example using the provided interfaces. The RadLib library generates absorption coefficients and their weighting factors for use within the appropriate RTE, but does not specify any particular geometry. After creating a radiation object, users interact with RadLib through the \texttt{get\textunderscore k\textunderscore a()} function, which requires arguments corresponding to the system temperature; system pressure; species mass fractions for H$_2$O, CO$_2$, CO, and CH$_4$; soot volume fraction in units of parts per million (ppm), if applicable; and variables initialized to receive output values for the radiation absorption coefficients and their corresponding weights. For examples that illustrate how a user might interact with RadLib, refer to the \texttt{simple\textunderscore interface.cc} and \texttt{simple\textunderscore interface.py} example files located in the \texttt{examples/c++} and \texttt{examples/python} folders, respectively. 
+The interfaces, solver, and examples included with the library serve to demonstrate its use and validate the implementation and results. Figure \ref{fig:flowchart} illustrates the basic structure use of the RadLib package within a generic example using the provided interfaces. The RadLib library generates absorption coefficients and their weighting factors for use within the appropriate RTE, but does not specify any particular geometry. After creating a radiation object, users interact with RadLib through the \texttt{get\textunderscore k\textunderscore a()} function, which requires arguments corresponding to the system temperature; system pressure; species mass fractions for H$_2$O, CO$_2$, CO, and CH$_4$; soot volume fraction in units of parts per million (ppm), if applicable; and variables initialized to receive output values for the radiation absorption coefficients and their corresponding weights. For examples that illustrate how a user might interact with RadLib, refer to the \texttt{simple\textunderscore interface.cc} and \texttt{simple\textunderscore interface.py} example files located in the \texttt{examples/c++} and \texttt{examples/python} folders, respectively. For information about adding additional radiative property models to the RadLib library, please refer to the package documentation. 
 %
 \begin{figure}
 	\begin{center}
@@ -464,6 +464,8 @@ The interfaces, solver, and examples included with the library serve to demonstr
 \label{fig:flowchart}
 \end{figure}
 %
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -498,7 +500,9 @@ Table~\ref{t:examples} summarizes the cases. Example S1 is a hot slab next to a 
 %
 The examples are provided with the RadLib code and implemented in both C++ and Python. A Juptyer notebook is provided with the Python examples that runs the examples, displays the plots, and saves the plots to PDF files. Python and Cython versions of the one-dimensional solver \texttt{parallel\textunderscore planes.py} are provided for convenience. 
 
-These cases are intended to illustrate the use of the RadLib library and are not exhaustive. Details about these examples and their motivations can be found in their respective references. While ommitted here for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in \cite{Solovjov_2017,Bordbar_2020} such that these examples also serve as a validation of the implementation of the models.
+These cases are intended to illustrate the use of the RadLib library and are not exhaustive. Details about these examples and their motivations can be found in their respective references. 
+%TO DO address this:
+While ommitted here for brevity, the implemented WSGG and RCSLW models give essentially identical results to those presented in \cite{Solovjov_2017,Bordbar_2020} such that these examples also serve as a validation of the implementation of the models.
 
 Figure~\ref{f:examples} shows comparative results for the different radiation models for these cases. 
 %
@@ -536,6 +540,18 @@ Figure~\ref{f:exSb1} shows the results from Example Sb1, which includes soot rad
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Discussion} \label{s:impact}
+
+%Note that we are presenting and not evaluating the models and make no claims as to causes of the results presented in the previous section. Several of the example cases deviate from the expected behavior (i.e. S2, S4). Also note that the PM and WSGG models are mostly empirical and contain very little representative physics, which can cause them to behave unpredictably in parameter ranges outside of those for which the models were specifically developed. If we look at Bordbar's paper, WSGG looks really good, but Example S4 gives us behavior we don't expect---WSGG performs very poorly. We don't know why, and we don't intend to explain it, but this is a good illustration of the fact that sometimes models need to be tested independently before application to a specific project. Sometimes a model that seems perfect may not be for your case, and RadLib is a good tool for investigating things like that. 
+
+Radiative heat transfer models are historically difficult to implement in CFD codes due to their complexity and high computational costs. Neglecting radiation or using simple models like the Planck Mean model is adequate for some cases with simple geometry or limited chemical heat release, which are usually associated with optical thinness and low rates of radiative reabsorption, but most combustion simulations of interest to engineers and researchers require more advanced radiation modeling to yield accurate results. In such cases, radiation models that are incorrectly implemented or inappropriate for the simulation parameters can become additional sources of error that may be extremely difficult to separate from existing sources or error. Currently, researchers that require detailed radiation modeling must code and validate it themselves at the expense of valuable research time and funding. 
+
+RadLib makes researchers' work easier by consolidating various approaches into a modular library of interchangeable, prevalidated radiation models. Additionally, RadLib's modular framework can also accommodate new models, allowing researchers to compare new or existing models with very little overhead. Sometimes, it is not clear which radiation model may be the best fit for a particular simulation. When simulations are especially complex or computationally expensive, researchers may have to extrapolate from theory and literature to choose an appropriate radiation model rather than testing for their specific case. RadLib is designed to ease both of these obstacles by facilitating comparison between radiation models through a common interface and providing a practical means of testing various models without the restriction of prespecified geometry or case parameters. With RadLib, researchers can put more of their time and effort into useful results rather than code or model development. 
+
+Currently, RadLib is only used within the authors' research group, where it is applied to combustion CFD simulations using the One-Dimensional Turbulence (ODT) model \cite{Stephens_2020}, but its design and structure as a C++ library allows it to be incorporated easily into existing codes. It can be applied to  research questions in various other fields involving radiative heat transfer as well, including energy engineering or atmospheric and climate sciences. Radiation is a universal phenomenon, and RadLib can assist researchers in many areas with systems and processes that involve heat transfer. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Computational Cost} \label{s:cost}
 
 A comparison was made of the computational cost of the current models implemented. Calculations were performed on a 4 GHz Quad Core Intel Core i7 iMac, version 10.15.7. Figure~\ref{f:cost}a shows the cost to compute the gas properties $k$ and $a$. This was done by timing the C++ code execution to evaluate the gas properties one million times in a loop and then averaging the results. The figure shows times normalized by the time for the WSGG model, which required 8.0E-7~s. The costs of the models, relative to WSGG, is 0.098, 1.9, 4.9, 9.4, and 18, for PM, and RCSLW with $n=1$, 2, 4, 8 gray gases, respectively. The cost of the RCSLW model is very nearly proportional to the number of gray gases considered.
@@ -554,29 +570,9 @@ A comparison was made of the computational cost of the current models implemente
 %
 
 Figure~\ref{f:cost}b shows the cost to evaluate Example S3. 
-In this case the costs of the models, relative to WSGG, is approximately 0.75, 1.1, 1.4, 1.9, and 2.9, for PM, and RCSLW with $n=1$, 2, 4, 8 gray gases, respectively. Here, the WSGG model took 0.0079 s. In running Example S3, the costs of the various models are much more similar than in evaluating gas properties alone due to the additional overhead required in performing the calculations. In the results presented, only the cost of evaluating the solution was included; initialization and input/output costs were neglected.
+In this case the costs of the models, relative to WSGG, is approximately 0.75, 1.1, 1.4, 1.9, and 2.9, for PM, and RCSLW with $n=1$, 2, 4, 8 gray gases, respectively. Here, the WSGG model took 0.0079 s. In running Example S3, the costs of the various models are much more similar than in evaluating gas properties alone due to the additional overhead of the ray-tracing solver in performing the calculations. In the results presented, only the cost of evaluating the solution was included; initialization and input/output costs were neglected.
 
 Cost comparisons were also attempted with Python, but it is difficult to get meaningful results when mixing Python and C++. In particular, the cost of a single evaluation of the gas properties is small and evaluating the gas properties in a Python loop results in the loop appearing to dominate the computational cost. Comparison between Python and C++ for Example S3 is somewhat more meaningful, but even here, for the six cases considered in Fig.~\ref{f:cost} the cost only varied by about 4\%, indicating that the costs are dominated by the Python and not by the model calculations themselves. The cost of the WSGG model was 0.6~s, which is 7.6 times slower than the C++ version. It is possible that improvements to the Python speed could be made by further optimization of the Cython interface, but the Python radiative solver used in the examples is only meant to demonstrate the use of the library evaluation of gas properties.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Discussion} \label{s:impact}
-
-Radiative heat transfer models are historically difficult to implement in CFD codes due to their complexity and high computational costs. Neglecting radiation or using simple models like the Planck Mean model is adequate for some cases with simple geometry or limited chemical heat release, which are usually associated with optical thinness and low rates of radiative reabsorption, but most combustion simulations of interest to engineers and researchers require more advanced radiation modeling to yield accurate results. In such cases, radiation models that are incorrectly implemented or inappropriate for the simulation parameters can become additional sources of error that may be extremely difficult to separate from existing sources or error. Currently, researchers that require detailed radiation modeling must code and validate it themselves at the expense of valuable research time and funding. 
-
-RadLib makes researchers' work easier by consolidating various approaches into a modular library of interchangeable, prevalidated radiation models. Additionally, RadLib's modular framework can also accommodate new models, allowing researchers to compare new or existing models with very little overhead. Sometimes, it is not clear which radiation model may be the best fit for a particular simulation. When simulations are especially complex or computationally expensive, researchers may have to extrapolate from theory and literature to choose an appropriate radiation model rather than testing for their specific case. RadLib is designed to ease both of these obstacles by facilitating comparison between radiation models through a common interface and providing a practical means of testing various models without the restriction of prespecified geometry or case parameters. With RadLib, researchers can put more of their time and effort into useful results rather than code or model development. 
-
-Currently, RadLib is only used within the authors' research group, where it is applied to combustion CFD simulations using the One-Dimensional Turbulence (ODT) model \cite{Stephens_2020}, but its design and structure as a C++ library allows it to be incorporated easily into existing codes. It can be applied to  research questions in various other fields involving radiative heat transfer as well, including energy engineering or atmospheric and climate sciences. Radiation is a universal phenomenon, and RadLib can assist researchers in many areas with systems and processes that involve heat transfer. 
-
-%Author guidelines for this section
-%\begin{itemize}
-% \item \textbf{This is the main section of the article and the reviewers weight the description here appropriately}
-% \item Indicate in what way new research questions can be pursued as a result of the software (if any).
-% \item Indicate in what way, and to what extent, the pursuit of existing research questions is improved (if so).
-% \item Indicate in what way the software has changed the daily practice of its users (if so).
-% \item Indicate how widespread the use of the software is within and outside the intended user group.
-% \item Indicate in what way the software is used in commercial settings and/or how it led to the creation of spin-off companies (if so).
-%\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -602,238 +598,238 @@ not-for-profit sectors.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliographystyle{elsarticle-num} 
-%\bibliography{references} 
+\bibliography{references} 
 
-\begin{thebibliography}{10}
-\expandafter\ifx\csname url\endcsname\relax
-  \def\url#1{\texttt{#1}}\fi
-\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
-\expandafter\ifx\csname href\endcsname\relax
-  \def\href#1#2{#2} \def\path#1{#1}\fi
+%\begin{thebibliography}{10}
+%\expandafter\ifx\csname url\endcsname\relax
+%  \def\url#1{\texttt{#1}}\fi
+%\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+%\expandafter\ifx\csname href\endcsname\relax
+%  \def\href#1#2{#2} \def\path#1{#1}\fi
+%
+%\bibitem{Hottel_1967}
+%H.~Hottel, A.~Sarofim, Radiative Transfer, {McGraw-Hill}, New York, 1967.
+%
+%\bibitem{Modest_2013}
+%M.~F. Modest, Radiative Heat Transfer, third edition, {Academic Press},
+%  New York, 2013.
+%  
+%\bibitem{Modest_2016}
+%M.~F. Modest, D.~C. Haworth, Radiative Heat Transfer in Turbulent Combustion Systems, {Springer}, New York, 2016.
+%
+%\bibitem{Smith_2003}
+%N.~Smith, J.~Gore, J.~Kim, Q.~Tang,
+%  \href{https://tnfworkshop.org/radiation/}{{TNF} workshop radiation models}
+%  (2003).
+%\newline\urlprefix\url{https://tnfworkshop.org/radiation/}
+%
+%\bibitem{Grosshandler_1993}
+%W.~L. Grosshandler, {RADCAL}: A narrow-band model for radiation calculations in
+%  a combustion environment: Nist technical note 1402.
+%
+%\bibitem{Barlow_2001}
+%R.~S. Barlow, A.~N. Karpetis, J.~H. Frank, J.-Y. Chen, Scalar profiles and {NO}
+%  formation in laminar opposed-flow partially premixed methane/air flames,
+%  Combustion and Flame 127~(3) (2001) 2102--2118.
+%\newblock \href {http://dx.doi.org/10.1016/S0010-2180(01)00313-3}
+%  {\path{doi:10.1016/S0010-2180(01)00313-3}}.
+%
+%\bibitem{Barlow_1999}
+%R.~Barlow, N.~Smith, J.~Chen, R.~Bilger,
+%  \href{http://www.sciencedirect.com/science/article/pii/S0010218098000716}{Nitric
+%  oxide formation in dilute hydrogen jet flames: isolation of the effects of
+%  radiation and turbulence-chemistry submodels}, Combustion and Flame 117~(1-2)
+%  (1999) 4--31.
+%\newblock \href {http://dx.doi.org/10.1016/S0010-2180(98)00071-6}
+%  {\path{doi:10.1016/S0010-2180(98)00071-6}}.
+%\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0010218098000716}
+%
+%\bibitem{Frank_2000}
+%J.~H. Frank, R.~S. Barlow, C.~Lundquist, Radiation and nitric oxide formation
+%  in turbulent non-premixed jet flames, Proceedings of the Combustion Institute
+%  28~(1) (2000) 447--454.
+%\newblock \href {http://dx.doi.org/10.1016/S0082-0784(00)80242-8}
+%  {\path{doi:10.1016/S0082-0784(00)80242-8}}.
+%
+%\bibitem{Zhu_2002}
+%X.~Zhu, J.~Gore, A.~N. Karpetis, R.~S. Barlow,
+%  \href{http://www.sciencedirect.com/science/article/pii/S0010218002003413}{The
+%  effects of self-absorption of radiation on an opposed flow partially premixed
+%  flame}, Combustion and Flame 129~(3) (2002) 342--345.
+%\newblock \href {http://dx.doi.org/10.1016/S0010-2180(02)00341-3}
+%  {\path{doi:10.1016/S0010-2180(02)00341-3}}.
+%\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0010218002003413}
+%
+%\bibitem{Coelho_2002}
+%P.~J. Coelho, O.~J. Teerling, D.~Roekaerts, Spectral radiative effects and
+%  turbulence-radiation-interaction in sandia flame {D}, in: {Barlow, Robert S.,
+%  Pope, Stephan B., Masri, Assaad R., Oefelein, Joseph C.} (Ed.), The
+%  Proceedings of the Sixth International Workshop on Measurement and
+%  Computation of Turbulent Nonpremixed Flames, 2002.
+%
+%\bibitem{Bordbar_2014}
+%M.~H. Bordbar, G.~Wecel, T.~Hyppanen, A line by line based weighted sum of gray
+%  gases model for inhomogeneous {CO$_2$–H$_2$O} mixture in oxy-fired
+%  combustion, Combustion and Flame 161~(9) (2014) 2435--2445.
+%\newblock \href {http://dx.doi.org/10.1016/j.combustflame.2014.03.013}
+%  {\path{doi:10.1016/j.combustflame.2014.03.013}}.
+%
+%\bibitem{Bordbar_2020}
+%H.~Bordbar, G.~C. Fraga, S.~Hostikka,
+%  \href{http://www.sciencedirect.com/science/article/pii/S0735193319302660}{An
+%  extended weighted-sum-of-gray-gases model to account for all {CO$_2$-H$_2$O}
+%  molar fraction ratios in thermal radiation}, International Communications in
+%  Heat and Mass Transfer 110 (2020) 104400.
+%\newblock \href {http://dx.doi.org/10.1016/j.icheatmasstransfer.2019.104400}
+%  {\path{doi:10.1016/j.icheatmasstransfer.2019.104400}}.
+%\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0735193319302660}
+%
+%\bibitem{Rothman_2010}
+%L.~S. Rothman, I.~E. Gordon, R.~J. Barber, H.~Dothe, R.~R. Gamache, A.~Goldman,
+%  V.~I. Perevalov, S.~A. Tashkun, J.~Tennyson,
+%  \href{http://www.sciencedirect.com/science/article/pii/S002240731000169X}{{HITEMP},
+%  the high-temperature molecular spectroscopic database}, Journal of
+%  Quantitative Spectroscopy {\&} Radiative Transfer 111~(15) (2010) 2139--2150.
+%\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2010.05.001}
+%  {\path{doi:10.1016/j.jqsrt.2010.05.001}}.
+%\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S002240731000169X}
+%
+%\bibitem{Solovjov_2016}
+%V.~P. Solovjov, F.~Andr{\'e}, D.~Lemonnier, B.~W. Webb, The generalized {SLW}
+%  model, Journal of Physics: Conference Series 676 (2016) 1--36.
+%
+%\bibitem{Solovjov_2017}
+%V.~P. Solovjov, F.~Andr{\'e}, D.~Lemonnier, B.~W. Webb, The rank correlated
+%  {SLW} model of gas radiation in non-uniform media, Journal of Quantitative
+%  Spectroscopy {\&} Radiative Transfer 197 (2017) 26--44.
+%\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2017.01.034}
+%  {\path{doi:10.1016/j.jqsrt.2017.01.034}}.
+%
+%\bibitem{Badger_2019}
+%J.~Badger, B.~W. Webb, V.~P. Solovjov, An exploration of advanced {SLW}
+%  modeling approaches in comprehensive combustion predictions, Combustion
+%  Science and Technology 012022~(676) (2019) 1--17.
+%\newblock \href {http://dx.doi.org/10.1080/00102202.2019.1678907}
+%  {\path{doi:10.1080/00102202.2019.1678907}}.
+%
+%\bibitem{Solovjov_2000}
+%V.~P. Solovjov, B.~W. Webb, {SLW} modeling of radiative transfer in
+%  multicomponent gas mixtures, Journal of Quantitative Spectroscopy and
+%  Radiative Transfer 65 (2000) 655--672.
+%
+%\bibitem{Solovjov_2001}
+%V.~P. Solovjov, B.~W. Webb, An efficient method for modeling radiative transfer
+%  in multicomponent gas mixtures with soot, Transactions of the ASME 123 (2001)
+%  450--457.
+%
+%\bibitem{Solovjov_2008}
+%V.~P. Solovjov, B.~W. Webb, Multilayer modeling of radiative transfer by {SLW}
+%  and {CW} methods in non-isothermal gaseous medium, Journal of Quantitative
+%  Spectroscopy and Radiative Transfer 109~(2) (2008) 245--257.
+%\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2007.08.015}
+%  {\path{doi:10.1016/j.jqsrt.2007.08.015}}.
+%
+%\bibitem{Solovjov_2011}
+%V.~P. Solovjov, D.~Lemonnier, B.~W. Webb, The {SLW}-1 model for efficient
+%  prediction of radiative transfer in high temperature gases, Journal of
+%  Quantitative Spectroscopy and Radiative Transfer 112~(7) (2011) 1205--1212.
+%\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2010.08.009}
+%  {\path{doi:10.1016/j.jqsrt.2010.08.009}}.
+%
+%\bibitem{Solovjov_2014}
+%V.~P. Solovjov, D.~Lemonnier, B.~W. Webb, Extension of the exact {SLW} model to
+%  non-isothermal gaseous media, Journal of Quantitative Spectroscopy and
+%  Radiative Transfer 143 (2014) 83--91.
+%\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2013.10.008}
+%  {\path{doi:10.1016/j.jqsrt.2013.10.008}}.
+%
+%\bibitem{Webb_2018}
+%B.~W. Webb, V.~P. Solovjov, F.~Andr{\'e}, An exploration of the influence of
+%  spectral model parameters on the accuracy of the rank correlated slw model,
+%  Journal of Quantitative Spectroscopy and Radiative Transfer 218 (2018)
+%  161--170.
+%\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2018.06.023}
+%  {\path{doi:10.1016/j.jqsrt.2018.06.023}}.
+%
+%\bibitem{Pearson_2014}
+%J.~Pearson, B.~Webb, S.~V.P., J.~Ma, Efficient representation of the absorption
+%  line blackbody distribution function for {H$_2$O}, {CO$_2$}, and {CO} at
+%  variable temperature, mole fraction, and total pressure, Journal of
+%  Quantitative Spectrosopy and Radiative Transfer 138 (2014) 82--96.
+%
+%\bibitem{Brewster_1992}
+%M.~Q. Brewster, Thermal Radiative Transfer and Properties, Wiley, 1992.
+%
+%\bibitem{Lee_1981}
+%S.~C. Lee, C.~L. Tien, Optical constants of soot in hydrocarbon flames,
+%  Symposium (International) on Combustion 18~(1) (1981) 1159--1166.
+%\newblock \href {http://dx.doi.org/10.1016/S0082-0784(81)80120-8}
+%  {\path{doi:10.1016/S0082-0784(81)80120-8}}.
+%
+%\bibitem{Stull_1960}
+%V.~R. Stull, G.~N. Plass, Emissivity of dispersed carbon particles, Journal of
+%  the Optical Society of America 50~(2) (1960) 121.
+%\newblock \href {http://dx.doi.org/10.1364/JOSA.50.000121}
+%  {\path{doi:10.1364/JOSA.50.000121}}.
+%
+%\bibitem{Dalzell_1969}
+%W.~H. Dalzell, A.~F. Sarofim, Optical constants of soot and their application
+%  to heat-flux calculations, Journal of Heat Transfer 91~(1) (1969) 100--104.
+%\newblock \href {http://dx.doi.org/10.1115/1.3580063}
+%  {\path{doi:10.1115/1.3580063}}.
+%
+%\bibitem{Howarth_1966}
+%C.~R. Howarth, P.~J. Foster, M.~W. Thring (Eds.), The Effect of Temperature on
+%  the Extinction of Radiation By Soot Particles, Begellhouse, 1966.
+%\newblock \href {http://dx.doi.org/10.1615/IHTC3.1210}
+%  {\path{doi:10.1615/IHTC3.1210}}.
+%
+%\bibitem{Chang_1990}
+%H.-c. Chang, T.~T. Charalampopoulos, Determination of the wavelength dependence
+%  of refractive indices of flame soot, Proceedings of the Royal Society of
+%  London. Series A: Mathematical and Physical Sciences 430~(1880) (1990)
+%  577--591.
+%\newblock \href {http://dx.doi.org/10.1098/rspa.1990.0107}
+%  {\path{doi:10.1098/rspa.1990.0107}}.
+%
+%\bibitem{Felske_1984}
+%J.~D. Felske, T.~T. Charalampopoulos, H.~S. Hura, Determination of the
+%  refractive indices of soot particles from the reflectivities of compressed
+%  soot pellets, Combustion Science and Technology 37~(5-6) (1984) 263--283.
+%\newblock \href {http://dx.doi.org/10.1080/00102208408923757}
+%  {\path{doi:10.1080/00102208408923757}}.
+%
+%\bibitem{Williams_2007}
+%T.~C. Williams, C.~R. Shaddix, K.~A. Jensen, J.~M. Suo-Anttila, Measurement of
+%  the dimensionless extinction coefficient of soot within laminar diffusion
+%  flames, International Journal of Heat and Mass Transfer 50~(7-8) (2007)
+%  1616--1630.
+%\newblock \href {http://dx.doi.org/10.1016/j.ijheatmasstransfer.2006.08.024}
+%  {\path{doi:10.1016/j.ijheatmasstransfer.2006.08.024}}.
+%
+%\bibitem{Felske_1977}
+%J.~Felske, T.~C.L., The use of the {M}ilne-{E}ddington absorption coefficient
+%  for radiative heat transfer in combustion systems, ASME Journal of Heat
+%  Transfer 99~(3) (1977) 633--647.
+%
+%\bibitem{Bordbar_personal}
+%H.~Bordbar, personal communication.
+%
+%\bibitem{Chang_1984}
+%S.~Chang, K.~Rhee, Blackbody radiation functions, International communictions
+%  in Heat and Mass Transfer 11 (1984) 451--455.
+%
+%\bibitem{Stephens_2020}
+%V.~Stephens, D.~Lignell, One-dimensional turbulence ({ODT}): computationally
+%  efficient modeling and simulation of turbulent flows, Software{X} 13 (2020)
+%  100641.
+%\newblock \href {http://dx.doi.org/10.1016/j.softx.2020.100641}
+%  {\path{doi:10.1016/j.softx.2020.100641}}.
+%  
+%\bibitem{Zhang_2002b}
+%H.~Zhang, M.~F.~Modest, Evaluation of the Planck-mean absorption coefficients from HITRAN and HITEMP databases, Journal of Quantitative Spectroscopy \& Radiative Transfer 73~(6) (2002) 649--653.
 
-\bibitem{Hottel_1967}
-H.~Hottel, A.~Sarofim, Radiative Transfer, {McGraw-Hill}, New York, 1967.
-
-\bibitem{Modest_2013}
-M.~F. Modest, Radiative Heat Transfer, third edition, {Academic Press},
-  New York, 2013.
-  
-\bibitem{Modest_2016}
-M.~F. Modest, D.~C. Haworth, Radiative Heat Transfer in Turbulent Combustion Systems, {Springer}, New York, 2016.
-
-\bibitem{Smith_2003}
-N.~Smith, J.~Gore, J.~Kim, Q.~Tang,
-  \href{https://tnfworkshop.org/radiation/}{{TNF} workshop radiation models}
-  (2003).
-\newline\urlprefix\url{https://tnfworkshop.org/radiation/}
-
-\bibitem{Grosshandler_1993}
-W.~L. Grosshandler, {RADCAL}: A narrow-band model for radiation calculations in
-  a combustion environment: Nist technical note 1402.
-
-\bibitem{Barlow_2001}
-R.~S. Barlow, A.~N. Karpetis, J.~H. Frank, J.-Y. Chen, Scalar profiles and {NO}
-  formation in laminar opposed-flow partially premixed methane/air flames,
-  Combustion and Flame 127~(3) (2001) 2102--2118.
-\newblock \href {http://dx.doi.org/10.1016/S0010-2180(01)00313-3}
-  {\path{doi:10.1016/S0010-2180(01)00313-3}}.
-
-\bibitem{Barlow_1999}
-R.~Barlow, N.~Smith, J.~Chen, R.~Bilger,
-  \href{http://www.sciencedirect.com/science/article/pii/S0010218098000716}{Nitric
-  oxide formation in dilute hydrogen jet flames: isolation of the effects of
-  radiation and turbulence-chemistry submodels}, Combustion and Flame 117~(1-2)
-  (1999) 4--31.
-\newblock \href {http://dx.doi.org/10.1016/S0010-2180(98)00071-6}
-  {\path{doi:10.1016/S0010-2180(98)00071-6}}.
-\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0010218098000716}
-
-\bibitem{Frank_2000}
-J.~H. Frank, R.~S. Barlow, C.~Lundquist, Radiation and nitric oxide formation
-  in turbulent non-premixed jet flames, Proceedings of the Combustion Institute
-  28~(1) (2000) 447--454.
-\newblock \href {http://dx.doi.org/10.1016/S0082-0784(00)80242-8}
-  {\path{doi:10.1016/S0082-0784(00)80242-8}}.
-
-\bibitem{Zhu_2002}
-X.~Zhu, J.~Gore, A.~N. Karpetis, R.~S. Barlow,
-  \href{http://www.sciencedirect.com/science/article/pii/S0010218002003413}{The
-  effects of self-absorption of radiation on an opposed flow partially premixed
-  flame}, Combustion and Flame 129~(3) (2002) 342--345.
-\newblock \href {http://dx.doi.org/10.1016/S0010-2180(02)00341-3}
-  {\path{doi:10.1016/S0010-2180(02)00341-3}}.
-\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0010218002003413}
-
-\bibitem{Coelho_2002}
-P.~J. Coelho, O.~J. Teerling, D.~Roekaerts, Spectral radiative effects and
-  turbulence-radiation-interaction in sandia flame {D}, in: {Barlow, Robert S.,
-  Pope, Stephan B., Masri, Assaad R., Oefelein, Joseph C.} (Ed.), The
-  Proceedings of the Sixth International Workshop on Measurement and
-  Computation of Turbulent Nonpremixed Flames, 2002.
-
-\bibitem{Bordbar_2014}
-M.~H. Bordbar, G.~Wecel, T.~Hyppanen, A line by line based weighted sum of gray
-  gases model for inhomogeneous {CO$_2$–H$_2$O} mixture in oxy-fired
-  combustion, Combustion and Flame 161~(9) (2014) 2435--2445.
-\newblock \href {http://dx.doi.org/10.1016/j.combustflame.2014.03.013}
-  {\path{doi:10.1016/j.combustflame.2014.03.013}}.
-
-\bibitem{Bordbar_2020}
-H.~Bordbar, G.~C. Fraga, S.~Hostikka,
-  \href{http://www.sciencedirect.com/science/article/pii/S0735193319302660}{An
-  extended weighted-sum-of-gray-gases model to account for all {CO$_2$-H$_2$O}
-  molar fraction ratios in thermal radiation}, International Communications in
-  Heat and Mass Transfer 110 (2020) 104400.
-\newblock \href {http://dx.doi.org/10.1016/j.icheatmasstransfer.2019.104400}
-  {\path{doi:10.1016/j.icheatmasstransfer.2019.104400}}.
-\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S0735193319302660}
-
-\bibitem{Rothman_2010}
-L.~S. Rothman, I.~E. Gordon, R.~J. Barber, H.~Dothe, R.~R. Gamache, A.~Goldman,
-  V.~I. Perevalov, S.~A. Tashkun, J.~Tennyson,
-  \href{http://www.sciencedirect.com/science/article/pii/S002240731000169X}{{HITEMP},
-  the high-temperature molecular spectroscopic database}, Journal of
-  Quantitative Spectroscopy {\&} Radiative Transfer 111~(15) (2010) 2139--2150.
-\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2010.05.001}
-  {\path{doi:10.1016/j.jqsrt.2010.05.001}}.
-\newline\urlprefix\url{http://www.sciencedirect.com/science/article/pii/S002240731000169X}
-
-\bibitem{Solovjov_2016}
-V.~P. Solovjov, F.~Andr{\'e}, D.~Lemonnier, B.~W. Webb, The generalized {SLW}
-  model, Journal of Physics: Conference Series 676 (2016) 1--36.
-
-\bibitem{Solovjov_2017}
-V.~P. Solovjov, F.~Andr{\'e}, D.~Lemonnier, B.~W. Webb, The rank correlated
-  {SLW} model of gas radiation in non-uniform media, Journal of Quantitative
-  Spectroscopy {\&} Radiative Transfer 197 (2017) 26--44.
-\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2017.01.034}
-  {\path{doi:10.1016/j.jqsrt.2017.01.034}}.
-
-\bibitem{Badger_2019}
-J.~Badger, B.~W. Webb, V.~P. Solovjov, An exploration of advanced {SLW}
-  modeling approaches in comprehensive combustion predictions, Combustion
-  Science and Technology 012022~(676) (2019) 1--17.
-\newblock \href {http://dx.doi.org/10.1080/00102202.2019.1678907}
-  {\path{doi:10.1080/00102202.2019.1678907}}.
-
-\bibitem{Solovjov_2000}
-V.~P. Solovjov, B.~W. Webb, {SLW} modeling of radiative transfer in
-  multicomponent gas mixtures, Journal of Quantitative Spectroscopy and
-  Radiative Transfer 65 (2000) 655--672.
-
-\bibitem{Solovjov_2001}
-V.~P. Solovjov, B.~W. Webb, An efficient method for modeling radiative transfer
-  in multicomponent gas mixtures with soot, Transactions of the ASME 123 (2001)
-  450--457.
-
-\bibitem{Solovjov_2008}
-V.~P. Solovjov, B.~W. Webb, Multilayer modeling of radiative transfer by {SLW}
-  and {CW} methods in non-isothermal gaseous medium, Journal of Quantitative
-  Spectroscopy and Radiative Transfer 109~(2) (2008) 245--257.
-\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2007.08.015}
-  {\path{doi:10.1016/j.jqsrt.2007.08.015}}.
-
-\bibitem{Solovjov_2011}
-V.~P. Solovjov, D.~Lemonnier, B.~W. Webb, The {SLW}-1 model for efficient
-  prediction of radiative transfer in high temperature gases, Journal of
-  Quantitative Spectroscopy and Radiative Transfer 112~(7) (2011) 1205--1212.
-\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2010.08.009}
-  {\path{doi:10.1016/j.jqsrt.2010.08.009}}.
-
-\bibitem{Solovjov_2014}
-V.~P. Solovjov, D.~Lemonnier, B.~W. Webb, Extension of the exact {SLW} model to
-  non-isothermal gaseous media, Journal of Quantitative Spectroscopy and
-  Radiative Transfer 143 (2014) 83--91.
-\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2013.10.008}
-  {\path{doi:10.1016/j.jqsrt.2013.10.008}}.
-
-\bibitem{Webb_2018}
-B.~W. Webb, V.~P. Solovjov, F.~Andr{\'e}, An exploration of the influence of
-  spectral model parameters on the accuracy of the rank correlated slw model,
-  Journal of Quantitative Spectroscopy and Radiative Transfer 218 (2018)
-  161--170.
-\newblock \href {http://dx.doi.org/10.1016/j.jqsrt.2018.06.023}
-  {\path{doi:10.1016/j.jqsrt.2018.06.023}}.
-
-\bibitem{Pearson_2014}
-J.~Pearson, B.~Webb, S.~V.P., J.~Ma, Efficient representation of the absorption
-  line blackbody distribution function for {H$_2$O}, {CO$_2$}, and {CO} at
-  variable temperature, mole fraction, and total pressure, Journal of
-  Quantitative Spectrosopy and Radiative Transfer 138 (2014) 82--96.
-
-\bibitem{Brewster_1992}
-M.~Q. Brewster, Thermal Radiative Transfer and Properties, Wiley, 1992.
-
-\bibitem{Lee_1981}
-S.~C. Lee, C.~L. Tien, Optical constants of soot in hydrocarbon flames,
-  Symposium (International) on Combustion 18~(1) (1981) 1159--1166.
-\newblock \href {http://dx.doi.org/10.1016/S0082-0784(81)80120-8}
-  {\path{doi:10.1016/S0082-0784(81)80120-8}}.
-
-\bibitem{Stull_1960}
-V.~R. Stull, G.~N. Plass, Emissivity of dispersed carbon particles, Journal of
-  the Optical Society of America 50~(2) (1960) 121.
-\newblock \href {http://dx.doi.org/10.1364/JOSA.50.000121}
-  {\path{doi:10.1364/JOSA.50.000121}}.
-
-\bibitem{Dalzell_1969}
-W.~H. Dalzell, A.~F. Sarofim, Optical constants of soot and their application
-  to heat-flux calculations, Journal of Heat Transfer 91~(1) (1969) 100--104.
-\newblock \href {http://dx.doi.org/10.1115/1.3580063}
-  {\path{doi:10.1115/1.3580063}}.
-
-\bibitem{Howarth_1966}
-C.~R. Howarth, P.~J. Foster, M.~W. Thring (Eds.), The Effect of Temperature on
-  the Extinction of Radiation By Soot Particles, Begellhouse, 1966.
-\newblock \href {http://dx.doi.org/10.1615/IHTC3.1210}
-  {\path{doi:10.1615/IHTC3.1210}}.
-
-\bibitem{Chang_1990}
-H.-c. Chang, T.~T. Charalampopoulos, Determination of the wavelength dependence
-  of refractive indices of flame soot, Proceedings of the Royal Society of
-  London. Series A: Mathematical and Physical Sciences 430~(1880) (1990)
-  577--591.
-\newblock \href {http://dx.doi.org/10.1098/rspa.1990.0107}
-  {\path{doi:10.1098/rspa.1990.0107}}.
-
-\bibitem{Felske_1984}
-J.~D. Felske, T.~T. Charalampopoulos, H.~S. Hura, Determination of the
-  refractive indices of soot particles from the reflectivities of compressed
-  soot pellets, Combustion Science and Technology 37~(5-6) (1984) 263--283.
-\newblock \href {http://dx.doi.org/10.1080/00102208408923757}
-  {\path{doi:10.1080/00102208408923757}}.
-
-\bibitem{Williams_2007}
-T.~C. Williams, C.~R. Shaddix, K.~A. Jensen, J.~M. Suo-Anttila, Measurement of
-  the dimensionless extinction coefficient of soot within laminar diffusion
-  flames, International Journal of Heat and Mass Transfer 50~(7-8) (2007)
-  1616--1630.
-\newblock \href {http://dx.doi.org/10.1016/j.ijheatmasstransfer.2006.08.024}
-  {\path{doi:10.1016/j.ijheatmasstransfer.2006.08.024}}.
-
-\bibitem{Felske_1977}
-J.~Felske, T.~C.L., The use of the {M}ilne-{E}ddington absorption coefficient
-  for radiative heat transfer in combustion systems, ASME Journal of Heat
-  Transfer 99~(3) (1977) 633--647.
-
-\bibitem{Bordbar_personal}
-H.~Bordbar, personal communication.
-
-\bibitem{Chang_1984}
-S.~Chang, K.~Rhee, Blackbody radiation functions, International communictions
-  in Heat and Mass Transfer 11 (1984) 451--455.
-
-\bibitem{Stephens_2020}
-V.~Stephens, D.~Lignell, One-dimensional turbulence ({ODT}): computationally
-  efficient modeling and simulation of turbulent flows, Software{X} 13 (2020)
-  100641.
-\newblock \href {http://dx.doi.org/10.1016/j.softx.2020.100641}
-  {\path{doi:10.1016/j.softx.2020.100641}}.
-  
-\bibitem{Zhang_2002b}
-H.~Zhang, M.~F.~Modest, Evaluation of the Planck-mean absorption coefficients from HITRAN and HITEMP databases, Journal of Quantitative Spectroscopy \& Radiative Transfer 73~(6) (2002) 649--653.
-
-\end{thebibliography}
+%\end{thebibliography}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
