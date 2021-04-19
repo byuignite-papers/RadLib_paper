@@ -68,11 +68,20 @@ I have a number of comments on the manuscript as well as the software itself whi
 5. CMake build system:
     1.	Consider installing a “RadLib.cmake” file for downstream usage by CMake-based projects. This helps downstream build systems configure for RadLib usage (setting include paths, etc.).
     1.	probably shouldn’t specify optimize or debug flags directly, as CMake will provide appropriate values on most platforms.
-    1.	the default build type isn’t defaulting to Release for me; it remains blank.
-    1.	I suggest not using verbose makefiles by default.
-    1.	Using GLOB to install the headers is not the appropriate CMake approach.
-    1.	the data files are not copied into the examples build directory, meaning that the example executables do not run.
-    1.	The run-examples.sh script is not helpful as it is not installed into the build directory where the executables are produced and doesn’t have path information to actually run the executables.
+
+		**Build has been updated to reflect this.**
+		
+    3.	the default build type isn’t defaulting to Release for me; it remains blank.
+    4.	I suggest not using verbose makefiles by default.
+    
+   		**Build has be updated so that verbose makefiles is no longer the default.**
+		
+    3.	Using GLOB to install the headers is not the appropriate CMake approach.		
+    3.	the data files are not copied into the examples build directory, meaning that the example executables do not run.
+    4.	The run-examples.sh script is not helpful as it is not installed into the build directory where the executables are produced and doesn’t have path information to actually run the executables.
+		
+		**Executables are built within the example folders in addition to the build directories, so run_examples.sh runs without any issues and serves as a simple illustration of the example cases.**
+		
     3.	Using “doxygen” as a target is not ideal since it conflicts with the “doxygen” executable name. It still works fine though...
 
 		**Build target name has been changed from "doxygen" to "docs" for safety.**
