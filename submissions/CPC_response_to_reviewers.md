@@ -67,7 +67,10 @@ I have a number of comments on the manuscript as well as the software itself whi
 
 5. CMake build system:
     1.	Consider installing a “RadLib.cmake” file for downstream usage by CMake-based projects. This helps downstream build systems configure for RadLib usage (setting include paths, etc.).
-    1.	probably shouldn’t specify optimize or debug flags directly, as CMake will provide appropriate values on most platforms.
+
+		**Installation now includes a radlib.cmake file, located in the installed/cmake/radlib directory, for downstream usage.**
+		
+    3.	probably shouldn’t specify optimize or debug flags directly, as CMake will provide appropriate values on most platforms.
 
 		**Build has been updated to reflect this.**
 		
