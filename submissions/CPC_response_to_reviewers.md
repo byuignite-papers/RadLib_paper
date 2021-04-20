@@ -75,13 +75,22 @@ I have a number of comments on the manuscript as well as the software itself whi
 		**Build has been updated to reflect this.**
 		
     3.	the default build type isn’t defaulting to Release for me; it remains blank.
-    4.	I suggest not using verbose makefiles by default.
-    
-   		**Build has be updated so that verbose makefiles is no longer the default.**
+
+		**The authors have not experienced problems with this, but have verified that it works correctly. Note that the build type can be overridden by IDE build settings, among other things, and that this may be a system issue specific to the reviewer.**
 		
-    3.	Using GLOB to install the headers is not the appropriate CMake approach.		
-    3.	the data files are not copied into the examples build directory, meaning that the example executables do not run.
-    4.	The run-examples.sh script is not helpful as it is not installed into the build directory where the executables are produced and doesn’t have path information to actually run the executables.
+    5.	I suggest not using verbose makefiles by default.
+   
+  		**Build has be updated so that verbose makefiles are no longer the default.**
+		
+    3.	Using GLOB to install the headers is not the appropriate CMake approach.
+
+		**Build updated accordingly; GLOB no longer used to install header files.**
+		
+    5.	the data files are not copied into the examples build directory, meaning that the example executables do not run.
+
+		**The authors have experienced no issues running the example executables from either the build/examples directory or directly from the examples directory.**
+		
+    7.	The run-examples.sh script is not helpful as it is not installed into the build directory where the executables are produced and doesn’t have path information to actually run the executables.
 		
 		**Executables are built within the example folders in addition to the build directories, so run_examples.sh runs without any issues and serves as a simple illustration of the example cases.**
 		
@@ -119,8 +128,6 @@ A radiation spectral property library is developed in this study using C++. A Pl
 
 **The authors would like to thank the reviewer for their comments and suggestions. We have already begun working on coupling RadLib to CFD software (that includes a DOM model for the RTE solution, among other features) in order to demonstrate RadLib's capabilities.**
 
-**TO DO: couple RadLib to ODT for demonstration purposes**
-
 1. RADCAL data were used to generate the PlanckMean absorption coefficient. Based on the reviewer's experience, the PlanckMean absorption coefficients can have meaningful differences when generated from RADCAL and from HiTEMP2010. It is recommended a more recent database being used for the library.
 
 	**The Planck Mean absorption coefficients model as implemented in RadLib refers specifically to the radiation model in [3,5], which is one of the most common radiation models applied to turbulent combustion simulations. It was chosen because of its popularity and widespread use in combustion simulations (despite its limitations). That said, there is value in using the most current tools. Given the reviewer's experience with variance in the Planck Mean absorption coefficients as calculated from various databases, the authors will strongly consider adding an updated Planck Mean model using the most current available data.**
@@ -154,6 +161,8 @@ Considering all these, I think that this CPiP submission is definitely within th
 I could resolve this by adding ARCHIVE DESTINATION line on the c++/CMakeLists.txt file.
 But, then on during "make" my installation was interrupted several times because of missing packages in my Python installation.
 I would strongly recommend that the authors modify the installation instructions to include: a) list of dependencies (i.e., what compilers, what versions of python, what python packages, etc.), b) how to install the dependencies before building RadLib, c) a way to build RadLib with either only C++ or only Python. These installation notes do not necessarily need to be in the main manuscript, but they must be in the installation README of the code package.
+
+	**The CMake build system has been updated such that ARCHIVE DESTINATION is explicitly specified, so that error should no longer occur. A build option has been added that makes the Python interface installation optional. Note that the C++ source code is required to install the Python interface, so there is no option to build only the Python interface. All of this information has been added to the ```README.md``` files located in the root directory and the ```build``` directory along with a more thorough list of software dependencies and required Python packages.**
 
 2) The library includes PM, one WSGG, and a RCSLW model. The authors should clearly indicate the rationale of these choices (i.e., why only these three models) early on in the manuscript. Since this is intended for researchers who, presumably, are not experts in radiation modeling, the inclusion of these three models can be misleading. One might think that these three models are the most appropriate models for their simulations.
 
