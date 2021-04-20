@@ -59,7 +59,7 @@ I have a number of comments on the manuscript as well as the software itself whi
     1.	Is referred to as build_examples.sh in the README.md file
     1.	is redundant with the cmake build system and isn’t portable. It should probably be removed.
 
-	**The make_examples.sh file has been removed.**
+	**The ```make_examples.sh``` file has been removed.**
 	
 3. It appears that there are no tests associated with the library. This is a bit surprising - I would expect regression test coverage on the basic API functionality.
 
@@ -68,7 +68,7 @@ I have a number of comments on the manuscript as well as the software itself whi
 5. CMake build system:
     1.	Consider installing a “RadLib.cmake” file for downstream usage by CMake-based projects. This helps downstream build systems configure for RadLib usage (setting include paths, etc.).
 
-		**Installation now includes a radlib.cmake file, located in the installed/cmake/radlib directory, for downstream usage.**
+		**Installation now includes a ```radlib.cmake``` file, located in the ```installed/cmake/radlib``` directory, for downstream usage.**
 		
     3.	probably shouldn’t specify optimize or debug flags directly, as CMake will provide appropriate values on most platforms.
 
@@ -88,11 +88,11 @@ I have a number of comments on the manuscript as well as the software itself whi
 		
     5.	the data files are not copied into the examples build directory, meaning that the example executables do not run.
 
-		**The authors have experienced no issues running the example executables from either the build/examples directory or directly from the examples directory.**
+		**The authors have experienced no issues running the example executables from either the ```build/examples``` directory or directly from the ```examples``` directory.**
 		
     7.	The run-examples.sh script is not helpful as it is not installed into the build directory where the executables are produced and doesn’t have path information to actually run the executables.
 		
-		**Executables are built within the example folders in addition to the build directories, so run_examples.sh runs without any issues and serves as a simple illustration of the example cases.**
+		**Executables are built within the example folders in addition to the build directories, so ```run_examples.sh``` runs without any issues and serves as a simple illustration of the example cases.**
 		
     3.	Using “doxygen” as a target is not ideal since it conflicts with the “doxygen” executable name. It still works fine though...
 
@@ -162,7 +162,7 @@ I could resolve this by adding ARCHIVE DESTINATION line on the c++/CMakeLists.tx
 But, then on during "make" my installation was interrupted several times because of missing packages in my Python installation.
 I would strongly recommend that the authors modify the installation instructions to include: a) list of dependencies (i.e., what compilers, what versions of python, what python packages, etc.), b) how to install the dependencies before building RadLib, c) a way to build RadLib with either only C++ or only Python. These installation notes do not necessarily need to be in the main manuscript, but they must be in the installation README of the code package.
 
-	**The CMake build system has been updated such that ARCHIVE DESTINATION is explicitly specified, so that error should no longer occur. A build option has been added that makes the Python interface installation optional. Note that the C++ source code is required to install the Python interface, so there is no option to build only the Python interface. All of this information has been added to the ```README.md``` files located in the root directory and the ```build``` directory along with a more thorough list of software dependencies and required Python packages.**
+	**The CMake build system has been updated such that ```ARCHIVE DESTINATION``` is explicitly specified, so that error should no longer occur. A build option has been added that makes the Python interface installation optional. Note that the C++ source code is required to install the Python interface, so there is no option to build only the Python interface. All of this information has been added to the ```README.md``` files located in the root directory and the ```build``` directory along with a more thorough list of software dependencies and required Python packages.**
 
 2) The library includes PM, one WSGG, and a RCSLW model. The authors should clearly indicate the rationale of these choices (i.e., why only these three models) early on in the manuscript. Since this is intended for researchers who, presumably, are not experts in radiation modeling, the inclusion of these three models can be misleading. One might think that these three models are the most appropriate models for their simulations.
 
