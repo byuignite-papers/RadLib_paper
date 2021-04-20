@@ -63,7 +63,7 @@ I have a number of comments on the manuscript as well as the software itself whi
 	
 3. It appears that there are no tests associated with the library. This is a bit surprising - I would expect regression test coverage on the basic API functionality.
 
-**TO DO: consult Josh about appropriate tests for RadLib**
+	**The authors acknowledge the lack of tests associated with the library and note that basic test coverage is currently being developed.**
 
 5. CMake build system:
     1.	Consider installing a “RadLib.cmake” file for downstream usage by CMake-based projects. This helps downstream build systems configure for RadLib usage (setting include paths, etc.).
