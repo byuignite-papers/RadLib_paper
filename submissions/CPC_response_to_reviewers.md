@@ -6,7 +6,7 @@ This manuscript introduces “RadLib,” a C++ library to calculate absorption c
 
 I have a number of comments on the manuscript as well as the software itself which the authors should consider to improve the manuscript and software.
 
-**The authors would like to thank the reviewer for their time and knowledge. While we disagree with some of the reviewer's comments and suggestions, they are, overall, constructive and helpful to the paper's development.**
+**The authors would like to thank the reviewer for their time and careful review.**
 
 ### Manuscript:
 
