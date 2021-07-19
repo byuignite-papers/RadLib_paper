@@ -6,43 +6,46 @@ This manuscript introduces “RadLib,” a C++ library to calculate absorption c
 
 I have a number of comments on the manuscript as well as the software itself which the authors should consider to improve the manuscript and software.
 
-**The authors would like to thank the reviewer for their time and careful review.**
+**The authors thank the reviewer for their time and careful review.**
 
 ### Manuscript:
 
 1. There is no general user documentation provided in section 3. Figure 1 includes information that is more algorithmic than illustrative of the API.
 
-	**Section 3 has been revised and extended to include more information on how users can include and interact with the RadLib library, including explicit references to example files that further illustrate usage of the library.**
+	**Section 3 has been significantly revised and extended to include more information on how users can include and interact with the RadLib library. This includes a description of the build procedure and a list of installed files. Compilation of user code with RadLib is outline. A description of the interface functions is also provided. The key interface function was ```get_k_a(...)```. An additional function is now included and described, ```get_k_a_oneband(...)```. The function arguments are now described. Since the initial submission, a Fortran 90 interface has been added and this is included in the section.**
 
 2. Section 5 makes several editorial claims that are quite subjective, and not well-supported:
 	1. First sentence: “historically difficult to implement … complexity and high computational costs”
-		-Property evaluation is not the expensive part of a radiation calculation. Solving the RTE is the expensive part.
-        	-I wouldn’t characterize the property evaluation as particularly complex in comparison with other aspects of combustion simulations (kinetics, thermodynamics, transport properties).
+		- Property evaluation is not the expensive part of a radiation calculation. Solving the RTE is the expensive part.
+        	- I wouldn’t characterize the property evaluation as particularly complex in comparison with other aspects of combustion simulations (kinetics, thermodynamics, transport properties).
 
     2. At the end of the first paragraph, the authors seem to imply that RadLib will solve the challenges of radiation modeling. Again, it is the RTE solver, not the property evaluation, that is the largest time-sink in terms of computer and human resources. 
 
     3. These kinds of statements persist throughout the second paragraph as well. There are limitations in RadLib such as lack of scattering treatment for particle-laden flows, inability to include more species, lack of any line-by-line capabilities, etc. The library checks a few useful boxes, but the verbiage here seems to take more credit than the authors may be due.
-    
-    **The authors have a number of concerns about the reviewer's claims here that they would like to address. First, note that the subject of the first sentence of Section 5 is "radiative heat transfer models", which does not refer specifically to either radiation property models or RTE evaluation methods, but the treatment of computational radiative heat transfer as a whole. This generalization holds for the entire first paragraph of Section 5. Additionally, at no point in the paper do the authors claim that property evaluation is more complex or computationally expensive than the RTE solution, only that it "can be a difficult and time-consuming portion of radiation calculations" (pg. 2). Likewise, the paper contains no claims about the complexity of radiation property models in relation to other aspects of combustion simulations. (On this topic, however, the authors would like to point out that these other aspects of combustion simulations are typically well-characterized in both commercial and open-source CFD codes and do not require very much user interaction, whereas radiation modeling is often absent or highly simplified.) The second paragraph of Section 5 is a brief discussion on how RadLib can benefit researchers that draws from the authors' experiences. It does not claim that RadLib will solve any of the challenges of radiation modeling, only that it can "ease . . . obstacles", which the authors believe it can do.**
-    
-    **All of that said, however, the fact that the reviewer made these assumptions and pointed out these implications indicates that the paper's language is, in fact, too subjective. Even though none of these statements were explicitly made, they must be implied for the reviewer to come to these conclusions. As such, revisions have been made throughout the paper to reduce subjective language, support generalized statements with additional explanation and/or references, and include due discussion of RadLib's limitations. Section 5 in particular has undergone heavy revision.** 
+
+    **In the first sentence and paragraph of Section 5, "radiative heat transfer models" does not refer specifically to either radiation property models or RTE evaluation methods, but the treatment of computational radiative heat transfer as a whole. This generalization was intended for the entire first paragraph of Section 5.**
+
+    **Regarding solution of the RTE versus the radiative property model, the reviewer is correct that in most engineering calculations, specification and implementation of the RTE can be more complex and costly than that of the property model. For both parts, however, this depends strongly on the particular model used, (and the geometry considered). The optically-thin model RTE model is trivial, and the RCSLW property model is not. We revised the manuscript to include a discussion of this in the second paragraph of the introduction, with a specific note that "In practical engineering simulations, the solution of the RTE is often the most complex and costly part of radiative simulation..." That said, we believe that access to good radiative property models as presented in this paper is a valuable contribution.**
+
+    **We want to be careful with what is claimed in the paper, and some major revision has occurred in response to this reviewer's comments and others. Section 4 contained examples provided along with results, but now contains a description of the examples provided with the code. Section 5 contained some discussion items as noted by the reviewer, but now includes simulation results for the examples along with a CFD demonstration. The discussion items noted by the reviewer have been modified and folded into the Conclusions section.
+    **
 
 3. Section 5 claims that “RadLib’s modular framework is designed to easily accommodate new models as well,” which is a bit of an overstatement. See comments below w.r.t. assumptions on species considered, hard-coded polynomial coefficients, etc. all of which reduce extensibility.
 
-	**In order to avoid subjective language, this sentence has been revised as follows: "RadLib's modular framework can also accomodate new models, . . .". Specific extensibility issues are addressed below with their respective reviewer comments.**
+    **We have reworded this to "...but its design and C++, Python, and Fortran interfaces permit expansion to additional property models." We remove the word "modular" throughout the paper. We do believe that the library can be easily extended. The reviewer is correct that we do not provide explicit functionality, for, e.g., generic extension to other species. In some cases, like the PM model, such extension would be trivial within the existing code structure. In the RCSLW model, extension to other species would require provision of the species ALBDF, and then extension would be a straightforward extension of the code, but the code is not set up for arbitrary species in arbitrary order. The library is primarily targeted at combustion applications where CO2 and H2O are the primary radiative species. Future efforts may motivate further extension.
 
 4. There are several minor issues that need to be addressed: 
 	1. Abstract: “well-written” is subjective and should be removed. 
 
-		**The offending sentence (actually located in the "Solution method" section of the Program Summary) has been revised to eliminate subjective language.**
+		**Done.**
 	
 	2. Introduction: second sentence: “Combustion simulations…” is a run-on sentence.	
-	
-		**Technically, no, this is not a run-on sentence, but its structure is awkward and inhibits readability. It has been revised to the following: "For example, combustion simulations are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to overall simulation cost."**
+
+    **We have reworded the sentence to "For example, combustion simulations are often complicated by the need for accurate radiation modeling, which can be difficult to implement and computationally expensive relative to overall simulation cost."**
 	
     3. Page 10: “[INSERT RUNTIME COMPARISONS HERE]”
     
-		**This was a placeholder that should not have been included in the document. It has been removed.**
+		**This has been corrected.**
 	
 	4. Section 7 heading: “Interes”
 	
@@ -52,77 +55,81 @@ I have a number of comments on the manuscript as well as the software itself whi
 
 1. API doxygen documentation is non-standard. It appears that the doxygen documentation is provided in the .cc files rather than the header files, which is where it is typically found. Downstream developers would typically be working from headers and the installed library, so it is convention to have doxygen documentation in the header only. This also reduces clutter in the implementation files.
 
-	**The authors were previously unaware of any such standards or conventions, and follow up research indicates that this is a stylistic preference rather than a flaw in the software. The locations of doxygen documentation blocks were chosen for overall readability as they tended to clutter the header files and were less obtrusive when located in the implementation files. However, the reviewer does make a valid point regarding usage by downstream developers, and while we would expect the typical RadLib user to be comfortable working with both header files and source code, it is worthwhile to consider all possible usages. Because this is an issue of style rather than function, no immediate changes have been made to the code or its documentation, but the authors appreciate this information about standard practice and will consider its implications moving forward.**
+**We believe this to be a stylistic preference. The reviewer's argument makes more sense for libraries that are distributed without the source. In our case, we provide the source and the header files. We follow the approach of putting class comments, data member documentation, and class usage in the header, and documentation of how the methods/functions work in the source files where they are defined. This has the benefit of not cluttering the header files. There certainly is precedence for this in online discussions. Here's a quote from the [doxygen website](https://www.doxygen.nl/manual/docblocks.html): "Unlike most other documentation systems, doxygen also allows you to put the documentation of members (including global functions) in front of the definition. This way the documentation can be placed in the source file instead of the header file. This keeps the header file compact, and allows the implementer of the members more direct access to the documentation." Furthermore, Doxygen is primarily used to build external documentation (html), so, from that perspective, it does not seem as important where the Doxygen comments are in the source code.**
 
 2. make_examples.sh:
     1.	will only work with a g++ compiler in the user’s path.
     1.	Is referred to as build_examples.sh in the README.md file
     1.	is redundant with the cmake build system and isn’t portable. It should probably be removed.
 
-	**The ```make_examples.sh``` file has been removed.**
+	**The ```make_examples.sh``` file has been removed and examples are built with CMake. This script was originally included for reference.**
 	
 3. It appears that there are no tests associated with the library. This is a bit surprising - I would expect regression test coverage on the basic API functionality.
 
+    **The API is pretty simple and consists of two functions. Extensive examples are provided, which are compared to LBL data, and which, as published here, are identical to the results of the published radiation models.**
+
+<!--
 	**The authors acknowledge the lack of tests associated with the library and note that basic test coverage is currently being developed.**
+-->
 
 5. CMake build system:
     1.	Consider installing a “RadLib.cmake” file for downstream usage by CMake-based projects. This helps downstream build systems configure for RadLib usage (setting include paths, etc.).
 
-		**Installation now includes a ```radlib.cmake``` file, located by default in the ```installed/cmake/radlib``` directory, for downstream usage.**
+		**This is a good point. The installation now includes ```radlib.cmake``` files, located by default in the ```installed/cmake/``` directory, for downstream usage.**
 		
     3.	probably shouldn’t specify optimize or debug flags directly, as CMake will provide appropriate values on most platforms.
 
-		**Build has been updated to reflect this.**
+		**The CMake build has been updated to reflect this.**
 		
     3.	the default build type isn’t defaulting to Release for me; it remains blank.
 
-		**The authors have not experienced problems with this, but have verified that it works correctly. Note that the build type can be overridden by IDE build settings, among other things, and that this may be a system issue specific to the reviewer.**
+        **This appears to be working in the revised version of the code. Testing shows the value of CMAKE_BUILD_TYPE as set to Release if not otherwise set. This is specified at the very top of the base CMakeLists.txt file. Note that the build type can be overridden by IDE build settings, among other things, and that this may be a system issue specific to the reviewer.**
 		
     5.	I suggest not using verbose makefiles by default.
    
-  		**Build has be updated so that verbose makefiles are no longer the default.**
+  		**The build has be updated so that verbose makefiles are no longer the default.**
 		
     3.	Using GLOB to install the headers is not the appropriate CMake approach.
 
-		**Build updated accordingly; GLOB no longer used to install header files.**
+		**The build updated accordingly; GLOB is no longer used to install header files.**
 		
     5.	the data files are not copied into the examples build directory, meaning that the example executables do not run.
 
-		**The authors have experienced no issues running the example executables from either the ```build/examples``` directory or directly from the ```examples``` directory. More information is required to address this issue.**
-		
+        **The original code has been updated and tested and this does not appear to be an issue.**
+
     7.	The run-examples.sh script is not helpful as it is not installed into the build directory where the executables are produced and doesn’t have path information to actually run the executables.
 		
-		**Executables are built within the example folders in addition to the build directories, so ```run_examples.sh``` runs without any issues.**
+		**Executables for the examples are installed within the example folders (in addition to the build directories), so ```run_examples.sh``` runs without any issues.**
 		
     3.	Using “doxygen” as a target is not ideal since it conflicts with the “doxygen” executable name. It still works fine though...
 
-		**Build target name has been changed from "doxygen" to "docs" for safety.**
+		**Build target name has been changed from "doxygen" to "docs" for safety. Note that building the documentation is off by default.**
 
 5. It appears that line-by-line data from HITEMP/HITRAN files cannot be loaded into RadLib. That’s an unfortunate limitation, but not a deal-breaker. 
 
-	**At present, RadLib's models cannot accommodate such data input, but this is a limitation of the models themselves, not the software. The appropriate line-by-line data is included within the RadLib package, which the authors consider a convenience rather than a hindrance. The ability to load database files directly into RadLib could be useful to researchers looking to extend RadLib's model library to include modern spectral models, however. The authors appreciate the suggestion and will consider it for future development.**
+    **This is true. The code is not presently set up to load HITEMP/HITRAN data. This is a good suggestion and we plan to extend the model to allow LBL simulations in the future.** 
 
 6. It looks like the software hard-codes Plank mean absorption coefficients as (fourth-order?) polynomial fits? Same for WSGG. There is no discussion of why this was chosen, how the coefficients were determined, or a characterization of its accuracy. Do you observe any problematic behavior with the fourth order polynomials over temperatures from 300 to 3000 K?  Are these interpolants or regression of data?
 
-	**This discussion was purposely omitted because it does not align with the goal of the paper, which is to present RadLib as a software tool for calculating radiation properties, not to evaluate the included models. All of the reviewer's questions are addressed in detail in the referenced literature (Planck Mean coefficients in [3,5] and WSGG in [10,11]). The authors believe that this is an issue of scope rather than missing information but are willing to extend the discussion at the editor's discretion.**
+    **The software implements the PM and WSGG models as provided in the cited references, which use polynomial fits. Model details are noted in the cited references. Use of a polynomial fit is standard for WSGG models, and a polynomial fit to temperature for species for the PM model seems reasonable. The PM model used is the one advocated by the TNF workshop cited in the paper, which is standard in the combustion community. The temperature range is 300-2500 K for the PM model. This is now stated in the paper, and the code enforces this range. The range for the WSGG model is 300-2400 K. The range for the RCSLW model is 300-3000 K. Temperatures outside these bounds use these bounds for the WSGG and RCSLW models. This is now stated in the paper.**
 
 7. The two previous items combined lead to a significant limitation of RadLib: one cannot easily add new species or modify existing data that is used to generate the absorption coefficients since there has been internal preprocessing of (an unknown subset of) the HITEMP/HITRAN databases to produce curve fits. And given that this process is opaque, it isn’t reproducible.
 
-	**The authors acknowledge that modifying existing models in RadLib is non-trivial, but would like to note that the paper does not claim that the implemented models are easily modified, only that the RadLib framework can be used to implement and validate additional models. Additionally, the authors disagree with the reviewer's statement regarding opacity and reproducability. The referenced literature (see above) clearly outlines the data sources and preprocessing methods applied; this information was omitted from the current paper for the reasons stated above. Given the provided sources, the process is neither opaque nor non-reproducible.**
+    **The implemented models are not opaque, they come from the literature. The novelty of the presented library is not the development of the absorption models, but the implementation, validation, and documentation of a library for application. Using radlib to generate correlations for species using HITEMP/HITRAN is outside of the intended scope. We acknowledge that extra work is required to extend the models to additional species, or to extend the temperature ranges. However, the species included cover a very wide range of practical applications, certainly in the combustion field, and models for other species (e.g., for WSGG, and RCSLW) are often not available. Indeed, Bordbar's WSGG model is one of the few (if not the only one) that is provided for arbitrary compositions of CO2 and H2O, with others assuming fixed or limited ratios. That said, radlib is documenented and while the code does not provide extension machinery directly, extending to additional species by following the existing code structure would not be difficult if such data/correlations were available.**
 
 8. RadLib only considers CO2 and H2O for WSGG, which is fairly limited. Even for Plank mean, only H2O, CO2, CO and CH4 are considered. NO and OH would be nice to include. It appears that including additional species would be a non-trivial undertaking.
 
-	**All WSGG correlations consider only CO2-H2O mixtures with the exception of specialized subset of WSGG models that consider CO2-H2O-soot mixtures. This WSGG model was chosen for RadLib due to its popularity, relative simplicity, and good performance. RadLib implements the WSGG model presented by Bordbar et al. in references [10] and [11], which was developed specifically for use in oxy-fired combustion simulations. CO2 and H2O are the major products of all combustion processes, and CO is a major product of rich combustion. NO and OH are minor species that, while important to other aspects of combustion processes, do not typically participate significantly in radiative heat transfer processes. For more information, please refer to Section 20.6 of reference [2] and/or Section 3.4.1 of *Radiative Heat Transfer in Turbulent Combustion Systems* by Modest and Haworth.** 
-
-	**It should also be noted that the Planck Mean absorption coefficients model as implemented in RadLib refers specifically to the radiation model in [3,5], which is one of the most common radiation models applied to turbulent combustion simulations. This is why Section 2.1 explicitly references the TNF radiation model and its calculated Planck Mean absorption coefficients. As implemented, the model is not intended to be general or extensible to other gas species and was never presented as such. Adding additional species would indeed be a non-trivial undertaking, but that is neither the goal nor purpose of RadLib as a software package, which presents and validates models rather than evaluating them.**
+    **See our reply to the previous comment regarding additional species. For heat transfer applications in combustion, NO and OH are minor species and will not contribute in any meaningful way. CO2, H2O, and soot will drive the radiation in practical configurations. It would be nice to include CO in the WSGG model, and we would like to do this following Bordbar's approach. But even CO is a minor species compared to CO2, both in terms of its concentration in practical systems (usually), and it's asorption coefficient on an equal concentration basis. CH4 was only included in the PM model from the TNF workshop since many of the fuels used there include CH4. But CH4 will largely be present at relatively low temperatures, not the highly radiating flame zones.**
 	
-	**Major revisions have been made to the paper text to clarify points like these for readers who do not specialize in combustion processes or modeling and provide additional information about why these models were chosen for implementation in RadLib.**
+	**We note that major revisions have been made to the paper text to clarify points like these for readers who do not specialize in combustion processes or modeling and provide additional information about why these models were chosen for implementation in RadLib.**
 
 9. Documentation:
     1.	Generating the documentation directly via doxygen v. 1.8.20 gives numerous warnings about obsolete tags and then fails because it is looking for a relative path “../../docs/doxygen” that doesn’t exist. This should be fixed.
     1.	Generating the doxygen documentation via the build system target (“make doxygen”) does seem to work fine.
 
-	**Build process has been updated so that documentation can be generated by the system target or manually.**
+	**The build process has been updated so that documentation can be generated by the system target or manually by running the command ```doxygen``` in the docs folder.**
+
+----------------------------------------------------
 
 ## Reviewer 2
 
