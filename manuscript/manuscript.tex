@@ -587,6 +587,31 @@ Figure~\ref{f:exSb1} shows the results from Example Sb1, which considers three m
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{CFD Results} \label{s:cfd}
+
+The RadLib model was coupled to the Fire Dynamics Simulator (FDS) code developed at NIST \cite{FDS}. FDS is written in Fortran, and the Fortran interface of Radlib was used for simulations. FDS includes several radiative models, but the spectral WSGG model coupled to a finite volume discrete ordinates model is used here. This was done by editing the \texttt{radi.f90} file. A \texttt{use rad\textunderscore module} statement is included and the functions \texttt{A\textunderscore WSGG} and \texttt{KAPPA\textunderscore WSGG} were replaced with calls to RadLib's \texttt{get\textunderscore k\textunderscore a\textunderscore oneband}. The \texttt{oneband} version was used because FDS does an outer iteration over the bands/gases, computing properties at a given band for each grid point. 
+
+FDS includes a number of validation cases. Here, we compare to the FM Burner case. The configuration is a vertically fired gas burner with various fuels and with a coflow oxidizer stream of varying nitrogen dilution. The burner has outer and inner diameters of 15.2 and 13.7 cm and is near the floor in the center of a 1.22 by 1.22 by 1.83 m tall compartment. The heat release rate was 10 kW and included a 1 kW pilot in a surrounding ring. The coflow oxidizer was fed through the floor. Simulations performed here used the ethylene fuel with 20.9\% \ce{N2} oxidizer (i.e., air). Further FDS model and case simulation details are provided in the FDS validation and user guides \cite{FDS}.
+
+Figure~\ref{f:fds} shows results of the simulation with comparison to experimental data. Three radiation models were included: the FDS default model, and the RCSLW and WSGG models from RadLib. 
+The FDS default model uses a single gray gas with a composition and temperature dependent absorption coefficient computed from RADCAL. Further details are provided in the FDS user guide \cite{FDS}. 
+Figure~\ref{f:fds}a shows radial profiles of mean temperature at two vertical positions. The models produce centerline temperature differences of about 80 K (7\%) between the RCSLW and the WSGG at z=2.5D, and 90 K (12\%) at z=3.5D. The differences are lower at lower points in the flame since the effect of radiation on temperature is cumulative. Figure~\ref{f:fds}b plots height versus radiative emission per unit length along the centerline with the spread in radiative emission around the peak values being 1.3 kW/m (11\%).
+%
+\begin{figure}
+    \begin{center}
+    \begin{tabular}{c c}
+        (a) & (b) \\
+        \includegraphics[width=2.5 in]{fig_fds_T_mean.pdf} &
+        \includegraphics[width=2.5 in]{fig_fds_rad_mean.pdf}
+    \end{tabular}
+    \caption{Radial profiles of mean temperature at two heights (a), and height versus radiative emission (b) for FDS simulations of the FM Burner validation case comparing three models to experimental data.}
+    \label{f:fds}
+    \end{center}
+\end{figure}
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Computational Cost} \label{s:cost}
 
 In addition to comparing model attributes and performance, we evaluated and compared the computational cost of the implemented radiation property models. 
@@ -598,8 +623,8 @@ Figure~\ref{f:cost}a displays the relative cost to compute the gas properties $k
     \begin{center}
     \begin{tabular}{c c}
         (a) & (b) \\
-        \includegraphics[width=2.75 in]{fig_getka_c++.pdf} &
-        \includegraphics[width=2.75 in]{fig_exS3_c++.pdf}
+        \includegraphics[width=2.5 in]{fig_getka_c++.pdf} &
+        \includegraphics[width=2.5 in]{fig_exS3_c++.pdf}
     \end{tabular}
     \caption{Relative computational cost to (a) evaluate gas properties only and (b) run Example S3, including the ray-tracing solver. Results are normalized by the cost of the WSSG model for each case.}
     \label{f:cost}
