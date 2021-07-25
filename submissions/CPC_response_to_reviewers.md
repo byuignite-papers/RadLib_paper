@@ -1,5 +1,7 @@
 # Response to Reviewers: CPC initial submission
 
+Note, reviewer comments are included with responses in **bold** text.
+
 ## Reviewer 1
 
 This manuscript introduces “RadLib,” a C++ library to calculate absorption coefficients for use in radiative heat transfer calculations. The library has reasonable value to the research community, despite a few limitations in its scope and design. The library is self-contained (doesn’t have any external dependencies), which is convenient.
