@@ -72,15 +72,15 @@
 \usepackage{booktabs}
 \usepackage{siunitx}
 \usepackage{bm}
-\usepackage{seqsplit}
-\usepackage{enumitem}
+%\usepackage{seqsplit}
+%\usepackage{enumitem}
 
 \restylefloat{table}
 
 \usepackage{hyperref}
 
 \newcommand{\BS}{\boldsymbol}
-\setlist[itemize]{noitemsep}%, topsep=0pt}
+%\setlist[itemize]{noitemsep}%, topsep=0pt}
 
 \newcounter{bla}
 \newenvironment{refnummer}{%
@@ -489,7 +489,7 @@ The C++ and Fortran libraries in the \texttt{lib} folder are
     \item \texttt{libradlib\textunderscore fortran.a}.
 \end{itemize}
 %
-This folder also contains the Python module. If the Python interface is built, the location of the installed Python package needs to be added to the \texttt{PYTHONPATH} environment variable. A command to do this is provided at the end of the installation, for example, \texttt{\seqsplit{export\ PYTHONPATH="/home/user/radlib/installed/lib/python3.8/site-packages:\$PYTHONPATH"}}.
+This folder also contains the Python module. If the Python interface is built, the location of the installed Python package needs to be added to the \texttt{PYTHONPATH} environment variable. A command to do this is provided at the end of the installation.
 
 To use RadLib in C++, a user code includes the header file for the desired radiation model, e.g., \texttt{\#include "rad\textunderscore rcslw.h"}. For Fortran, a \texttt{use rad\textunderscore module} statement provides access to the required interface functions. The Python interface functions are loaded from the \texttt{pyrad} module, as in \texttt{from pyrad import pyrad\textunderscore rcslw}. Such usage is demonstrated in the code listing for the examples discussed below. Compilation of C++ and Fortran programs requires specification of the header/module and library directory locations and linking against the installed libraries (\texttt{libradlib.a} for C++ and both \texttt{libradlib.a} and \texttt{libradlib\textunderscore fortran.a} for Fortran).
 
