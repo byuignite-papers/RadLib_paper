@@ -35,61 +35,74 @@ few issues that need to be resolved before it is accepted for publication.
    range of pressures under which the RCSLW model can be applied. A table summarizing these conditions has been added to
    the beginning of Section 2.**
 
+<font color='green'>
+
 2) Please rephrase and, if possible, simplify the sentence on lines 82-86 ("Radiation property models, including those
    implemented in RadLib, are typically developed using ... correlations and modeling assumptions [4].") It is difficult
    to understand what exactly the authors are trying to convey in this sentence.
 
-   **Sentence has been revised for clarity.**
+   **This sentence has been rephrased as requested.**
+
 
 3) Line 92 - 95: "Modern band models .. cant lose accuracy when applied to nonhomogeneous media and may still require
    large numbers of RTE evaluations [1]." Should this be "<can> lose accuracy when applied …"?
 
-   **Yes, it should. Typo has been fixed.**
+   **Yes, it should, this typo has been fixed.**
 
 4) In Figure 2, Example S5: Do "n=2" "n=4", etc mean the number of bands in RCSLW? It needs to be clarified.
    Furthermore, can the authors comment on the physical significance of RCSLW n =1 and how is this different from PM
    which uses a spectral average value?
 
-   **The figure's caption has been updated to clarify this. The main difference between the PM model and RCSLW (or WSGG) with n=1 
-is that the RCSLW model always considers one transparent gas (representing gaps in the absorption spectrum) in addition 
-to some number of gray gases, whereas the PM model uses an average over the entire spectrum, gaps included. The "clear gas" 
-concept is discussed on page 4 during the derivation of the gray gas spectral RTE (Eq. 5), but the PM model description 
-did not indicate its deviation from this and has been revised to clarify that it does not consider a transparent gas in 
-addition to its single gray gas.**
+   **The "n=2", etc. refer to the number of gray gases in the RCLSW model. The figure's caption has been updated to clarify this. The figure legend has also been modified to add "n=" to the number listed in Example S2.
+The PM model differs from the $n=1$ RCSLW model as follows. The PM model gives a Planck-function-weighted average absorption coefficient, which is not true for the RCSLW model. That statement is now added to the paper in Section 2.1. For n=1, the RCSLW model considers one gray gas as well as a clear gas representing windows in the distribution, discussed on page 4 during the derivation of the gray gas spectral RTE (Eq. 5). 
+We have revised the paper to note that the PM model does not include a clear gas. 
+The PM model uses a linear mixing of partial-pressure-weighted components for the absorption coefficients, whereas the RCSLW model uses the multiplication method to get the mixture ALBDF from the product of species ALBDF values (Eq. 14), which is then used to compute the absorption coefficient and weight. The method of calculation of the gas absorption coefficient and weight for RCSLW follows from the summary description near the end of section 2.3.**
+</font>
+
+<font color='green'>
 
 5) In Figure 2: This is a kind of cosmetic request, but still if the legends and symbols can be made consistent it will
    be easier to read.
+
+   **We have revised the figure as requested. All subplots now use consistent line styles. Figure 3 is also made consistent with Fig. 2.**
 
 6) In lines 499-501: Please clarify the sentence, "The PM absorption coefficient is 27.4 atm−1 m−1 , which results in a
    calculated optical thicknesses of 0.09 and 0.36 m in the thick and thin layers, respectively." Optical thickness is a
    dimensionless quantity, it cannot be 0.36 m. The thicknesses of layers are changing in S2, so what do these 0.09 and
    0.36 refer to?
 
-   **Those numbers are intended to be optical thicknesses and should not have units. This has been fixed. The layer thicknesses in 
-Example S2 are physical lengths, as indicated.**
+    **These numbers are the inverse of the PM absorption coefficient times the partial pressures of the radiating gas (CO2) in the two regions and could be considered optical path lengths. We have corrected this issue in the paper and reword to "The PM absorption coefficient is 27.4 (1/atm*m), which results in optical thicknesses greater than 5.5
+for the domain sizes considered in Example S2."**
+</font>
+
+<font color='green'>
 
 7) In Section 5.1, please clarify which files and functions belong to FDS and which to RadLib. For example, in line
    544, "This was done by editing the radi.f90 file." By looking at the f90 extension the readers can guess that
    radi.f90 is part of FDS and not RadLib. But then in the next sentence, there are references to A_WSGG and KAPPA_WSGG
    functions. Are these part of FDS?
 
-   **Sentence has been revised to clarify which files and functions belong to FDS.**
+   **This sentence has been revised to clarify which files and functions belong to FDS.**
 
 8) In lines 562-564: "The FDS default model uses a single gray gas with a composition and temperature dependent
    absorption coefficient computed from RADCAL." Is this equivalent to the PM model in RadLib? If so, a comparison with
    PM from RadLib and FDS default will be a good validation. Also, what RTE solver does FDS default use?
 
-   **No, they are not equivalent. FDS uses a finite-volume discrete ordinates RTE solver, as specified in the first paragraph of Section 5.1.**
+   **No, they are not equivalent. FDS uses the RadCal narrow-band model that depends on a user-specified radiative path length with a default value of 0.1 m. This is a geometry-dependent property that is different than a PM coefficient. For the radiative solver, FDS uses a finite-volume discrete ordinates RTE solver. That is noted in the paper in the first paragraph of Section 5.1. We added a note of the path length variable in the revised manuscript.**
+</font>
 
 9) In Section 5.2 can the author comment on the computational cost of RadLib-coupled FDS runs? Some quantitative
    information on the computational cost of using RadLib for a coupled run will be very useful. For example, the authors
    can compare the cost of the same FDS configuration simulated without any radiation, with RadLib, and with the
    FDS-default model.
 
+<font color='green'>
+
 10) Line 624: "At present, it includes three major radiation property models - Planck Mean (PM) absorption coefficients
     using the optically thin approximation, the weighted sum of gray gases (WSGG) model,..." PM can be used with any RTE
     solver in principle, not just with optically thin approximation. Is there any limitation within RadLib of using PM
     only with optically thin approximation?
 
-   **This is an error; the reference to the optically thin approximation has been removed. It is true that the PM model can 
+    **This is an error; the reference to the optically thin approximation has been removed. It is true that the PM model can 
 be used with any RTE solver. There is no limitation within RadLib that prevents its use with other RTE solvers.**
+</font>
