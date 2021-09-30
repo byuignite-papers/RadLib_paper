@@ -18,6 +18,7 @@ few issues that need to be resolved before it is accepted for publication.
 
 **The authors thank the reviewer for their time and contributions.**
 
+<font color='green'>
 1) The capabilities and limitations of RadLib should be more clearly articulated. For example, different property models
    have different temperature ranges of applicability. While the authors specified what happens if the simulation
    temperature goes beyond the appropriate temperature range, they should comment or provide some recommendations on the
@@ -30,12 +31,12 @@ few issues that need to be resolved before it is accepted for publication.
    range of applicability for each model may be useful for understanding the capabilities of RadLib at-a-glance for an
    user.
 
+
    **Valid temperature ranges for the WSGG and RCSLW models were noted in their respective sections, and the applicable
    temperature range for the PM model has been added to its section. Additionally, the RCSLW model section specifies the
-   range of pressures under which the RCSLW model can be applied. A table summarizing these conditions has been added to
-   the beginning of Section 2.**
+   range of pressures under which the RCSLW model can be applied. The WSGG model has pressure ranges given as the pressure-path length product, which are now    noted in the paper. A table summarizing these conditions has been added to the beginning of Section 2 as requested. 
+   The models included cannot be used reliably outside the temperature and pressure bounds for which the models were developed. In the WSGG model, only the a weights have temperature dependence. The model gives a continuing trend as the temperature crosses above the 2400 K bound, up to at least 3000 K, suggesting use of the model up to 3000 K. This is true for the applicable range of Mr. However, some of the a weights are slightly negative above 2800 K as the upper Mr bound is approached. A statement is added to the paper.**
 
-<font color='green'>
 
 2) Please rephrase and, if possible, simplify the sentence on lines 82-86 ("Radiation property models, including those
    implemented in RadLib, are typically developed using ... correlations and modeling assumptions [4].") It is difficult

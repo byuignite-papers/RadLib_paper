@@ -269,20 +269,17 @@ At present, RadLib includes three radiation property models of varying complexit
 Radiation absorption coefficients are typically calculated via correlations developed from high-resolution spectral databases like RADCAL, HITRAN, and HITEMP \citep{Grosshandler_1993,Rothman_2010} that relate spectral line strength to properties such as temperature, pressure, and gas composition \citep{Zhang_2002b}. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$), depending on the model, and soot. The property models implemented in RadLib apply only to non-scattering media. Table~\ref{t:models} summarizes RadLib's three radiative property models and the thermodynamic conditions under which they apply.
 
 \begin{table}
-\caption{Summary of radiative property models in RadLib.}
+    \caption{Summary of radiative property models and ranges of applicability. For the WSGG model the pressure range is given in terms of the pressure-path length product.}
 \label{t:models}
 \centering
 \resizebox{\textwidth}{!}{
     \begin{tabular}{l l l l l}
         \hline
-        Model & T range (K) & P range (atm) & Gas species & Refs.   \\
+        Model & T range                 & P range               & Gas species                            & Refs.   \\
         \hline
-        PM      & 300\textendash 2500 & 1                 & \ce{H2O}, \ce{CO2}, \ce{CO}, \ce{CH4}  &
-        \cite{TNF} \\
-        WSGG    & 300\textendash 2400 & 1                 & \ce{H2O}, \ce{CO2} & \cite{Bordbar_2020,
-            Bordbar_2014} \\
-        RCSLW   & 300\textendash 3000 & 0.1\textendash 50 & \ce{H2O}, \ce{CO2}, \ce{CO} &
-        \cite{Solovjov_2017} \\
+        PM      & 300\textendash 2500 K & 1 atm                 & \ce{H2O}, \ce{CO2}, \ce{CO}, \ce{CH4}  & \cite{TNF} \\
+        WSGG    & 300\textendash 2400 K & 0.01-60 atm$\cdot$m   & \ce{H2O}, \ce{CO2}                     & \cite{Bordbar_2020, Bordbar_2014} \\
+        RCSLW   & 300\textendash 3000 K & 0.1\textendash 50 atm & \ce{H2O}, \ce{CO2}, \ce{CO}            & \cite{Solovjov_2017} \\
         \hline
     \end{tabular}
 }
@@ -293,7 +290,7 @@ Radiation absorption coefficients are typically calculated via correlations deve
 
 The Planck Mean (PM) model is the simplest of the three models implemented. This model assumes a single gray gas (with no transparent gas) and computes the absorption coefficient as a function of temperature, pressure, and gas composition. The PM absorption coefficient is a Planck-function-weighted average absorption coefficient.
 
-The particular version of the model implemented is from the Turbulent Nonpremixed Flames (TNF) workshop \cite{TNF}. This is a long-running collaboration between experimental and computational researchers in turbulent combustion \citep{Smith_2003,Barlow_2001}. The workshop includes a number of laboratory jet flames that have been extensively researched for flame temperature, velocity, and composition profiles, and these serve as target flames for computational scientists to validate simulations and models. The PM model implemented here is the one advocated (and hence widely used) by the TNF workshop. For each species, the PM model provides the absorption coefficient as a fourth or fifth order polynomial fit in one of two temperature ranges to $\kappa(T)$ values computed from the RADCAL database \cite{Grosshandler_1993}.  Ultimately, the model accommodates temperatures between 300 K and 2500 K. See \cite{TNF} for details and references. The PM model here considers the species \ce{CO2}, \ce{H2O}, \ce{CO}, \ce{CH4}.  The last two species have lower absorption than the first two, but are included because \ce{CH4} and syngas (consisting of \ce{CO} and \ce{H2}) are common fuels in combustion applications and so are present in the TNF flames in high concentrations in the fuel stream. (\ce{CO} is also a common species in rich flame regions and is also included in the RCSLW model.)
+The particular version of the model implemented is from the Turbulent Nonpremixed Flames (TNF) workshop \cite{TNF}. This is a long-running collaboration between experimental and computational researchers in turbulent combustion \citep{Smith_2003,Barlow_2001}. The workshop includes a number of laboratory jet flames that have been extensively researched for flame temperature, velocity, and composition profiles, and these serve as target flames for computational scientists to validate simulations and models. The PM model implemented here is the one advocated (and hence widely used) by the TNF workshop. For each species, the PM model provides the absorption coefficient as a fourth or fifth order polynomial fit in one of two temperature ranges to $\kappa(T)$ values computed from the RADCAL database \cite{Grosshandler_1993}. The model accommodates temperatures between 300 K and 2500 K. See \cite{TNF} for details and references. The PM model here considers the species \ce{CO2}, \ce{H2O}, \ce{CO}, \ce{CH4}.  The last two species have lower absorption than the first two, but are included because \ce{CH4} and syngas (consisting of \ce{CO} and \ce{H2}) are common fuels in combustion applications and so are present in the TNF flames in high concentrations in the fuel stream. (\ce{CO} is also a common species in rich flame regions and is also included in the RCSLW model.)
 
 The PM model is not as accurate as the other two models considered, and this is illustrated in Section~\ref{s:discussion}.
 It is implemented in RadLib primarily for comparison and evaluation against other radiation property models because of its relatively common use in some simulations.
@@ -322,7 +319,7 @@ where $\kappa_j$ is the absorption coefficient for gray gas $j$, $d_{j,k}$ is a 
 \end{equation}
 \end{linenomath}
 %
-where $a_j$ is the weighting factor for gas $j$, $b_{i,j}$ is computed as shown below,  and $T_r$ is a scaled temperature equal to $T/T_{ref}$ with $T_{ref}$=1200 K. The valid temperature range of the model is 300-2400 K; temperatures outside this range use the value at the respective bound. The value of $b_{i,j}$ is calculated by
+where $a_j$ is the weighting factor for gas $j$, $b_{i,j}$ is computed as shown below,  and $T_r$ is a scaled temperature equal to $T/T_{ref}$ with $T_{ref}$=1200 K. The valid temperature range of the model is 300-2400 K; temperatures outside this range use the value at the respective bound. The $\kappa_j$ values are not temperature dependent. The $a_j$ values show a continuing trend as the temperature increases past 2400 K up to 3000 K, suggesting possible use of the model at these temperatures. However, some of the $a_j$ become slightly negative above $\sim$2800 K as the upper $M_r$ bound is approached. The pressure range of the model is given in terms of the pressure-path length product with values from 0.01-60 atm$\cdot$m. The value of $b_{i,j}$ is calculated by
 %
 \begin{linenomath}
 \begin{equation}
