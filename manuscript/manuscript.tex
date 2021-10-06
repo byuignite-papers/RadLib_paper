@@ -5,7 +5,7 @@
 %% completed and which will give the correct layout in the
 %% preprint and the journal.
 %% The `elsarticle' style is used and more information on this style
-%% can be found at 
+%% can be found at
 %% http://www.elsevier.com/wps/find/authorsview.authors/elsarticle.
 %%
 %%
@@ -151,7 +151,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-RadLib is a C++ library of radiation property models that can be applied to variety of systems involving radiative heat transfer, including CFD simulations. RadLib includes three major radiation property models---Planck Mean (PM) absorption coefficients, the weighted sum of gray gases (WSGG) model, and the rank-correlation spectral line weighted-sum-of-gray-gases (RCSLW) model. RadLib includes C++, Python, and Fortran interfaces and can be expanded to include additional models.Several example cases illustrate the use of the models with an included ray-tracing solver and compare them in terms of accuracy relative to line-by-line solutions. A CFD example is provided of an ethylene burner in a compartment using Fire Dynamics Simulator (FDS). The computational cost of the models is compared. RadLib provides researchers with convenient access to validated radiation property models and a framework for further development.
+RadLib is a C++ library of radiation property models that can be applied to variety of systems involving radiative heat transfer, including CFD simulations. RadLib includes three major radiation property models---Planck Mean (PM) absorption coefficients, the weighted sum of gray gases (WSGG) model, and the rank-correlation spectral line weighted-sum-of-gray-gases (RCSLW) model. RadLib includes C++, Python, and Fortran interfaces and can be expanded to include additional models. Several example cases illustrate use of the models with an included ray-tracing solver, compare their accuracy relative to line-by-line (LBL) solutions, and examine their computational costs. Additionally, an integrated CFD example of an ethylene burner configuration using Fire Dynamics Simulator (FDS) is provided.
+%Several example cases illustrate the use of the models with an included ray-tracing solver and compare them in terms of accuracy relative to line-by-line solutions. A CFD example is provided of an ethylene burner in a compartment using Fire Dynamics Simulator (FDS). The computational cost of the models is compared.
+RadLib provides researchers with convenient access to validated radiation property models and a framework for further development.
 \end{abstract}
 
 %In addition to the manuscript you must supply: the program source code; a README file giving the names and a brief description of the files/directory structure that make up the package and clear instructions on the installation and execution of the program; sample input and output data for at least one comprehensive test run; and, where appropriate, a user manual.
@@ -197,22 +199,22 @@ The library is intended to be used in Linux-like terminal applications.
 
 Modeling radiative heat transfer in participating media in high temperature systems is a challenging problem. Combustion is one of the key radiative transfer applications, and combustion CFD is uniquely challenging because it involves numerous tightly coupled physical phenomena---including multicomponent mass transfer, convective and radiative heat transfer, turbulent fluid dynamics, multi-phase and particle flows, and complex chemical reaction kinetics---that span many orders of magnitude in both length and time scales. Combustion simulations are often complicated by a lack of accurate radiation modeling, which can be difficult to implement and computationally expensive relative to overall simulation cost. Frequently, radiative heat transfer modeling in combustion systems is either neglected or oversimplified, resulting in significant errors flame temperatures~\citep{Modest_2016}. Additionally, some late-stage flame phenomena, particularly soot behavior and flame sheet breakthrough, increasingly depend on and influence the magnitude of radiative heat losses and are difficult to simulate accurately without robust radiation modeling \cite{Modest_2013}. These problems motivated development of the RadLib library, which implements three radiation property models with C++, Python, and Fortran interfaces and provides a framework for additional models and further development, giving researchers convenient access to advanced radiation property modeling tools.
 
-The core mechanisms of radiative phenomena are physically and mathematically complex. Unlike other modes of heat transfer, radiation is governed by a set of integro-differential equations that depend on both direction and wavelength, known as the radiative transfer equations (RTE). Computational radiation solvers require two distinct but interconnected parts: (1) a solution approach for the radiative transfer equations (RTE) and (2) a radiative property model. 
+The core mechanisms of radiative phenomena are physically and mathematically complex. Unlike other modes of heat transfer, radiation is governed by a set of integro-differential equations that depend on both direction and wavelength, known as the radiative transfer equations (RTE). Computational radiation solvers require two distinct but interconnected parts: (1) a solution approach for the radiative transfer equations (RTE) and (2) a radiative property model.
 Complexity, implementation, and computational cost of these two parts can vary widely depending on the models chosen. The optically thin model for solution of the RTE is trivial, while the discrete ordinates model (DOM) and reverse Monte Carlo ray tracing (RMCRC) model, among others, are significantly more involved. Similarly, radiation property models range from simple correlations for computing mean absorption coefficients to gray gas models, including the weighted sum of gray gases (WSGG) model, to more advanced spectral line-weighted-sum-of-gray-gases (SLW) models to full line-by-line (LBL) treatment. In practical engineering simulations, the solution of the RTE is often the most complex and costly part of radiative simulation, but advanced property models such as the Rank Correlated SLW (RCSLW), discussed here, are nontrivial models to understand, implement, and validate.
 RadLib addresses this second radiative property model part of radiation simulation by providing a set of implemented and validated radiation property models that can be applied to various solution approaches for the RTE.
 
 For an absorbing, emitting, and non-scattering medium (considered here), the RTE for intensity $I$ at a specified wavenumber $\eta$ in unit direction $\mathbf{s}$ is described by
-% 
+%
 \begin{linenomath}
 \begin{equation} \label{e:RTE_general}
     \frac{dI_{\eta}}{ds} = -\kappa_{\eta}I_{\eta} + \kappa_{\eta}I_{b,\eta},
 \end{equation}
 \end{linenomath}
 %
-where $I_{\eta}$ is the radiative spectral intensity, $I_{b,\eta}$ is the spectral blackbody radiative intensity (or Planck function), $\kappa_{\eta}$ is the spectral absorption coefficient of the medium, and $s$ is a path length along direction $\mathbf{s}$.  Solving the RTE requires information about the radiative properties of the materials and media in the system.  Radiative property data typically takes the form of radiation absorption coefficients $\kappa$, which are provided by a radiation property model.  Gas absorption spectra consist of millions of spectral lines corresponding to the individual quantum mechanical energy levels of gas molecules and depend on the local thermochemical state of the system (e.g., temperature, pressure, and composition).  
+where $I_{\eta}$ is the radiative spectral intensity, $I_{b,\eta}$ is the spectral blackbody radiative intensity (or Planck function), $\kappa_{\eta}$ is the spectral absorption coefficient of the medium, and $s$ is a path length along direction $\mathbf{s}$.  Solving the RTE requires information about the radiative properties of the materials and media in the system.  Radiative property data typically takes the form of radiation absorption coefficients $\kappa$, which are provided by a radiation property model.  Gas absorption spectra consist of millions of spectral lines corresponding to the individual quantum mechanical energy levels of gas molecules and depend on the local thermochemical state of the system (e.g., temperature, pressure, and composition).
 Radiation property models are typically developed as correlations from high-resolution spectral databases, reducing the huge amount of spectral data contained in those databases and simplifying the evaluation of absorption coefficients \cite{Zhang_2002b}.
 
-The direct solution of the spectral RTE using so-called line-by-line calculations, in which the RTE is solved for each individual spectral line, is computationally prohibitive for most practical configurations and is used primarily for model validation. Some band models rely on estimated or averaged "line-of-sight" property values that cannot be directly incorporated into the RTE. 
+The direct solution of the spectral RTE using so-called line-by-line calculations, in which the RTE is solved for each individual spectral line, is computationally prohibitive for most practical configurations and is used primarily for model validation. Some band models rely on estimated or averaged "line-of-sight" property values that cannot be directly incorporated into the RTE.
 %dol
 Modern band models require high-resolution databases and reorder emission levels rather than averaging across sequential absorption bands, but these can lose accuracy when applied to nonhomogeneous media and may still require large numbers of RTE evaluations \citep{Modest_2016}.
 
@@ -389,7 +391,7 @@ F_{\eta}(C_{\eta}) = F_{\ce{CO2},\eta} \left( \frac{C_{\eta}}{x_{\ce{CO2}}} \rig
 Here, the $\BS{\phi}$ and $T$ arguments of $F$ are omitted from Eq.~\ref{e:multiF} for clarity.
 
 The spectrally integrated RTE (Eq.~\ref{e:RTE_wsgg}) assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but $C_\eta$ depends on the thermodynamic state (denoted by vector $\BS{\phi}$), which does vary spatially.
-%That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$. 
+%That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$.
 Hence, a spatially-fixed $\Delta_j$ with spatially varying $\BS{\phi}$ implies a spatial variation in $C_j$ and $\tilde{C}_j$.
 The RCSLW model uses the notion of rank correlation to handle this spatial variation in the ALBDF.
 Consider two positions with thermodynamic states $\BS{\phi}_1$ and $\BS{\phi}_2$ with corresponding absorption cross section spectra $C_\eta(\eta,\BS{\phi}_1)$, and $C_\eta(\eta,\BS{\phi}_2)$ and let $\hat{C}_1\equiv C_\eta(\hat{\eta},\BS{\phi}_1)$ and $\hat{C}_2\equiv C_\eta(\hat{\eta},\BS{\phi}_2)$ denote the cross sections at some wavenumber $\hat{\eta}$. For each spectrum, we define the set of wavenumbers that give cross sections less than $\hat{C}$ as
@@ -487,7 +489,7 @@ RadLib is an object-oriented C++ library that includes C++, Python, and Fortran 
 An additional directory, \texttt{installed}, is created and populated with RadLib's executables and header files during installation if no other installation location is specified.
 The \texttt{src} and \texttt{examples} directories are further divided into \texttt{c++}, \texttt{python}, and \texttt{fortran} subdirectories to differentiate between interfaces.
 
-RadLib installation is automated with CMake. Inside the downloaded \texttt{radlib} folder, the user must create a \texttt{build} directory and navigate into it. From there, the user executes the following commands in order: 
+RadLib installation is automated with CMake. Inside the downloaded \texttt{radlib} folder, the user must create a \texttt{build} directory and navigate into it. From there, the user executes the following commands in order:
 %
 \begin{enumerate}
     \item \texttt{cmake ..}
@@ -641,7 +643,7 @@ Figures~\ref{f:examples} and~\ref{f:exSb1} display comparative results for the P
 \end{figure}
 %
 
-In general, the PM model performs poorly compared to the WSGG and RCSLW models and the LBL data. The results show that the PM model tends to exaggerate the trends displayed by the other models. The PM data mimics the shape of the other curves in Example S5 as well, but the curve is off-scale and omitted for clarity. For the PM model in Example S5, $Q$ varies from around -80~kW/m$^3$ at $x=0$ to a peak of 200~kW/m$^3$ at x=$1.5$~m and drops to~100 kW/m$^3$ at $x=2$~m.  In Example S2, the PM value of $q(L)/\sigma T^4$ is off the scale at an essentially constant value of unity. 
+In general, the PM model performs poorly compared to the WSGG and RCSLW models and the LBL data. The results show that the PM model tends to exaggerate the trends displayed by the other models. The PM data mimics the shape of the other curves in Example S5 as well, but the curve is off-scale and omitted for clarity. For the PM model in Example S5, $Q$ varies from around -80~kW/m$^3$ at $x=0$ to a peak of 200~kW/m$^3$ at x=$1.5$~m and drops to~100 kW/m$^3$ at $x=2$~m.  In Example S2, the PM value of $q(L)/\sigma T^4$ is off the scale at an essentially constant value of unity.
 %
 %DOL: old: The PM absorption coefficient is 27.4 atm$^{-1}$m$^{-1}$, which results in calculated optical thicknesses of 0.09 and 0.36 in the thick and thin layers, respectively. These values are small compared to the domain sizes greater than 0.5 m considered in Example S2.
 %DOL: revised: The PM absorption coefficient is $k_{PM}=27.4$~atm$^{-1}$m$^{-1}$. The quantity $(k_{PM}P_{CO_2})^{-1}$ is an optical pathlength with values of 0.09~m and 0.36~m in the thick and thin layers, respectively, which are small compared to the domain sizes greater than 0.5~m that are considered in Example S2.
@@ -1022,4 +1024,3 @@ Communications in Heat and Mass Transfer} 11~(5) (1984) 451--455.
 
 \end{document}
 \endinput
-
