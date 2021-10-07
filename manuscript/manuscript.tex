@@ -292,7 +292,9 @@ RadLib calculates radiation absorption coefficients and weighting factors for us
 
 \section{Model descriptions} \label{s:models}
 
-At present, RadLib includes three radiation property models of varying complexity: Planck Mean absorption coefficients, most often applied alongside the optically thin approximation, a weighted sum of gray gases (WSGG) model, and the rank-correlated spectral line-weighted-sum-of-gray-gases (RCSLW) model. These models were chosen for their relevance to practical radiative heat transfer simulations. They represent increasing levels of complexity, computational cost, and accuracy. Each model is discussed in more detail in the following sections.
+At present, RadLib includes three radiation property models of varying complexity: a Planck Mean (PM) absorption coefficients model, a weighted sum of gray gases (WSGG) model, and the rank-correlated spectral line-weighted-sum-of-gray-gases (RCSLW) model.
+%At present, RadLib includes three radiation property models of varying complexity: Planck Mean absorption coefficients, most often applied alongside the optically thin approximation, a weighted sum of gray gases (WSGG) model, and the rank-correlated spectral line-weighted-sum-of-gray-gases (RCSLW) model.
+These models were chosen for their relevance to practical radiative heat transfer simulations. They represent increasing levels of complexity, computational cost, and accuracy. Each model is discussed in more detail in the following sections.
 
 Radiation absorption coefficients are typically calculated via correlations developed from high-resolution spectral databases like RADCAL, HITRAN, and HITEMP \citep{Grosshandler_1993,Rothman_2010} that relate spectral line strength to properties such as temperature, pressure, and gas composition \citep{Zhang_2002b}. At present, RadLib considers up to four gas species (H$_2$O, CO, CO$_2$, and CH$_4$), depending on the model, and soot. The property models implemented in RadLib apply only to non-scattering media. Table~\ref{t:models} summarizes RadLib's three radiative property models and the thermodynamic conditions under which they apply.
 
@@ -318,13 +320,27 @@ Radiation absorption coefficients are typically calculated via correlations deve
 
 The Planck Mean (PM) model is the simplest of the three models implemented. This model assumes a single gray gas (with no transparent gas) and computes the absorption coefficient as a function of temperature, pressure, and gas composition. The PM absorption coefficient is a Planck-function-weighted average absorption coefficient.
 
-The particular version of the model implemented is from the Turbulent Nonpremixed Flames (TNF) workshop \cite{TNF}. This is a long-running collaboration between experimental and computational researchers in turbulent combustion \citep{Smith_2003,Barlow_2001}. The workshop includes a number of laboratory jet flames that have been extensively researched for flame temperature, velocity, and composition profiles, and these serve as target flames for computational scientists to validate simulations and models. The PM model implemented here is the one advocated (and hence widely used) by the TNF workshop. For each species, the PM model provides the absorption coefficient as a fourth or fifth order polynomial fit in one of two temperature ranges to $\kappa(T)$ values computed from the RADCAL database \cite{Grosshandler_1993}. The model accommodates temperatures between 300 K and 2500 K. See \cite{TNF} for details and references. The PM model here considers the species \ce{CO2}, \ce{H2O}, \ce{CO}, \ce{CH4}.  The last two species have lower absorption than the first two, but are included because \ce{CH4} and syngas (consisting of \ce{CO} and \ce{H2}) are common fuels in combustion applications and so are present in the TNF flames in high concentrations in the fuel stream. (\ce{CO} is also a common species in rich flame regions and is also included in the RCSLW model.)
+The version of the PM model implemented in RadLib comes from the Turbulent Nonpremixed Flames (TNF) workshop \cite{TNF}, a long-running collaboration between experimental and computational researchers in turbulent combustion \citep{Smith_2003,Barlow_2001}. The workshop includes a number of laboratory jet flames that have been extensively characterized\textemdash including temperature, velocity, and composition profiles\textemdash and serve as target flames against which computational scientists can validate models and simulations.
+%The particular version of the model implemented is from the Turbulent Nonpremixed Flames (TNF) workshop \cite{TNF}. This is a long-running collaboration between experimental and computational researchers in turbulent combustion \citep{Smith_2003,Barlow_2001}. The workshop includes a number of laboratory jet flames that have been extensively researched for flame temperature, velocity, and composition profiles, and these serve as target flames for computational scientists to validate simulations and models.
+The PM model implemented in RadLib is the model advocated by the TNF workshop and, as a result, widely used in turbulent combustion research.
+%The PM model implemented here is the one advocated (and hence widely used) by the TNF workshop.
+For each chemical species considered, the PM model provides the absorption coefficient as a fourth or fifth order polynomial fit in one of two temperature ranges to $\kappa(T)$ values computed from the RADCAL database \cite{Grosshandler_1993}.
+%For each species, the PM model provides the absorption coefficient as a fourth or fifth order polynomial fit in one of two temperature ranges to $\kappa(T)$ values computed from the RADCAL database \cite{Grosshandler_1993}.
+The model accommodates temperatures between 300 K and 2500 K and considers the chemical species \ce{CO2}, \ce{H2O}, \ce{CO}, \ce{CH4}.
+%The model accommodates temperatures between 300 K and 2500 K. See \cite{TNF} for details and references. The PM model here considers the species \ce{CO2}, \ce{H2O}, \ce{CO}, \ce{CH4}.
+\ce{CO}, \ce{CH4} contribute significantly less to radiative absorption and emission than \ce{CO2} and \ce{H2O}, but the TNF Workshop radiation model includes them because \ce{CH4} and syngas (which consists of \ce{CO} and \ce{H2}) are common fuels in combustion applications and so are present in high concentrations in the fuel streams of several TNF target flames. Additionally, \ce{CO} is also a common species in rich flame regions and is also included in the RCSLW model.
+%The last two species have lower absorption than the first two, but are included because \ce{CH4} and syngas (consisting of \ce{CO} and \ce{H2}) are common fuels in combustion applications and so are present in the TNF flames in high concentrations in the fuel stream. (\ce{CO} is also a common species in rich flame regions and is also included in the RCSLW model.)
 
-The PM model is not as accurate as the other two models considered, and this is illustrated in Section~\ref{s:discussion}.
-It is implemented in RadLib primarily for comparison and evaluation against other radiation property models because of its relatively common use in some simulations.
-The model has been reported to overpredict radiative losses and underpredict flame temperature by as much as 100 K or more \cite{Frank_2000,Zhu_2002,Coelho_2002}, though this will depend strongly on the geometric configuration. Accurate results have been reported for hydrogen jet flames \cite{Barlow_1999}.
+The PM model is not as accurate as the other two models considered, as illustrated by the example cases in Section~\ref{s:discussion}.
+%The PM model is not as accurate as the other two models considered, and this is illustrated in Section~\ref{s:discussion}.
+It is implemented in RadLib primarily for comparison and evaluation against other radiation property models because of its relatively common use in combustion simulations.
+%It is implemented in RadLib primarily for comparison and evaluation against other radiation property models because of its relatively common use in some simulations.
+The PM model reportedly overpredicts radiative losses and underpredicts flame temperature by as much as 100 K or more \cite{Frank_2000,Zhu_2002,Coelho_2002}, though this depends strongly on the geometric configuration of the simulation.
+%The model has been reported to overpredict radiative losses and underpredict flame temperature by as much as 100 K or more \cite{Frank_2000,Zhu_2002,Coelho_2002}, though this will depend strongly on the geometric configuration.
+Accurate results have been reported for hydrogen jet flames \cite{Barlow_1999}.
 
-The PM model is often used in conjunction with the optically-thin approximation for solving the RTE, in which case the radiative source term of the energy transport equation is particularly simple, and the overall computational cost of the radiative treatment is negligible in comparison to other aspects of a reacting flow simulation. Many smaller combustion applications are radiatively thin, and have smaller radiative heat loss. It is not uncommon for non-sooting laboratory-scale research jet flames to have radiative losses of around 5\%. At these levels, the accuracy of the radiative property model is not as crucial, and simpler models like the PM model are appropriate.
+The PM model is most often used in conjunction with the optically thin approximation for solving the RTE, in which case the radiative source term of the energy transport equation reduces to an algebraic expression and the overall computational cost of the radiative treatment is negligible in comparison to other aspects of reacting flow simulations. Many smaller combustion configurations are radiatively thin and experience minimal radiative heat loss; non-sooting laboratory-scale research jet flames, for example, tend to exhibit radiative losses of around 5\%. At low levels of radiative heat loss, the accuracy of the radiation model is not as crucial, and simpler radiative property models like the PM model may be appropriate.
+%The PM model is often used in conjunction with the optically-thin approximation for solving the RTE, in which case the radiative source term of the energy transport equation is particularly simple, and the overall computational cost of the radiative treatment is negligible in comparison to other aspects of a reacting flow simulation. Many smaller combustion applications are radiatively thin, and have smaller radiative heat loss. It is not uncommon for non-sooting laboratory-scale research jet flames to have radiative losses of around 5\%. At these levels, the accuracy of the radiative property model is not as crucial, and simpler models like the PM model are appropriate.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -355,7 +371,7 @@ where $a_j$ is the weighting factor for gas $j$, $b_{i,j}$ is computed as shown 
 \end{equation}
 \end{linenomath}
 %
-where $C_{j,k,i}$ is a correlated model coefficient. The model coefficients $d_{j,k}$ and $C_{j,k,i}$ are provided by Bordbar et~al. \citep{Bordbar_2014,Bordbar_2020} but updated values are used in RadLib.
+where $C_{j,k,i}$ is a correlated model coefficient. The model coefficients $d_{j,k}$ and $C_{j,k,i}$ are provided by Bordbar et~al. \citep{Bordbar_2014,Bordbar_2020}, but updated values are used in RadLib.
 
 This particular WSGG model was chosen for RadLib for its performance, accuracy, and flexibility. Most WSGG models are limited to specific values of the molar \ce{H2O}--\ce{CO2} ratio, or to a limited range of values. This is true of Bordbar et al.'s 2014 model \cite{Bordbar_2014}, which used correlations valid for $0.01\le M_r\le4$. That paper summarizes a number of WSGG models and gives the applicable molar ratio range for several recent WSGG model versions.
 Bordbar et al.~\citep{Bordbar_2020} extended the molar ratio range to arbitrary values by interpolating $\kappa_j$ and $a_j$ between the pure component values and the corresponding limit on $M_r$ for values outside of the correlated range, and that is the model implemented here.
@@ -371,7 +387,7 @@ Other SLW models have been applied to gas--soot mixtures \cite{Solovjov_2001,Sol
 
 RadLib implements the RCSLW method presented by Solovjov et al. \cite{Solovjov_2017} as method I.2.2, which gives the best and most consistent results of the SLW methods discussed in the aforementioned study. A summary of the general SLW method and the RCSLW method are presented here, but more detailed information about these and other SLW methods can be found in the literature \cite{Solovjov_2000, Solovjov_2001, Solovjov_2008, Solovjov_2011, Solovjov_2014, Solovjov_2016, Solovjov_2017, Webb_2018}.
 
-SLW and WSGG models are similar in that they approximate real gas mixtures with a set of radiatively gray gases, but differ in the way the gray gases are constructed. In traditional WSGG models, the component gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \citep{Badger_2019}. In SLW approaches, however, the gases are gray in a given spectral band by construction. Rather than defining a gray gas $j$ by integrating over a band of sequential wavenumbers $\eta$ (which may have highly variable absorption coefficients), SLW models define a gray gas $j$ by integrating over a set of nonsequential wavenumbers that correspond to a given band of the absorption cross section $C_{\eta}$ with values constant to within the width of the band.
+SLW and WSGG models are similar in that they approximate real gas mixtures with a set of radiatively gray gases, but differ in the way that the gray gases are constructed. In traditional WSGG models, the component gases are only conceptually gray, and the absorption coefficients and weights are determined empirically \citep{Badger_2019}. In SLW approaches, however, the gases are gray in a given spectral band by construction. Rather than defining a gray gas $j$ by integrating over a band of sequential wavenumbers $\eta$ (which may have highly variable absorption coefficients), SLW models define a gray gas $j$ by integrating over a set of nonsequential wavenumbers that correspond to a given band of the absorption cross section $C_{\eta}$ with values constant to within the width of the band.
 
 The absorption cross section is related to the absorption coefficient by $\kappa_\eta=C_\eta N$, where $N$ is the molar density of the radiatively participating gas.
 %
@@ -397,7 +413,9 @@ a_j = F(\tilde{C}_j,\BS{\phi}, T) - F(\tilde{C}_{j-1}, \BS{\phi},T).
 %todo: deal with T versus Tb in e:albdf and previous eqn.
 Note that $F$ varies between zero and one and is monotonic in $C$, which permits calculation of an inverse ALBDF $C(F,\BS{\phi},T)$.
 
-For multicomponent gas mixtures, the mixture absorption cross section $C_{\eta}$ is defined as a weighted sum of its component absorption cross sections \cite{Solovjov_2000}. The RCSLW implementation considers \ce{H2O}, \ce{CO2}, and \ce{CO}, for which the mixture absorption cross section for a given gray gas is given by
+For multicomponent gas mixtures, the mixture absorption cross section $C_{\eta}$ is defined as a weighted sum of its component absorption cross sections \cite{Solovjov_2000}.
+In RadLib, the RCSLW implementation considers \ce{H2O}, \ce{CO2}, and \ce{CO}, for which the mixture absorption cross section for a given gray gas is given by
+%The RCSLW implementation considers \ce{H2O}, \ce{CO2}, and \ce{CO}, for which the mixture absorption cross section for a given gray gas is given by
 %
 \begin{linenomath}
 \begin{equation} \label{e:multiC}
@@ -414,7 +432,8 @@ F_{\eta}(C_{\eta}) = F_{\ce{CO2},\eta} \left( \frac{C_{\eta}}{x_{\ce{CO2}}} \rig
 \end{equation}
 \end{linenomath}
 %
-Here, the $\BS{\phi}$ and $T$ arguments of $F$ are omitted from Eq.~\ref{e:multiF} for clarity.
+Note that the $\BS{\phi}$ and $T$ arguments of $F$ are omitted from Eq.~\ref{e:multiF} for clarity.
+%Here, the $\BS{\phi}$ and $T$ arguments of $F$ are omitted from Eq.~\ref{e:multiF} for clarity.
 
 The spectrally integrated RTE (Eq.~\ref{e:RTE_wsgg}) assumes the sets $\Delta_j$ are independent of spatial position $\mathbf{x}$, but $C_\eta$ depends on the thermodynamic state (denoted by vector $\BS{\phi}$), which does vary spatially.
 %That is, $C_\eta=C_\eta(\eta,\BS{\phi}(\mathbf{x}))$.
