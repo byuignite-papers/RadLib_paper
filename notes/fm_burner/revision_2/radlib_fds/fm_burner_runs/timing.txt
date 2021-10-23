@@ -1,0 +1,5 @@
+case    time     # steps   time/step  relative
+norad    2071    11326    0.1828       1
+default  1848     9758    0.1894       1.036 
+wsgg     2865     9666    0.2964       1.621
+rcslw    3861     9672    0.3992       2.184

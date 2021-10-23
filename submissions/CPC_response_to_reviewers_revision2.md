@@ -97,7 +97,7 @@ for the domain sizes considered in Example S2."**
    can compare the cost of the same FDS configuration simulated without any radiation, with RadLib, and with the
    FDS-default model.
 
-   **FDS simulations were rerun. The cost of the FDS simulations relative to the FDS default radiative case is 1, 1.68, and 1.71, for the default, WSGG, and RCSLW, respectively. This has been added to the paper with a note that the small difference between the WSGG and RCSLW costs imply that the cost is dominated by the solver rather than the property model. The corresponding results plots were updated.**
+   **FDS simulations were rerun along with a case without radiation. The computational costs of the simulations relative to the no radiation case is reported.**
 
 <font color='green'>
 
